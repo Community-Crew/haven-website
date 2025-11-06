@@ -18,9 +18,9 @@ withDefaults(
     </Head>
     <img class="p-8" src="https://www.graphicscycle.com/wp-content/uploads/2023/03/graphic-design-is-my-passion-gif-.gif">
     <div class="p-8">
-        <Link>
+        <a href="/login/redirect">
             login
-        </Link>
+        </a>
     </div>
 
 </template>

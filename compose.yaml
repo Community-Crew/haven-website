@@ -56,9 +56,26 @@ services:
             - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
         networks:
             - sail
+
+    keycloak:
+      image: keycloak/keycloak:latest
+      command: start-dev
+      environment:
+          KEYCLOAK_ADMIN: admin
+          KEYCLOAK_ADMIN_PASSWORD: admin
+          KC_HOSTNAME: keycloak
+          KC_HOSTNAME_PORT: 8080
+      ports:
+        - "8080:8080"
+      networks:
+        - sail
+      volumes:
+        - 'sail-keycloak:/opt/keycloak/data'
 networks:
     sail:
         driver: bridge
 volumes:
     sail-mariadb:
         driver: local
+    sail-keycloak:
+      driver: local
