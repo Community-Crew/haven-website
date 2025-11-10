@@ -1,10 +1,15 @@
 <?php
 
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Auth\AccountValidationController;
+use App\Http\Controllers\Auth\KeycloakLoginController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('login')->name('login.')->group(function () {
-    Route::get('redirect', [AuthController::class, 'redirect'])->name('login.redirect');
-    Route::get('callback', [AuthController::class, 'callback'])->name('login.callback');
+Route::prefix('auth')->name('auth')->group(function () {
+    Route::prefix('login')->name('login')->group(function () {
+        Route::get('redirect', [KeycloakLoginController::class, 'redirect'])->name('redirect');
+        Route::get('callback', [KeycloakLoginController::class, 'callback'])->name('callback');
+    });
+    Route::get('register', [KeycloakLoginController::class, 'register'])->name('register');
+    Route::post('validate', [AccountValidationController::class, 'store'])->name('validate');
 });
 

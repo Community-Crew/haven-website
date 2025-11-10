@@ -89,6 +89,9 @@ class KeycloakProvider extends AbstractProvider implements ProviderInterface
     {
         return (new User)->setRaw($user)->map([
             'id' => $user['sub'],
+            'is_validated' => $user['validated'],
+            'name' => $user['name'],
+            'email' => $user['email'],
         ]);
     }
 }
