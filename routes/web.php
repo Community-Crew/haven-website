@@ -2,16 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
+    return Inertia::render('Welcome', []);
 })->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('test', function () {
+    return Inertia::render('auth/Validation');
+})->name('Test');
 
-require __DIR__.'/settings.php';
+
+
+require __DIR__.'/auth.php';
+require __DIR__.'/onboarding.php';
