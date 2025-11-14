@@ -1,0 +1,74 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import NavBarProfile from '@/components/PublicAppLayout/NavBarProfile.vue';
+
+const isMenuOpen = ref<boolean>(false);
+
+const toggleMenu = (): void => {
+    isMenuOpen.value = !isMenuOpen.value;
+}
+
+const closeMenu = (): void => {
+    isMenuOpen.value = false;
+}
+</script>
+
+<template>
+    <nav class="bg-haven-blue text-haven-yellow shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+
+                <!-- Brand/Logo -->
+                <a href="#" class="text-xl font-bold">Haven Community</a>
+
+                <!-- Desktop Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="" class="hover:text-haven-white transition-colors duration-300">Home</a>
+                    <a href="" class="hover:text-haven-white transition-colors duration-300">Agenda</a>
+                    <a href="" class="hover:text-haven-white transition-colors duration-300">Rooms</a>
+                    <a href="" class="hover:text-haven-white transition-colors duration-300">Contact</a>
+                    <div></div>
+                    <NavBarProfile></NavBarProfile>
+                </div>
+
+                <!-- Mobile Menu Button (Hamburger) -->
+                <div class="md:hidden flex items-center">
+                    <button @click="toggleMenu" class="z-50 focus:outline-none" aria-label="Toggle menu">
+                        <!-- Animated Hamburger/Close Icon -->
+                        <div class="w-6 h-6 flex flex-col justify-around">
+              <span
+                  class="block w-full h-0.5 bg-white transform transition duration-300 ease-in-out"
+                  :class="{'rotate-45 translate-y-[5px]': isMenuOpen}"
+              ></span>
+                            <span
+                                class="block w-full h-0.5 bg-white transition duration-300 ease-in-out"
+                                :class="{'opacity-0': isMenuOpen}"
+                            ></span>
+                            <span
+                                class="block w-full h-0.5 bg-white transform transition duration-300 ease-in-out"
+                                :class="{'-rotate-45 -translate-y-[10px]': isMenuOpen}"
+                            ></span>
+                        </div>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Slide-in Overlay) -->
+        <div
+            class="fixed inset-0 bg-haven-blue bg-opacity-95 z-40 transform md:hidden transition-transform duration-300 ease-in-out"
+            :class="isMenuOpen ? 'translate-x-0' : 'translate-x-full'"
+        >
+            <div class="flex flex-col items-center justify-center h-full space-y-8">
+                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Home</a>
+                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Agenda</a>
+                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Rooms</a>
+                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Contact</a>
+                <a v-if="true" href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Login</a>
+            </div>
+        </div>
+    </nav>
+</template>
+
+<style scoped></style>

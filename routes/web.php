@@ -8,8 +8,10 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('test', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    return Inertia::render('auth/Validation');
+})->name('Test');
+
+
 
 require __DIR__.'/auth.php';
 require __DIR__.'/onboarding.php';

@@ -7,6 +7,8 @@ import { createApp, h } from 'vue';
 import { initializeTheme } from './composables/useAppearance';
 import VueForm from '@vueform/vueform';
 import vueformConfig from './../../vueform.config'
+import { ZiggyVue } from 'ziggy-js';
+import { Ziggy } from './ziggy.js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -21,6 +23,7 @@ createInertiaApp({
         createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(VueForm, vueformConfig)
+            .use(ZiggyVue, Ziggy)
             .mount(el);
     },
     progress: {

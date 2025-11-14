@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 
 withDefaults(
     defineProps<{
@@ -14,11 +15,9 @@ withDefaults(
 <template>
     <Head title="Welcome">
     </Head>
-    <img class="p-8" src="https://www.graphicscycle.com/wp-content/uploads/2023/03/graphic-design-is-my-passion-gif-.gif">
-    <div class="p-8">
-        <a href="/auth/login/redirect">
-            login
-        </a>
-    </div>
-
+    <PublicAppLayout>
+        <div class="bg-haven-white h-auto">
+            TEST
+        </div>
+    </PublicAppLayout>
 </template>

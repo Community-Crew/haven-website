@@ -24,17 +24,14 @@ class KeycloakLoginController extends Controller
 
         $user_is_validated = $keycloak_user->user['validated'];
 
-        if($user_is_validated){
+        if($user_is_validated == 'yes'){
             Auth::login($user);
-            return redirect('/home');
+            return redirect('/');
         } else {
             $request->session()->put('keycloak_id', $user->keycloak_id);
 
             return Inertia::render('auth/Validation', []);
         }
-
-
-        @dd($user);
     }
 
     public function redirect(Request $request){

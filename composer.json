@@ -14,7 +14,8 @@
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9"
+        "laravel/wayfinder": "^0.1.9",
+        "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -77,6 +78,9 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "routes": [
+            "php artisan ziggy:generate --types"
         ]
     },
     "extra": {

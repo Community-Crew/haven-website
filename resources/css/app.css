@@ -7,6 +7,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+    --color-haven-white: #f3e7d5;
+    --color-haven-pink: #ffada0;
+    --color-haven-yellow: #ffbf38;
+    --color-haven-light-blue: #95d3de;
+    --color-haven-black: #000000;
+    --color-haven-red: #f05737;
+    --color-haven-green: #305248;
+    --color-haven-blue: #091d4b;
+}
+
 @theme inline {
     --font-sans:
         Instrument Sans, ui-sans-serif, system-ui, sans-serif,
