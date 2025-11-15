@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import NavBarProfile from '@/components/PublicAppLayout/NavBarProfile.vue';
+import { computed } from 'vue'
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 
 const isMenuOpen = ref<boolean>(false);
 
@@ -65,7 +70,8 @@ const closeMenu = (): void => {
                 <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Agenda</a>
                 <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Rooms</a>
                 <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Contact</a>
-                <a v-if="true" href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Login</a>
+                <a v-if="!user" :href="route('authloginredirect')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Login</a>
+                <a v-if="user" href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">{{ user.name }}</a>
             </div>
         </div>
     </nav>
