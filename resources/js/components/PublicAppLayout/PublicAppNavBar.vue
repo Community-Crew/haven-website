@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import NavBarProfile from '@/components/PublicAppLayout/NavBarProfile.vue';
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -72,6 +73,7 @@ const closeMenu = (): void => {
                 <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Contact</a>
                 <a v-if="!user" :href="route('authloginredirect')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Login</a>
                 <a v-if="user" href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">{{ user.name }}</a>
+                <a v-if="user" :href="route('authlogout')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Logout</a>
             </div>
         </div>
     </nav>

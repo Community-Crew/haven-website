@@ -2,11 +2,12 @@
 declare module 'ziggy-js' {
   interface RouteList {
     "home": [],
-    "Welcome": [],
+    "Test": [],
     "authloginredirect": [],
     "authlogincallback": [],
     "authregister": [],
     "authvalidate": [],
+    "authlogout": [],
     "storage.local": [
         {
             "name": "path",
@@ -16,8 +17,3 @@ declare module 'ziggy-js' {
 }
 }
 export {};
-// declare module 'vue' {
-//     interface ComponentCustomProperties {
-//         route: typeof routeFn;
-//     }
-// }

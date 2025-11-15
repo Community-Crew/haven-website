@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AccountValidationController;
 use App\Http\Controllers\Auth\KeycloakLoginController;
+use App\Http\Controllers\Auth\LogoutController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->name('auth')->group(function () {
@@ -11,5 +12,6 @@ Route::prefix('auth')->name('auth')->group(function () {
     });
     Route::get('register', [KeycloakLoginController::class, 'register'])->name('register');
     Route::post('validate', [AccountValidationController::class, 'store'])->name('validate');
+    Route::get('logout', [LogoutController::class, 'logout'])->name('logout');
 });
 

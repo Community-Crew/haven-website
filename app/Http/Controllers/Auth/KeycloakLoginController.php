@@ -41,4 +41,5 @@ class KeycloakLoginController extends Controller
     public function register(Request $request){
         return redirect(config('services.keycloak.base_url').config('services.keycloak.realm').'account');
     }
+
 }
