@@ -14,6 +14,7 @@ const created_at = new Date(user.value.created_at).toISOString().split('T')[0];
 
 const props = defineProps<{
     unit: Unit;
+    groups: string;
 }>();
 
 </script>
@@ -44,10 +45,8 @@ const props = defineProps<{
                             }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="font-semibold">Primary Group:</span>
-                            <span class="text-brand-dark-blue/80">{{
-                                'WIP'
-                            }}</span>
+                            <span class="font-semibold">Groups:</span>
+                            <span class="text-brand-dark-blue/80">{{ groups }}</span>
                         </div>
                     </div>
                 </ContentCard>

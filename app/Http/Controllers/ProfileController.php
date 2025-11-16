@@ -9,6 +9,7 @@ class ProfileController extends Controller
 {
     public function index(Request $request){
         $unit = $request->user()->unit()->first();
-        return Inertia::render('Profile', ['unit' => $unit]);
+        $groups = $request->user()->groups()->pluck('name')->join(', ');
+        return Inertia::render('Profile', ['unit' => $unit, 'groups' => $groups]);
     }
 }
