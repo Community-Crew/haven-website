@@ -36,4 +36,13 @@ export interface User {
     updated_at: string;
 }
 
+export interface Unit {
+    id: number;
+    building: string;
+    floor: string;
+    unit: string;
+    subunit: string;
+    max_residents: number;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
