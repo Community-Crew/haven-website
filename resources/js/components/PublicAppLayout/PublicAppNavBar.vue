@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import NavBarProfile from '@/components/PublicAppLayout/NavBarProfile.vue';
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
+
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
