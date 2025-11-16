@@ -5,6 +5,8 @@ namespace Database\Seeders;
 
 use App\Models\Unit;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use function Laravel\Prompts\table;
 
 class UnitSeeder extends Seeder
 {
@@ -13,8 +15,12 @@ class UnitSeeder extends Seeder
      */
     public function run(): void
     {
-        Unit::factory()
-            ->count(50)
-            ->create();
+        $path = database_path("seeders/data/units.json");
+        $json = file_exists($path) ? file_get_contents($path) : [];
+        $rows = json_decode($json, true) ?: [];
+
+        if(!empty($rows)){
+            DB::table('units')->insert($rows);
+        }
     }
 }
