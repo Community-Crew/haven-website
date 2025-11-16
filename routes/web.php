@@ -12,7 +12,9 @@ Route::get('test', function () {
     return Inertia::render('auth/Validation');
 })->name('Test');
 
-Route::get('profile', [ProfileController::class, 'index'])->name('profile');
+Route::middleware(['auth'])->group(function () {
+    Route::get('profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile');
+});
 
 
 require __DIR__.'/auth.php';
