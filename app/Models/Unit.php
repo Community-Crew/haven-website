@@ -13,7 +13,9 @@ class Unit extends Model
 
     protected $fillable = [
         'building',
-        'number',
+        'floor',
+        'unit',
+        'subunit',
         'max_residents',
     ];
 
