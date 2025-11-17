@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,7 +14,7 @@ Route::get('test', function () {
 })->name('Test');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile');
+    Route::get('profile', [ProfileController::class, 'index'])->middleware(['auth', CheckRole::class.':view-dashboardds'])->name('profile');
 });
 
 
