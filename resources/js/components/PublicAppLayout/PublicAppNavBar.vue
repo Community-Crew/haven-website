@@ -37,11 +37,9 @@ const closeMenu = (): void => {
                     <NavBarProfile></NavBarProfile>
                 </div>
 
-                <!-- Mobile Menu Button (Hamburger) -->
                 <div class="md:hidden flex items-center">
                     <button @click="toggleMenu" class="z-50 focus:outline-none" aria-label="Toggle menu">
-                        <!-- Animated Hamburger/Close Icon -->
-                        <div class="w-6 h-6 flex flex-col justify-around">
+                        <span class="w-6 h-6 flex flex-col justify-around">
               <span
                   class="block w-full h-0.5 bg-white transform transition duration-300 ease-in-out"
                   :class="{'rotate-45 translate-y-[5px]': isMenuOpen}"
@@ -54,7 +52,7 @@ const closeMenu = (): void => {
                                 class="block w-full h-0.5 bg-white transform transition duration-300 ease-in-out"
                                 :class="{'-rotate-45 -translate-y-[10px]': isMenuOpen}"
                             ></span>
-                        </div>
+                        </span>
                     </button>
                 </div>
 
@@ -72,7 +70,7 @@ const closeMenu = (): void => {
                 <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Rooms</a>
                 <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Contact</a>
                 <a v-if="!user" :href="route('authloginredirect')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Login</a>
-                <a v-if="user" href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">{{ user.name }}</a>
+                <a v-if="user" :href="route('profile')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">{{ user.name }}</a>
                 <a v-if="user" :href="route('authlogout')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Logout</a>
             </div>
         </div>
