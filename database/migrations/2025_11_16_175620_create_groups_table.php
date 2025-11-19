@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('registration_codes', function (Blueprint $table) {
+        Schema::create('groups', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->foreignId('unit_id')->constrained('Units');
-            $table->boolean('is_used')->default(false);
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('registation_codes');
+        Schema::dropIfExists('group');
     }
 };

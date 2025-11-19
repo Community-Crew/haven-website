@@ -62,7 +62,6 @@ class AccountValidationController extends Controller
             ]);
 
             if ($tokenResponse->failed()) {
-                @dd($tokenResponse);
                 return false;
             }
 

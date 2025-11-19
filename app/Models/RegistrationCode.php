@@ -16,6 +16,10 @@ class RegistrationCode extends Model
         'is_used',
     ];
 
+    protected $casts = [
+        'is_used' => 'boolean',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (RegistrationCode $registrationCode) {

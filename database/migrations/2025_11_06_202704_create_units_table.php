@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('units', function (Blueprint $table) {
+        Schema::create('Units', function (Blueprint $table) {
             $table->id();
             $table->string('building');
-            $table->string('number');
+            $table->string('floor');
+            $table->string('unit');
+            $table->string('subunit')->nullable();
             $table->integer('max_residents');
             $table->timestamps();
         });

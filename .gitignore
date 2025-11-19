@@ -27,3 +27,4 @@ yarn-error.log
 /.vscode
 /.zed
 /docs/.$database.drawio.bkp
+resources/js/ziggy.*

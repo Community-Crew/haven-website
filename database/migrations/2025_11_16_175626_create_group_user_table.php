@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('registration_codes', function (Blueprint $table) {
-            $table->id();
-            $table->string('code')->unique();
-            $table->foreignId('unit_id')->constrained('Units');
-            $table->boolean('is_used')->default(false);
-            $table->timestamps();
+        Schema::create('group_user', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('group_id')->constrained()->cascadeOnDelete();
+            $table->primary(['user_id', 'group_id']);
         });
     }
 
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('registation_codes');
+        Schema::dropIfExists('group_user');
     }
 };
