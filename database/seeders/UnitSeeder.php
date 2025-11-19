@@ -15,7 +15,7 @@ class UnitSeeder extends Seeder
      */
     public function run(): void
     {
-        $path = database_path("seeders/data/Units.json");
+        $path = database_path("seeders/data/units.json");
         $json = file_exists($path) ? file_get_contents($path) : [];
         $rows = json_decode($json, true) ?: [];
 
