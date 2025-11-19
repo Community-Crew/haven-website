@@ -20,7 +20,7 @@ class UnitSeeder extends Seeder
         $rows = json_decode($json, true) ?: [];
 
         if(!empty($rows)){
-            DB::table('Units')->insert($rows);
+            DB::table('units')->insert($rows);
         }
     }
 }
