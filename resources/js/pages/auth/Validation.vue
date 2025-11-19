@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ContentCard from '@/components/ContentCard.vue';
 import InputError from '@/components/InputError.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import TextInput from '@/components/TextInput.vue';
@@ -30,7 +31,7 @@ const formatRegistrationCode = (event: Event) => {
     } else {
         form.registration_code = cleaned;
     }
-}
+};
 </script>
 
 <template>
@@ -39,45 +40,45 @@ const formatRegistrationCode = (event: Event) => {
     <div
         class="flex h-screen flex-col items-center justify-center bg-haven-white"
     >
-        <div class="bg-haven-light-blue text-haven-black m-8 rounded-2xl w-sm">
-            <div class="flex flex-col p-4 items-center">
-                <p class="text-2xl pb-2 font-bold">Validate your account</p>
-                <p>
-                    Use the code you have received by the Haven Community Crew!
-                </p>
-            </div>
-        </div>
-        <div class="w-sm rounded-2xl bg-haven-light-blue">
-            <form @submit.prevent="submit" class="p-8">
-                <div>
-                    <TextInput
-                        id="registration_code"
-                        v-model="form.registration_code"
-                        @input="formatRegistrationCode"
-                        type="text"
-                        class="mt-1 block h-20 w-full bg-haven-white text-center text-5xl font-bold font-mono text-haven-black"
-                        required
-                        autofocus
-                        maxlength="9"
-                        placeholder="AAAA-1234"
-                    />
-                    <InputError
-                        class="mt-2"
-                        :message="form.errors.registration_code"
-                    />
+        <ContentCard title="Validate Account">
+            <div class="flex flex-col items-center">
+                <div class="items-center text-haven-black font-semibold">
+                    <p>
+                        Use the code you have received by the Haven Community
+                        Crew!
+                    </p>
                 </div>
+                <form @submit.prevent="submit" class="p-8">
+                    <div>
+                        <TextInput
+                            id="registration_code"
+                            v-model="form.registration_code"
+                            @input="formatRegistrationCode"
+                            type="text"
+                            class="mt-1 block h-20 w-[10ch] bg-haven-white text-center font-mono text-5xl font-bold text-haven-black"
+                            required
+                            autofocus
+                            maxlength="9"
+                            placeholder="AAAA-1234"
+                        />
+                        <InputError
+                            class="mt-2"
+                            :message="form.errors.registration_code"
+                        />
+                    </div>
 
-                <div class="mt-4 flex items-center justify-center">
-                    <PrimaryButton
-                        class="h-2xl"
-                        :class="{ 'opacity-25': form.processing }"
-                        :disabled="form.processing"
-                    >
-                        Validate Account
-                    </PrimaryButton>
-                </div>
-            </form>
-        </div>
+                    <div class="mt-4 flex items-center justify-center">
+                        <PrimaryButton
+                            class="h-2xl bg-haven-blue "
+                            :class="{ 'opacity-25': form.processing }"
+                            :disabled="form.processing"
+                        >
+                            <span class="text-haven-yellow">Validate</span>
+                        </PrimaryButton>
+                    </div>
+                </form>
+            </div>
+        </ContentCard>
     </div>
 </template>
 

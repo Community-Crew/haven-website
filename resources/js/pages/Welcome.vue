@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
-
-withDefaults(
-    defineProps<{
-        canRegister: boolean;
-    }>(),
-    {
-        canRegister: true,
-    },
-);
 </script>
 
 <template>
