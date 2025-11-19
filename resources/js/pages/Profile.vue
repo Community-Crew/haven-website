@@ -54,7 +54,7 @@ const props = defineProps<{
                 <ContentCard title="Unit" position="end">
                     <div class="text-haven-black">
                         <h2 class="mt-4 text-2xl font-bold">
-                            {{ props.unit.building + " " + props.unit.floor.padStart(2, '0') + props.unit.unit.padStart(2, '0') + props.unit.subunit }}
+                            {{ props.unit.name }}
                         </h2>
                     </div>
                     <hr class="my-6 border-t border-haven-blue/20" />

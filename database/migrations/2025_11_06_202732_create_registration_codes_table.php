@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('registration_codes', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->foreignId('unit_id')->constrained('units');
+            $table->foreignId('unit_id')->constrained('Units');
             $table->boolean('is_used')->default(false);
             $table->timestamps();
         });

@@ -17,7 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-        $middleware->redirectGuestsTo(fn (Request $request) => route('authloginredirect'));
+        $middleware->redirectGuestsTo(fn (Request $request) => route('auth.login.redirect'));
         $middleware->alias([
             'role' => CheckRole::class
         ]);

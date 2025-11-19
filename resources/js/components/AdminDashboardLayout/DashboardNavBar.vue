@@ -30,9 +30,7 @@ const closeMenu = (): void => {
                 <!-- Desktop Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="" class="hover:text-haven-white transition-colors duration-300">Home</a>
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Agenda</a>
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Rooms</a>
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Contact</a>
+                    <a :href="route('admin.units.index')" class="hover:text-haven-white transition-colors duration-300">Units</a>
                     <div></div>
                     <NavBarProfile></NavBarProfile>
                 </div>
@@ -65,10 +63,7 @@ const closeMenu = (): void => {
             :class="isMenuOpen ? 'translate-x-0' : 'translate-x-full'"
         >
             <div class="flex flex-col items-center justify-center h-full space-y-8">
-                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Home</a>
-                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Agenda</a>
-                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Rooms</a>
-                <a href="" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Contact</a>
+                <a :href="route('home')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Home</a>
                 <a v-if="!user" :href="route('auth.login.redirect')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Login</a>
                 <a v-if="user" :href="route('profile')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">{{ user.name }}</a>
                 <a v-if="user" :href="route('auth.logout')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Logout</a>
