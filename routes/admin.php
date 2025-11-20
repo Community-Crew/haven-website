@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminDashboard\AdminDashboardController;
+use App\Http\Controllers\AdminDashboard\RegistrationCodeController;
 use App\Http\Controllers\AdminDashboard\UnitController;
-use App\Http\Controllers\RegistrationCodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->middleware(['auth', 'role:view-dashboard'])->name('admin.')->group(function () {
