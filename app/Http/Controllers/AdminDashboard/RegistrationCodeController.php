@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AdminDashboard;
 
+use App\Http\Controllers\Controller;
 use App\Models\RegistrationCode;
 use App\Models\Unit;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
