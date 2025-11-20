@@ -63,16 +63,20 @@ const copyToClipboard = (code: string) => {
                         >
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="font-semibold">Floor:</span>
+                        <span v-if="unit.building == 'Terra'" class="font-semibold">House Number:</span>
+                        <span v-else class="font-semibold">Floor:</span>
                         <span class="text-brand-dark-blue/80">{{
-                            props.unit.floor.padStart(2, '0')
+                                props.unit.floor.toString().padStart(2, '0')
                         }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="font-semibold">Unit:</span>
-                        <span class="text-brand-dark-blue/80">{{
-                            props.unit.unit.padStart(2, '0')
+                        <span v-if="unit.building == 'Terra'" class="text-brand-dark-blue/80">{{
+                                props.unit.unit
                         }}</span>
+                        <span v-else class="text-brand-dark-blue/80">{{
+                                props.unit.unit.padStart(2, '0')
+                            }}</span>
                     </div>
                     <div
                         v-if="props.unit.subunit"
