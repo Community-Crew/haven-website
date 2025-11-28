@@ -81,4 +81,9 @@ class RegistrationCodePolicy
         return in_array('admin-'.$this->resource.'-force_delete', $roles)
             || in_array('admin-'.$this->resource.'-force_delete-'.$registrationCode->id, $roles);
     }
+
+    public function print(User $user, RegistrationCode $registrationCode): bool
+    {
+        return in_array('admin-'.$this->resource.'-print', $this->getUserRoles());
+    }
 }
