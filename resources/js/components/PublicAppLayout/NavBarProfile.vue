@@ -78,7 +78,7 @@ onUnmounted(() => {
                     >Profile</a
                 >
                 <a
-                    :href="route('authlogout')"
+                    :href="route('auth.logout')"
                     class="block px-4 py-2 text-sm text-haven-green hover:bg-gray-100"
                     >Logout</a
                 >
