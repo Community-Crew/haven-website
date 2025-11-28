@@ -43,7 +43,6 @@ class UnitController extends Controller
                 ->where('building', $request->input('building'))
                 ->select('floor')
                 ->distinct()
-                ->orderByRaw('CAST(floor AS UNSIGNED) ASC')
                 ->pluck('floor'),
         ]);
     }
