@@ -2,9 +2,8 @@
 import ContentCard from '@/components/ContentCard.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import { registrationCode, Unit, User } from '@/types';
-import { getCurrentInstance, ref } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-
+import { getCurrentInstance, ref } from 'vue';
 
 const app = getCurrentInstance();
 const route = app?.appContext.config.globalProperties.route;
@@ -63,20 +62,26 @@ const copyToClipboard = (code: string) => {
                         >
                     </div>
                     <div class="flex items-center justify-between">
-                        <span v-if="unit.building == 'Terra'" class="font-semibold">House Number:</span>
+                        <span
+                            v-if="unit.building == 'Terra'"
+                            class="font-semibold"
+                            >House Number:</span
+                        >
                         <span v-else class="font-semibold">Floor:</span>
                         <span class="text-brand-dark-blue/80">{{
-                                props.unit.floor.toString().padStart(2, '0')
+                            props.unit.floor.toString().padStart(2, '0')
                         }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="font-semibold">Unit:</span>
-                        <span v-if="unit.building == 'Terra'" class="text-brand-dark-blue/80">{{
-                                props.unit.unit
-                        }}</span>
+                        <span
+                            v-if="unit.building == 'Terra'"
+                            class="text-brand-dark-blue/80"
+                            >{{ props.unit.unit }}</span
+                        >
                         <span v-else class="text-brand-dark-blue/80">{{
-                                props.unit.unit.padStart(2, '0')
-                            }}</span>
+                            props.unit.unit.padStart(2, '0')
+                        }}</span>
                     </div>
                     <div
                         v-if="props.unit.subunit"
@@ -126,23 +131,43 @@ const copyToClipboard = (code: string) => {
                         class="flex items-center justify-between rounded-md bg-gray-50 p-3"
                     >
                         <div>
-                        <span class="font-mono text-base font-bold text-gray-800">
-                            {{ regCode.code }}
-                        </span>
+                            <span
+                                v-if="regCode.is_used"
+                                class="font-mono text-base font-bold text-gray-800 line-through"
+                            >
+                                {{ regCode.code }}
+                            </span>
+                            <span
+                                v-else
+                                class="font-mono text-base font-bold text-gray-800"
+                            >
+                                {{ regCode.code }}
+                            </span>
                         </div>
 
                         <!-- Right side: The action buttons -->
                         <div class="flex items-center space-x-6">
                             <button
-                                @click="copyToClipboard(regCode.code)"
-                                class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                                v-if="regCode.is_used"
+                                class="text-sm font-semibold text-gray-600 transition-colors"
                             >
-                                {{ copiedCode === regCode.code ? 'Copied!' : 'Copy' }}
+                                {{ 'Used' }}
+                            </button>
+                            <button
+                                v-else
+                                @click="copyToClipboard(regCode.code)"
+                                class="text-sm font-semibold text-blue-600 transition-colors hover:text-blue-800"
+                            >
+                                {{
+                                    copiedCode === regCode.code
+                                        ? 'Copied!'
+                                        : 'Copy'
+                                }}
                             </button>
 
                             <button
                                 @click="deleteCode(regCode.id)"
-                                class="text-sm font-semibold text-red-600 hover:text-red-800 transition-colors"
+                                class="text-sm font-semibold text-red-600 transition-colors hover:text-red-800"
                             >
                                 Delete
                             </button>
