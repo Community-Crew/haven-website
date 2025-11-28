@@ -34,7 +34,7 @@ onUnmounted(() => {
 <template>
     <div v-if="!user">
         <a
-            :href="route('authloginredirect')"
+            :href="route('auth.login.redirect')"
             class="transition-colors duration-300 hover:text-haven-white"
             >Login</a
         >
