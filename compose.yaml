@@ -25,6 +25,30 @@ services:
     depends_on:
       - pgsql
       - mailpit
+  #    mariadb:
+  #        image: 'mariadb:11'
+  #        ports:
+  #            - '${FORWARD_DB_PORT:-3306}:3306'
+  #        environment:
+  #            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+  #            MYSQL_ROOT_HOST: '%'
+  #            MYSQL_DATABASE: '${DB_DATABASE}'
+  #            MYSQL_USER: '${DB_USERNAME}'
+  #            MYSQL_PASSWORD: '${DB_PASSWORD}'
+  #            MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+  #        volumes:
+  #            - 'sail-mariadb:/var/lib/mysql'
+  #            - './vendor/laravel/sail/database/mariadb/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+  #        networks:
+  #            - sail
+  #        healthcheck:
+  #            test:
+  #                - CMD
+  #                - healthcheck.sh
+  #                - '--connect'
+  #                - '--innodb_initialized'
+  #            retries: 3
+  #            timeout: 5s
   pgsql:
     image: 'postgres:15'
     ports:
@@ -42,8 +66,8 @@ services:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}" ]
       interval: 5s
       timeout: 5s
-      retries:
-        5
+      retries: 5
+
   mailpit:
     image: 'axllent/mailpit:latest'
     ports:
@@ -51,11 +75,11 @@ services:
       - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
     networks:
       - sail
+
+
 networks:
   sail:
     driver: bridge
 volumes:
   sail-pgsql:
-    driver: local
-  sail-keycloak:
     driver: local

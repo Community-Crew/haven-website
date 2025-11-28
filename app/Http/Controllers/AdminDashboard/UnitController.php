@@ -43,6 +43,7 @@ class UnitController extends Controller
                 ->where('building', $request->input('building'))
                 ->select('floor')
                 ->distinct()
+                ->orderBy('floor')
                 ->pluck('floor'),
         ]);
     }
