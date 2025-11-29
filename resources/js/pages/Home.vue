@@ -9,7 +9,7 @@ import { Head } from '@inertiajs/vue3';
     <Head title="Home"> </Head>
     <PublicAppLayout>
         <HeaderWave></HeaderWave>
-        <div class="grid grid-cols-2 gap-8 sm:grid-cols-1">
+        <div class="grid sm:grid-cols-2 gap-8 grid-cols-1">
             <ContentCard title="Agenda" position="start">
                 <div class="text-center my-5">
                     <span class="text-6xl font-bold">Work In progress</span>
