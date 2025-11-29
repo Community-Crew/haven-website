@@ -3,6 +3,9 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
+import { execSync } from 'child_process';
+
+const gitVersion = execSync('git describe --tags --always').toString().trim()
 
 export default defineConfig({
     plugins: [
@@ -24,4 +27,7 @@ export default defineConfig({
             },
         }),
     ],
+    define: {
+        'import.meta.env.VITE_APP_VERSION': JSON.stringify(gitVersion),
+    },
 });

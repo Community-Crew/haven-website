@@ -68,7 +68,7 @@ const props = defineProps<{
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="font-semibold">Floor:</span>
-                            <span class="text-brand-dark-blue/80">{{ props.unit.floor.padStart(2, '0') }}</span>
+                            <span class="text-brand-dark-blue/80">{{ props.unit.floor.toString().padStart(2, '0') }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="font-semibold">Unit:</span>
