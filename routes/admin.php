@@ -9,5 +9,5 @@ Route::prefix('admin')->middleware(['auth', 'role:view-dashboard'])->name('admin
     Route::get('', [AdminDashboardController::class, 'index'])->name('index');
     Route::Resource('units', UnitController::class);
     Route::Resource('registration-codes', RegistrationCodeController::class)->only(['store', 'destroy', 'show']);
-    Route::get('registration-codes/print/{registrationCode}', [RegistrationCodeController::class, 'print'])->name('registration-codes.print');
+    Route::post('registration-codes/print/{registrationCode}', [RegistrationCodeController::class, 'print'])->name('registration-codes.print');
 });

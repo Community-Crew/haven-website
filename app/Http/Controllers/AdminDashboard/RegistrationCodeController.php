@@ -5,11 +5,13 @@ namespace App\Http\Controllers\AdminDashboard;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationCode;
 use App\Models\Unit;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Rawilk\Printing\Facades\Printing;
 
 class RegistrationCodeController extends Controller
 {
@@ -90,13 +92,36 @@ class RegistrationCodeController extends Controller
     public function print(RegistrationCode $registrationCode)
     {
         $this->authorize('print', $registrationCode);
-        $printers = Printing::printers();
-        @dd($printers);
+        $unit = $registrationCode->unit()->first();
 
-        Printing::newPrintTask()
-            ->printer(Printing::defaultPrinter())
-            ->url(route('admin.registration-codes.show', $registrationCode))
-            ->jobTitle($registrationCode['code'])
-            ->send();
+        $pdf = PDF::loadView('pdfs.label', ['regCode' => $registrationCode, 'unit' => $unit]);
+        $pdfContent = $pdf->output();
+
+        try {
+            $agentUrl = config('printing.agent_url');
+            $apiKey = config('printing.agent_api_key');
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/pdf',
+                'X-PRINT-API-KEY' => $apiKey,
+            ])->timeout(10)->send('POST', $agentUrl, [
+                'body' => $pdfContent
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('Print Agent Error: ' . $response->body());
+                // Return with an error flash message
+                return back()->with('error', 'Could not connect to the print agent.');
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Print Agent Connection Exception: ' . $e->getMessage());
+            return back()->with('error', 'Error connecting to the print agent.');
+        }
+
+        // --- THIS IS THE KEY ---
+        // Redirect back with a success flash message. Inertia will handle this gracefully.
+        return back()->with('success', 'Print job sent to the label printer!');
+
     }
 }
