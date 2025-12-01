@@ -52,6 +52,7 @@ export interface Unit {
     max_residents: number;
     residents: number;
     name: string;
+    registration_codes: registrationCode[];
 }
 
 export interface PaginatedLink {

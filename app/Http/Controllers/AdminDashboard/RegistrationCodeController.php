@@ -18,9 +18,18 @@ class RegistrationCodeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', RegistrationCode::class);
+
+        $building = $request->get('building');
+        $floor = $request->get('floor');
+        $units = Unit::with('registrationCodes')
+            ->where('building', $building)
+            ->where('floor', $floor)
+            ->get();
+
+        return Inertia::render('dashboard/registrationCodes/Index', ["units" => $units]);
     }
 
     /**
