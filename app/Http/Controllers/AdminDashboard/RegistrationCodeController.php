@@ -9,7 +9,6 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Rawilk\Printing\Facades\Printing;
 
 class RegistrationCodeController extends Controller
 {
@@ -90,13 +89,5 @@ class RegistrationCodeController extends Controller
     public function print(RegistrationCode $registrationCode)
     {
         $this->authorize('print', $registrationCode);
-        $printers = Printing::printers();
-        @dd($printers);
-
-        Printing::newPrintTask()
-            ->printer(Printing::defaultPrinter())
-            ->url(route('admin.registration-codes.show', $registrationCode))
-            ->jobTitle($registrationCode['code'])
-            ->send();
     }
 }
