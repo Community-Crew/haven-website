@@ -164,6 +164,12 @@ const copyToClipboard = (code: string) => {
                                         : 'Copy'
                                 }}
                             </button>
+                            <a
+                                :href="route('admin.registration-codes.show', regCode.id)"
+                                class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                            >
+                                Print
+                            </a>
 
                             <button
                                 @click="deleteCode(regCode.id)"

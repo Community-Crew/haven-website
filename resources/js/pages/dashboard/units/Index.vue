@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import ContentCard from '@/components/ContentCard.vue';
 import Pagination from '@/components/Pagination/Pagination.vue';
+import UnitCard from '@/components/Units/UnitCard.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import { Filters, Paginator, Unit } from '@/types';
-import UnitCard from '@/components/Units/UnitCard.vue';
-import { ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
+import { ref, watch } from 'vue';
 
 const props = defineProps<{
     units: Paginator<Unit>;
@@ -35,8 +35,8 @@ const reset = () => {
     form.value = {
         building: null,
         floor: null,
-    }
-}
+    };
+};
 </script>
 
 <template>
@@ -44,28 +44,53 @@ const reset = () => {
         <ContentCard class="m-6" title="Units">
             <div class="flex flex-col">
                 <div class="relative">
-                    <div class="flex items-center justify-between ml-8 bg-haven-white p-4 rounded-md shadow-sm">
-                        <div class="flex w-full max-w-md items-center text-haven-black">
+                    <div
+                        class="ml-8 flex items-center justify-between rounded-md bg-haven-white p-4 shadow-sm"
+                    >
+                        <div
+                            class="flex w-full max-w-md items-center text-haven-black"
+                        >
                             <select v-model="form.building" class="form-select">
                                 <option :value="null">All buildings</option>
-                                <option v-for="building in buildings" :key="building" :value="building">
+                                <option
+                                    v-for="building in buildings"
+                                    :key="building"
+                                    :value="building"
+                                >
                                     {{ building }}
                                 </option>
                             </select>
                             <select v-model="form.floor" class="form-select">
                                 <option :value="null">All floors</option>
-                                <option v-for="floor in floors" :key="floor" :value="floor">
+                                <option
+                                    v-for="floor in floors"
+                                    :key="floor"
+                                    :value="floor"
+                                >
                                     {{ floor }}
                                 </option>
                             </select>
                         </div>
-                        <button
-                            class="ml-3 text-sm text-gray-500 hover:text-gray-700"
-                            type="button"
-                            @click="reset"
-                        >
-                            Reset
-                        </button>
+                        <div>
+                            <a
+                                class="ml-3 text-sm text-haven-black "
+                                :href="
+                                    route('admin.registration-codes.index', {
+                                        building: form.building,
+                                        floor: form.floor,
+                                    })
+                                "
+                            >
+                                Print
+                            </a>
+                            <button
+                                class="ml-3 text-sm text-gray-500 hover:text-gray-700"
+                                type="button"
+                                @click="reset"
+                            >
+                                Reset
+                            </button>
+                        </div>
                     </div>
                     <div
                         class="mt-8 rounded-3xl border-2 border-haven-light-blue bg-haven-light-blue/50 p-8 pt-16"
