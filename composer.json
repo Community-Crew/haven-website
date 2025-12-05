@@ -15,6 +15,7 @@
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
+        "spatie/laravel-sluggable": "^3.7",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
