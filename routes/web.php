@@ -9,10 +9,6 @@ Route::get('/', function () {
     return Inertia::render('Home', []);
 })->name('home');
 
-Route::get('test', function () {
-    return Inertia::render('auth/Validation');
-})->name('Test');
-
 Route::middleware(['auth'])->group(function () {
     Route::get('profile', [ProfileController::class, 'index'])->middleware(['auth'])->name('profile');
 });
