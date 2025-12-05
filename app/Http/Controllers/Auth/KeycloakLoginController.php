@@ -23,8 +23,7 @@ class KeycloakLoginController extends Controller
                 'email' => $keycloak_user->getEmail()
             ]
         );
-
-        $user_is_validated = $keycloak_user->user['validated'];
+        $user_is_validated = $keycloak_user->user['validated'] ?? "no";
 
         // Get groups
         $access_token = $keycloak_user->token;
