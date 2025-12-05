@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\RoomStatus;
+use App\Traits\HasS3Image;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -11,13 +12,14 @@ use Spatie\Sluggable\SlugOptions;
 
 class Room extends Model
 {
-    use HasSlug;
+    use HasSlug, HasS3Image;
 
     protected $fillable = [
         'name',
         'slug',
         'description',
         'location',
+        'image_path',
         'status',
     ];
 
