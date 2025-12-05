@@ -20,5 +20,5 @@ class Room extends Model
 
     protected $casts = [
         'status' => RoomStatus::class,
-    ]
+    ];
 }
