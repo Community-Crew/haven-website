@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomController;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -8,6 +9,8 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Home', []);
 })->name('home');
+
+Route::resource('rooms', RoomController::class);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('profile', [ProfileController::class, 'index'])->middleware(['auth'])->name('profile');
