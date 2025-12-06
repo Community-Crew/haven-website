@@ -29,10 +29,10 @@ const closeMenu = (): void => {
 
                 <!-- Desktop Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Home</a>
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Agenda</a>
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Rooms</a>
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Contact</a>
+                    <a :href="route('home')" class="hover:text-haven-white transition-colors duration-300">Home</a>
+                    <a :href="route('wip')" class="hover:text-haven-white transition-colors duration-300">Agenda</a>
+                    <a :href="route('rooms.index')" class="hover:text-haven-white transition-colors duration-300">Rooms</a>
+                    <a :href="route('wip')" class="hover:text-haven-white transition-colors duration-300">Contact</a>
                     <div></div>
                     <NavBarProfile></NavBarProfile>
                 </div>

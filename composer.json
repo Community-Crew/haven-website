@@ -11,10 +11,13 @@
     "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^2.0",
+        "intervention/image-laravel": "^1.5",
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
+        "league/flysystem-aws-s3-v3": "^3.0",
+        "spatie/laravel-sluggable": "^3.7",
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {

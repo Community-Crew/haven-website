@@ -1,22 +1,37 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomController;
 use App\Http\Middleware\CheckRole;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Home', []);
 })->name('home');
 
-Route::get('test', function () {
-    return Inertia::render('auth/Validation');
-})->name('Test');
+Route::resource('rooms', RoomController::class);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('profile', [ProfileController::class, 'index'])->middleware(['auth'])->name('profile');
 });
 
+Route::get('images/placeholder', function () {
+    $url = Cache::remember('hetzner_placeholder_url', 50 * 60, function () {
+        return Storage::disk('hetzner')->temporaryUrl(
+            'placeholder.gif',
+            now()->addMinutes(60)
+        );
+    });
+
+    return redirect($url);
+})->name('image.placeholder');
+
+route::get('wip', function () {
+    return Inertia::render('WIP', []);
+})->name('wip');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';

@@ -89,6 +89,21 @@ export interface registrationCode {
     is_used: boolean;
 }
 
+export interface RoomStatus {
+    name: string;
+    label: string;
+    text_color: string;
+    background_color: string;
+}
 
+export interface Room {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    location: string;
+    image_path: string;
+    status: RoomStatus;
+}
 
 export type BreadcrumbItemType = BreadcrumbItem;

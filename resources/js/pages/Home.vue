@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ContentCard from '@/components/ContentCard.vue';
 import HeaderWave from '@/components/HeaderWave.vue';
+import S3Image from '@/components/S3Image.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { Head } from '@inertiajs/vue3';
 </script>
@@ -9,15 +10,24 @@ import { Head } from '@inertiajs/vue3';
     <Head title="Home"> </Head>
     <PublicAppLayout>
         <HeaderWave></HeaderWave>
-        <div class="grid sm:grid-cols-2 gap-8 grid-cols-1">
+        <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
             <ContentCard title="Agenda" position="start">
-                <div class="text-center my-5">
+                <div class="my-5 text-center">
                     <span class="text-6xl font-bold">Work In progress</span>
+                    <S3Image
+                        class="h-full w-full"
+                    />
                 </div>
+
             </ContentCard>
             <ContentCard title="Latest News" position="end">
-                <div class="text-center my-5">
-                    <span class="text-6xl font-bold">Work In progress <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/></span>
+                <div class="my-5 text-center">
+                    <span class="text-6xl font-bold"
+                        >Work In progress
+                        </span>
+                    <S3Image
+                        class="h-full w-full"
+                    />
                 </div>
             </ContentCard>
         </div>

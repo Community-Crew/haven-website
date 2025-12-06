@@ -1,0 +1,6 @@
+[
+    {"name": "Hangout Downstairs","description": "Hangout time is vibing time.", "location": "Blauwe Loper 61", "status": "available"},
+    {"name": "Movie room","description": "Lets watch epic movie.", "location": "Castor 7th Floor", "status": "maintenance"},
+    {"name": "Dining room","description": "Jummy jummy jum food.", "location": "Castor 5th Floor", "status": "cleaning"},
+    {"name": "Hangout Upstairs","description": "Hangout movie time.", "location": "Blauwe Loper 61", "status": "occupied"}
+]

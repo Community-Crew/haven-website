@@ -20,6 +20,7 @@ const error = computed(() => page.props.session);
         ></ErrorPopup>
         <main class="flex-grow overflow-y-auto bg-haven-white">
             <slot />
+            <div class="w-full h-0 pb-[9%] shrink-0 pointer-events-none"/>
         </main>
         <footer class="w-full flex-shrink-0">
             <Footer class="flex-shrink-0" />
