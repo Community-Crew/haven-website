@@ -3,16 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Models\Unit;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class RoomController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
+     * @throws AuthorizationException
      */
     public function index()
     {
-        //
+        return Inertia::render('rooms/Index', ['rooms' => Room::all()]);
     }
 
     /**

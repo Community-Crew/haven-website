@@ -58,4 +58,13 @@ class Room extends Model
         });
     }
 
+    public function toArray()
+    {
+        $attributes = parent::toArray();
+
+        $attributes['status'] = $this->status->jsonSerialize();
+
+        return $attributes;
+    }
+
 }

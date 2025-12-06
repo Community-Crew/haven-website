@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 type CardPosition = 'start' | 'end' | 'middle' | 'full';
 interface Props {
-    title: string;
+    title?: string;
     position?: CardPosition;
 }
 
@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // right rounding.
 const cardBodyClasses = computed<string>(() => {
-    const baseClasses = 'bg-haven-light-blue p-6 pt-12 h-full';
+    const baseClasses = 'bg-haven-light-blue p-6 h-full ' + (props.title ? 'pt-12' : 'p-6');
 
     let roundingClasses = 'rounded-none';
 
@@ -26,6 +26,7 @@ const cardBodyClasses = computed<string>(() => {
             break;
         case 'full':
             roundingClasses += ' md:rounded-none';
+            break;
         case 'middle':
             roundingClasses += ' md:rounded-3xl';
             break;
@@ -69,7 +70,9 @@ const headerStyle = computed(() => {
 
 <template>
     <div class="relative pt-6">
-        <div class="absolute top-0 left-1/2 z-10 w-max -translate-x-1/2">
+        <div
+            v-if="props.title"
+            class="absolute top-0 left-1/2 z-10 w-max -translate-x-1/2">
             <div
                 class="bg-haven-blue px-10 py-3 font-bold text-haven-yellow shadow-md"
                 :style="headerStyle"

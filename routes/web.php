@@ -18,7 +18,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('profile', [ProfileController::class, 'index'])->middleware(['auth'])->name('profile');
 });
 
-Route::get('/images/placeholder', function () {
+Route::get('images/placeholder', function () {
     $url = Cache::remember('hetzner_placeholder_url', 50 * 60, function () {
         return Storage::disk('hetzner')->temporaryUrl(
             'placeholder.gif',
@@ -28,6 +28,10 @@ Route::get('/images/placeholder', function () {
 
     return redirect($url);
 })->name('image.placeholder');
+
+route::get('wip', function () {
+    return Inertia::render('WIP', []);
+})->name('wip');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
