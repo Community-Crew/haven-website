@@ -3,7 +3,7 @@ const appVersion = import.meta.env.VITE_APP_VERSION;
 </script>
 
 <template>
-    <footer class="relative bg-haven-blue">
+    <footer class="relative z-10">
         <div class="absolute bottom-full left-0 w-full leading-none pointer-events-none">
             <svg
                 xmlns="http://www.w3.org/2000/svg"

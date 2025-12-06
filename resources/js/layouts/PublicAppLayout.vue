@@ -15,8 +15,9 @@ const error = computed(()=> page.props.session)
         <ErrorPopup class="fixed max-h-20 top-4 right-4 z-50" v-if="error" :message="error.toString()" type="error"></ErrorPopup>
         <main class="flex-grow overflow-y-auto bg-haven-white">
             <slot />
+            <div class="w-full h-0 pb-[9%] shrink-0 pointer-events-none"/>
         </main>
-        <Footer class="flex-shrink-0 bg-haven-white" />
+        <Footer />
     </div>
 </template>
 
