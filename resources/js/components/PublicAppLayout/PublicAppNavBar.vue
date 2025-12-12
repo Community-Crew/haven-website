@@ -73,6 +73,11 @@ const closeMenu = (): void => {
                 <a v-if="user" :href="route('profile')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">{{ user.name }}</a>
                 <a v-if="user" :href="route('auth.logout')" @click="closeMenu" class="text-haven-yellow text-3xl hover:text-haven-red">Logout</a>
             </div>
+            <div
+                class="absolute bottom-8 w-full flex justify-center items-center gap-x-1 font-mono text-xs"
+            >
+                <a class="font-semibold text-white/75" :href="route('privacy-policy')">Privacy Policy</a>
+            </div>
         </div>
     </nav>
 </template>
