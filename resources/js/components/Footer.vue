@@ -22,6 +22,11 @@ const appVersion = import.meta.env.VITE_APP_VERSION;
             {{ appVersion }}
         </p>
         <div
+            class="hidden absolute bottom-8 left-6 sm:flex items-center gap-x-1 font-mono text-xs text-white/50 select-none"
+        >
+            <a class="font-semibold text-white/75 hover:underline" :href="route('privacy-policy')">Privacy Policy</a>
+        </div>
+        <div
             class="hidden absolute bottom-4 left-6 sm:flex items-center gap-x-1 font-mono text-xs text-white/50 select-none"
         >
             <p>Made with</p>

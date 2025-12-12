@@ -29,6 +29,10 @@ Route::get('images/placeholder', function () {
     return redirect($url);
 })->name('image.placeholder');
 
+Route::get('privacy-policy', function () {
+    return Inertia::render('PrivacyPolicy');
+})->name('privacy-policy');
+
 route::get('wip', function () {
     return Inertia::render('WIP', []);
 })->name('wip');
