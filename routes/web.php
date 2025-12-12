@@ -33,5 +33,5 @@ route::get('wip', function () {
     return Inertia::render('WIP', []);
 })->name('wip');
 
-require __DIR__.'/auth.php';
-require __DIR__.'/admin.php';
+require __DIR__ . '/auth.php';
+require __DIR__ . '/admin.php';
