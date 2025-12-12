@@ -25,7 +25,7 @@ import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
                     <li><span class="font-bold text-gray-900">Waarom:</span> Zodat jij de community kunt gebruiken en de website werkt.</li>
                     <li><span class="font-bold text-gray-900">Verkopen we je data?</span> Nee, nooit.</li>
                     <li><span class="font-bold text-gray-900">Cookies?</span> Alleen de noodzakelijke om te zorgen dat je ingelogd blijft. Geen trackers.</li>
-                    <li><span class="font-bold text-gray-900">Wegwezen?</span> Wil je dat we je gegevens verwijderen? Stuur ons een mailtje &rarr; <a href="mailto:privacy@havencommunity.nl" class="text-blue-600 hover:underline">privacy@havencommunity.nl</a>.</li>
+                    <li><span class="font-bold text-gray-900">Wegwezen?</span> Wil je dat we je gegevens verwijderen? Stuur ons een mailtje &rarr; <a href="mailto:fg@havencommunity.nl" class="text-blue-600 hover:underline">fg@havencommunity.nl</a>.</li>
                 </ul>
             </div>
 
