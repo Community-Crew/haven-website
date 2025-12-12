@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReservationResource;
+use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\Unit;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use function Pest\Laravel\get;
 
 class RoomController extends Controller
 {
@@ -43,7 +48,10 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        //
+        $reservations = Reservation::with('user')
+        ->whereBetween('start_at', [Carbon::now()->startOfDay(), Carbon::now()->addDays(7)->endOfDay()])
+            ->get();
+        return Inertia::render('rooms/Show', ['room' => $room, 'reservations' => ReservationResource::collection($reservations)]);
     }
 
     /**

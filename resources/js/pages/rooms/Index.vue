@@ -4,6 +4,7 @@ import HeaderWave from '@/components/HeaderWave.vue';
 import S3Image from '@/components/S3Image.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { Room } from '@/types';
+import { Link } from '@inertiajs/vue3';
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core';
 
 const props = defineProps<{
@@ -28,48 +29,52 @@ const getCardPosition = (index: number) => {
     <PublicAppLayout>
         <HeaderWave />
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 2xl:grid-cols-3">
-            <ContentCard
+            <Link
                 v-for="(room, index) in props.rooms"
                 v-bind:key="room.id"
-                :position="getCardPosition(index)"
+                :href="route('rooms.show', room.slug)"
             >
-                <div class="relative pb-2">
-                    <S3Image
-                        class="aspect-video rounded-2xl bg-background"
-                        :src="room.image_path"
-                    />
-                    <div
-                        class="absolute bottom-8 left-0 z-1 h-12 w-fit content-center rounded-r-2xl bg-haven-blue/85 pl-10"
-                    >
-                        <span
-                            class="m-4 text-2xl font-extrabold text-haven-white"
-                        >
-                            {{ room.name }}
-                        </span>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between gap-4 px-2 pt-2">
-                    <p
-                        class="line-clamp-3 flex-1 pl-2 text-lg leading-relaxed font-normal text-haven-black"
-                    >
-                        {{ room.description }}
-                    </p>
-
-                    <div class="shrink-0 pr-2">
+                <ContentCard :position="getCardPosition(index)">
+                    <div class="relative pb-2">
+                        <S3Image
+                            class="aspect-video rounded-2xl bg-background"
+                            :src="room.image_path"
+                        />
                         <div
-                            class="flex items-center justify-center rounded-full px-4 py-2 shadow-sm"
-                            :class="room.status.background_color"
+                            class="absolute bottom-8 left-0 z-1 h-12 w-fit content-center rounded-r-2xl bg-haven-blue/85 pl-10"
                         >
                             <span
-                                :class="room.status.text_color"
-                                class="text-sm font-bold tracking-wide uppercase"
+                                class="m-4 text-2xl font-extrabold text-haven-white"
                             >
-                                {{ room.status.label }}
+                                {{ room.name }}
                             </span>
                         </div>
                     </div>
-                </div>
-            </ContentCard>
+                    <div
+                        class="flex items-center justify-between gap-4 px-2 pt-2"
+                    >
+                        <p
+                            class="line-clamp-3 flex-1 pl-2 text-lg leading-relaxed font-normal text-haven-black"
+                        >
+                            {{ room.description }}
+                        </p>
+
+                        <div class="shrink-0 pr-2">
+                            <div
+                                class="flex items-center justify-center rounded-full px-4 py-2 shadow-sm"
+                                :class="room.status.background_color"
+                            >
+                                <span
+                                    :class="room.status.text_color"
+                                    class="text-sm font-bold tracking-wide uppercase"
+                                >
+                                    {{ room.status.label }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </ContentCard>
+            </Link>
         </div>
     </PublicAppLayout>
 </template>

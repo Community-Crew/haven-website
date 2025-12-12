@@ -106,4 +106,13 @@ export interface Room {
     status: RoomStatus;
 }
 
+export interface Reservation {
+    id: number;
+    title: string;
+    room: Room;
+    start_at: string;
+    end_at: string;
+    user: User;
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
