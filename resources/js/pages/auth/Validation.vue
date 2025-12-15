@@ -5,6 +5,10 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import TextInput from '@/components/TextInput.vue';
 import { Head, useForm } from '@inertiajs/vue3';
 
+const props = defineProps<{
+    error: string | null | undefined;
+}>();
+
 const form = useForm({
     registration_code: '',
 });
@@ -46,6 +50,10 @@ const formatRegistrationCode = (event: Event) => {
                     <p>
                         Use the code you have received by the Haven Community
                         Crew!
+                    </p>
+                    <br/>
+                    <p class="text-center text-haven-red font-semibold">
+                        {{ props.error }}
                     </p>
                 </div>
                 <form @submit.prevent="submit" class="p-8">
