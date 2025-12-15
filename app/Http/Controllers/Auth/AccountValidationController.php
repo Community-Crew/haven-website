@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
+use Inertia\Inertia;
 
 class AccountValidationController extends Controller
 {
@@ -24,18 +26,18 @@ class AccountValidationController extends Controller
         $code = $request->get('registration_code');
         $registrationCode = RegistrationCode::Where(['code' => $code])->first();
 
+        if ($registrationCode == null) {
+            return Inertia::render('auth/Validation', ['error' => 'Invalid registration code']);
+        }
+
         if ($registrationCode['is_used'])
         {
-            return Redirect::route('/')->with('error', 'This registration code already has been used.');
+            return Inertia::render('auth/Validation', ['error' => 'Registration code has been used already!']);
         }
 
         $user = User::where('keycloak_id', $keycloak_id)->firstOrFail();
 
-        $keycloak_update = $this->updateUserInKeycloak($keycloak_id);
-
-        if (!$keycloak_update){
-            @dd($keycloak_update);
-        }
+        $this->updateUserInKeycloak($keycloak_id);
 
         $user['unit_id'] = $registrationCode['unit_id'];
         $user->save();

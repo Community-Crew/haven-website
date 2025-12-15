@@ -10,12 +10,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Laravel\Socialite\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 
 class KeycloakLoginController extends Controller
 {
-    public function callback(Request $request){
-        $keycloak_user = Socialite::driver('keycloak')->user();
+    public function callback(Request $request)
+    {
+        try {
+            $keycloak_user = Socialite::driver('keycloak')->user();
+        } catch (InvalidStateException) {
+            return redirect('auth/login/redirect');
+        }
         $user = User::updateOrCreate(
             ['keycloak_id' => $keycloak_user->getId()],
             [
@@ -40,7 +46,7 @@ class KeycloakLoginController extends Controller
 
 
 
-        if($user_is_validated == 'yes'){
+        if ($user_is_validated == 'yes') {
             Auth::login($user);
             return redirect('/');
         } else {
@@ -50,15 +56,18 @@ class KeycloakLoginController extends Controller
         }
     }
 
-    public function redirect(Request $request){
+    public function redirect(Request $request)
+    {
         return Socialite::driver('keycloak')->redirect();
     }
 
-    public function register(Request $request){
-        return redirect(config('services.keycloak.base_url').config('services.keycloak.realm').'account');
+    public function register(Request $request)
+    {
+        return redirect(config('services.keycloak.base_url') . config('services.keycloak.realm') . 'account');
     }
 
-    protected function syncUserGroups(User $user, array $groupsFromToken){
+    protected function syncUserGroups(User $user, array $groupsFromToken)
+    {
         $groupIds = [];
         foreach ($groupsFromToken as $groupName) {
             $group = Group::firstOrCreate(
