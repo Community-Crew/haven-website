@@ -16,6 +16,8 @@ class Reservation extends Model
         "name",
         "start_at",
         "end_at",
+        "room_id",
+        "user_id",
         "share_user",
         "status",
     ];

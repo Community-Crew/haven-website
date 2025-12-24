@@ -73,7 +73,7 @@ class ReservationController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'room' => 'required|string|max:50',
+            'room' => 'required|exists:rooms,id',
             'start_time' => 'required|date|after:now',
             'end_time' => 'required|date|after:start_time',
         ]);
@@ -88,8 +88,8 @@ class ReservationController extends Controller
             'user_id' => $user->id,
             'name' => $validated['name'],
             'room_id' => $validated['room'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
+            'start_at' => $validated['start_time'],
+            'end_at' => $validated['end_time'],
         ]);
 
         return redirect()->route('admin.reservations.create')
