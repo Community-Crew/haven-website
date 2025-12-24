@@ -19,7 +19,7 @@ class RegistrationCodeSeeder extends Seeder
         $units->each(function (Unit $unit) {
             $number = fake()->numberBetween(0,3);
             RegistrationCode::factory()
-                ->count($number) // We want to create two codes
+                ->count($number)
                 ->create([
                     'unit_id' => $unit->id,
                 ]);
