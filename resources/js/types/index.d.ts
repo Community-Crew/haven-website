@@ -77,10 +77,16 @@ export interface Paginator<T> {
     total: number;
 }
 
-export interface Filters {
+export interface UnitFilters {
     search: string;
     building: string | null;
     floor: string | null;
+}
+
+export interface ReservationFilters {
+    search: string;
+    room: string;
+    status: string;
 }
 
 export interface registrationCode {
@@ -108,10 +114,11 @@ export interface Room {
 
 export interface Reservation {
     id: number;
-    title: string;
+    name: string;
     room: Room;
     start_at: string;
     end_at: string;
+    user_name: string;
     user: User;
 }
 

@@ -3,7 +3,7 @@
 namespace App\Rules;
 
 use App\Models\ReservationPolicy;
-use App\Services\TimeSlotService;
+use App\Services\ReservationPolicyService;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Carbon;
@@ -28,9 +28,9 @@ class ReservationCompliesWithRolePolicy implements ValidationRule
         $reqStart = Carbon::parse($startString);
         $reqEnd   = Carbon::parse($endString);
 
-        $service = new TimeSlotService();
+        $service = new ReservationPolicyService();
 
-        $validRanges = $service->getMergedTimeSlots($reqStart);
+        $validRanges = $service->getMergedTimeSlots($reqStart->dayOfWeek());
 
         if (empty($validRanges)) {
             $fail('No booking options available.');

@@ -4,16 +4,22 @@ namespace App\Policies;
 
 use App\Models\Reservation;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ReservationPolicy
 {
+    protected string $resource = 'reservations';
+
+    private function getUserRoles(): array
+    {
+        // Get roles from session and ensure it's an array, default to empty array if null.
+        return (array) session('roles', []);
+    }
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return in_array('admin-'.$this->resource.'-view', $this->getUserRoles());
     }
 
     /**
@@ -21,15 +27,17 @@ class ReservationPolicy
      */
     public function view(User $user, Reservation $reservation): bool
     {
-        return false;
+        $roles = $this->getUserRoles();
+        return in_array('admin-'.$this->resource.'-view-'.$reservation->id, $roles)
+            || $this->viewAny($user); // You can re-use viewAny for the general permission
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
-        return false;
+        return in_array('admin-'.$this->resource.'-create', $this->getUserRoles());
     }
 
     /**
@@ -37,7 +45,9 @@ class ReservationPolicy
      */
     public function update(User $user, Reservation $reservation): bool
     {
-        return false;
+        $roles = $this->getUserRoles();
+        return in_array('admin-'.$this->resource.'-update', $roles)
+            || in_array('admin-'.$this->resource.'-update-'.$reservation->id, $roles);
     }
 
     /**
@@ -45,7 +55,9 @@ class ReservationPolicy
      */
     public function delete(User $user, Reservation $reservation): bool
     {
-        return false;
+        $roles = $this->getUserRoles();
+        return in_array('admin-'.$this->resource.'-delete', $roles)
+            || in_array('admin-'.$this->resource.'-delete-'.$reservation->id, $roles);
     }
 
     /**
@@ -53,7 +65,9 @@ class ReservationPolicy
      */
     public function restore(User $user, Reservation $reservation): bool
     {
-        return false;
+        $roles = $this->getUserRoles();
+        return in_array('admin-'.$this->resource.'-restore', $roles)
+            || in_array('admin-'.$this->resource.'-restore-'.$reservation->id, $roles);
     }
 
     /**
@@ -61,6 +75,8 @@ class ReservationPolicy
      */
     public function forceDelete(User $user, Reservation $reservation): bool
     {
-        return false;
+        $roles = $this->getUserRoles();
+        return in_array('admin-'.$this->resource.'-force_delete', $roles)
+            || in_array('admin-'.$this->resource.'-force_delete-'.$reservation->id, $roles);
     }
 }

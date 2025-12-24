@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ReservationResource;
-use App\Models\Reservation;
 use App\Models\Room;
-use App\Models\Unit;
-use App\Models\User;
-use Carbon\Carbon;
+use App\Services\ReservationPolicyService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use function Pest\Laravel\get;
 
 class RoomController extends Controller
 {
@@ -48,10 +43,41 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        $reservations = Reservation::with('user')
-        ->whereBetween('start_at', [Carbon::now()->startOfDay(), Carbon::now()->addDays(7)->endOfDay()])
-            ->get();
-        return Inertia::render('rooms/Show', ['room' => $room, 'reservations' => ReservationResource::collection($reservations)]);
+        $reservations = $room->reservations()
+            ->whereTodayOrAfter('start_at')
+            ->with('user')
+            ->orderBy('start_at')
+            ->limit(15)->get();
+
+        $formattedReservations = $reservations->map(function ($reservation) {
+            $data = [
+                'id' => $reservation->id,
+                'start_at' => $reservation->start_at,
+                'end_at' => $reservation->end_at,
+                'name' => $reservation->name,
+                'status' => $reservation->status,
+            ];
+
+            if ($reservation->share_user || $reservation->user == auth()->user()) {
+                $data['user_name'] = $reservation->user->name;
+            }
+
+            return $data;
+        });
+
+
+        $service = new ReservationPolicyService();
+        $policy = [];
+        for ($i = 0; $i < 7; $i++) {
+            $policy[$i] = $service->getMergedTimeSlots($i);
+        }
+        return Inertia::render('rooms/Show',
+            [
+                'room' => $room,
+                'reservations' => $formattedReservations,
+                'policy' => $policy,
+                'maxDaysInAdvance' => $service->getDaysInAdvance()
+            ]);
     }
 
     /**

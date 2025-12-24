@@ -3,14 +3,14 @@ import ContentCard from '@/components/ContentCard.vue';
 import Pagination from '@/components/Pagination/Pagination.vue';
 import UnitCard from '@/components/Units/UnitCard.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
-import { Filters, Paginator, Unit } from '@/types';
+import { UnitFilters, Paginator, Unit } from '@/types';
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
     units: Paginator<Unit>;
-    filters: Filters;
+    filters: UnitFilters;
     buildings: string[];
     floors: string[];
 }>();

@@ -3,9 +3,7 @@
 namespace App\Policies;
 
 use App\Models\RegistrationCode;
-use App\Models\Unit;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class RegistrationCodePolicy
 {

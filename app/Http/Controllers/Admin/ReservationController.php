@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Http\Enums\ReservationStatus;
+use App\Models\Reservation;
+use App\Models\Room;
+use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use ReflectionEnum;
+
+class ReservationController extends Controller
+{
+    use AuthorizesRequests;
+
+    /**
+     * Display a listing of the resource.
+     * @param Request
+     * @return \Inertia\Response
+     */
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', Reservation::class);
+
+        $query = Reservation::query()->with('user', 'room');
+
+
+        $query->when($request->input('room'), function ($query, $room) {
+            $roomObject = Room::where('name', $room)->first();
+            $query->where('room_id', $roomObject->id);
+        });
+
+        $query->when($request->input('status'), function ($query, $status) {
+            $query->where('status', $status);
+        });
+
+        $query->orderBy('start_at');
+
+        $reservations = $query->paginate(25)->withQueryString();
+        $enumReflectionStatues = new ReflectionEnum(ReservationStatus::class);
+        $statuses = array_map(fn($case) => $case->getValue()->value, $enumReflectionStatues->getCases());
+
+        return Inertia::render('dashboard/reservations/Index',
+            [
+                'reservations' => $reservations,
+                'filters' => request()->only('building', 'floor'),
+                'rooms' => Room::all()->pluck('name'),
+                'statuses' => $statuses,
+
+            ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        $this->authorize('create', Reservation::class);
+        return Inertia::render('dashboard/reservations/Create', ['rooms' => Room::all()]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        Log::info('Reservation Store Attempt:', $request->all());
+        $this->authorize('create', Reservation::class);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'room' => 'required|string|max:50',
+            'start_time' => 'required|date|after:now',
+            'end_time' => 'required|date|after:start_time',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user) {
+            return redirect()->route('admin.reservations.create')->with('error', 'No user with this email address.');
+        }
+
+        Reservation::create([
+            'user_id' => $user->id,
+            'name' => $validated['name'],
+            'room_id' => $validated['room'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+        ]);
+
+        return redirect()->route('admin.reservations.create')
+            ->with('success', "Reservation created and linked to user: {$user->name}.");
+
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Reservation $reservation)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Reservation $reservation)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Reservation $reservation)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Reservation $reservation)
+    {
+        //
+    }
+}

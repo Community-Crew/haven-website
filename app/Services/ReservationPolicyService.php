@@ -2,37 +2,27 @@
 
 namespace App\Services;
 
-use App\Models\Reservation;
 use App\Models\ReservationPolicy;
-use App\Models\User;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Session;
 
-class TimeSlotService
+class ReservationPolicyService
 {
-    public function getMergedTimeSlots(Carbon $date)
+    public function getMergedTimeSlots(int $dayOfWeek)
     {
         $roles = session('roles');
 
-        if(empty($roles)){
+        if (empty($roles)) {
             return [];
         }
 
         $policies = ReservationPolicy::whereIn('role_name', $roles)->get();
 
-        if(empty($policies)){
+        if (empty($policies)) {
             return [];
         }
 
         $rawRanges = [];
-        $daysInAdvance = $date->diffInDays(Carbon::now()->startOfDay());
 
         foreach ($policies as $policy) {
-            if ($daysInAdvance > $policy->max_days_in_advance) {
-                continue;
-            }
-
-            $dayOfWeek = $date->dayOfWeek;
             $schedule = $policy->weekly_schedule[$dayOfWeek] ?? null;
 
             if ($schedule) {
@@ -69,5 +59,18 @@ class TimeSlotService
         $merged[] = $current;
 
         return $merged;
+    }
+
+    public function getDaysInAdvance()
+    {
+        $roles = session('roles');
+
+        if (empty($roles)) {
+            return [];
+        }
+
+        return ReservationPolicy::whereIn('role_name', $roles)->pluck('max_days_in_advance')
+            ->toArray();
+
     }
 }

@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use App\RoomStatus;
+use App\Http\Enums\RoomStatus;
 use App\Traits\HasS3Image;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Sluggable\HasSlug;

@@ -20,8 +20,6 @@ class CheckRole
         if(in_array($role, $roles)) {
             return $next($request);
         }
-
-
         return redirect()->back()->with('error', ['Geen permissie (' . $role . ' Benodigd)']);
     }
 }

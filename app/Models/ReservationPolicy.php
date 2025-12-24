@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ReservationPolicy extends Model
 {
@@ -16,4 +17,9 @@ class ReservationPolicy extends Model
     protected $casts = [
         'weekly_schedule' => AsArrayObject::class,
     ];
+
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
+    }
 }

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\AdminDashboard;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Inertia\Inertia;
 
-class AdminDashboardController extends Controller
+class DashboardController extends Controller
 {
     public function index(Response $response)
     {
