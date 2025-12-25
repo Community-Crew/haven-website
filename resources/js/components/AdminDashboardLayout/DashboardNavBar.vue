@@ -21,15 +21,21 @@ const closeMenu = (): void => {
 
 <template>
     <nav class="bg-haven-blue text-haven-yellow shadow-lg">
-        <div class="container mx-auto px-4">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
 
                 <!-- Brand/Logo -->
-                <a href="#" class="text-xl font-bold">Haven Community</a>
+                <div class="flex items-center">
+                    <a :href="route('admin.index')" class="text-xl font-bold">Haven Community</a>
+                    <p class="text-xs align-bottom pt-2">ADMIN</p>
+                    <a :href="route('home')" class="ml-8 bg-haven-yellow text-haven-black p-2 rounded-xl">Back to site</a>
+                </div>
+
 
                 <!-- Desktop Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="" class="hover:text-haven-white transition-colors duration-300">Home</a>
+                    <a :href="route('admin.index')" class="hover:text-haven-white transition-colors duration-300">Home</a>
+                    <a :href="route('admin.reservations.index')" class="hover:text-haven-white transition-colors duration-300">Reservations</a>
                     <a :href="route('admin.units.index')" class="hover:text-haven-white transition-colors duration-300">Units</a>
                     <div></div>
                     <NavBarProfile></NavBarProfile>
