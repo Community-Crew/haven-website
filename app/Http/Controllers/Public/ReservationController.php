@@ -58,7 +58,6 @@ class ReservationController extends Controller
 
 
         $allowedSlots = $service->getMergedTimeSlots($reqStart);
-        Log::info($allowedSlots);
         $dateString = $reqStart->format('Y-m-d');
         $isWithinPolicy = false;
 
