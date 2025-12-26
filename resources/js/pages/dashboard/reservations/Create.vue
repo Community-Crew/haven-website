@@ -28,7 +28,7 @@ const form = useForm<ReservationForm>({
 });
 
 const props = defineProps<{
-    rooms: string[];
+    rooms: Room[];
 }>();
 
 const submit = () => {

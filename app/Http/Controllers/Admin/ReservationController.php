@@ -9,7 +9,7 @@ use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use ReflectionEnum;
 
@@ -68,7 +68,6 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('Reservation Store Attempt:', $request->all());
         $this->authorize('create', Reservation::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -80,6 +79,9 @@ class ReservationController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
+        $startAt = Carbon::parse($validated['start_time'], 'Europe/Amsterdam');
+        $endAt   = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
+
         if (!$user) {
             return redirect()->route('admin.reservations.create')->with('error', 'No user with this email address.');
         }
@@ -88,8 +90,9 @@ class ReservationController extends Controller
             'user_id' => $user->id,
             'name' => $validated['name'],
             'room_id' => $validated['room'],
-            'start_at' => $validated['start_time'],
-            'end_at' => $validated['end_time'],
+            'status' => 'approved',
+            'start_at' => $startAt,
+            'end_at' => $endAt,
         ]);
 
         return redirect()->route('admin.reservations.create')
@@ -102,7 +105,12 @@ class ReservationController extends Controller
      */
     public function show(Reservation $reservation)
     {
-        //
+        $this->authorize('view', $reservation);
+        $reservation = $reservation->load('user', 'room');
+        $enumReflectionStatues = new ReflectionEnum(ReservationStatus::class);
+        $statuses = array_map(fn($case) => $case->getValue()->value, $enumReflectionStatues->getCases());
+
+        return Inertia::render('dashboard/reservations/Show', ['reservation' => $reservation, 'rooms' => Room::all(), 'statuses' => $statuses]);
     }
 
     /**
@@ -118,7 +126,36 @@ class ReservationController extends Controller
      */
     public function update(Request $request, Reservation $reservation)
     {
-        //
+        $this->authorize('update', $reservation);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'room' => 'required|exists:rooms,id',
+            'status' => 'required',
+            'start_time' => 'required|date|after:now',
+            'end_time' => 'required|date|after:start_time',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        $startAt = Carbon::parse($validated['start_time'], 'Europe/Amsterdam');
+        $endAt   = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
+
+        if (!$user) {
+            return redirect()->route('admin.reservations.create')->with('error', 'No user with this email address.');
+        }
+
+
+        $reservation->update([
+            'name' => $validated['name'],
+            'user_id' => $user->id,
+            'room_id' => $validated['room'],
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+            'status' => $validated['status'],
+        ]);
+
+        return redirect()->route('admin.reservations.show', ['reservation' => $reservation]);
     }
 
     /**

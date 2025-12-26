@@ -88,9 +88,10 @@ const reset = () => {
                             v-if="reservations.data.length > 0"
                             class="grid grid-cols-1 gap-x-8 gap-y-2"
                         >
-                            <div
+                            <Link
                                 v-for="reservation in reservations.data"
                                 :key="reservation.id"
+                                :href="route('admin.reservations.show', reservation.id)"
                                 class="place w-full rounded-2xl bg-haven-white/45 p-3 shadow"
                             >
                                 <div class="grid grid-cols-5">
@@ -156,7 +157,7 @@ const reset = () => {
                                     </p>
                                     <p></p>
                                 </div>
-                            </div>
+                            </Link>
                         </div>
 
                         <div v-else class="py-16 text-center">

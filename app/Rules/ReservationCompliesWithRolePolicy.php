@@ -30,7 +30,7 @@ class ReservationCompliesWithRolePolicy implements ValidationRule
 
         $service = new ReservationPolicyService();
 
-        $validRanges = $service->getMergedTimeSlots($reqStart->dayOfWeek());
+        $validRanges = $service->getMergedTimeSlotsOnWeekday($reqStart->dayOfWeek());
 
         if (empty($validRanges)) {
             $fail('No booking options available.');

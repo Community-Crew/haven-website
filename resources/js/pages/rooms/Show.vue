@@ -6,6 +6,8 @@ import S3Image from '@/components/S3Image.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { Reservation, Room } from '@/types';
 import { Link } from '@inertiajs/vue3';
+import ReservationOverlay from '@/components/Reservations/ReservationOverlay.vue';
+import { ref } from 'vue';
 
 const props = defineProps<{
     room: Room;
@@ -13,6 +15,8 @@ const props = defineProps<{
     policy: any[][];
     maxDaysInAdvance: number[];
 }>();
+
+const showReservationModal = ref(false);
 
 const getDateString = (date: Date) => {
     return date.toLocaleDateString('nl-NL', {});
@@ -65,11 +69,11 @@ const getDateString = (date: Date) => {
                     </div>
                     <hr class="my-6 border-t border-haven-blue/20" />
                     <div class="flex w-full content-center justify-end gap-4">
-                        <Link :href="route('wip')">
+                        <button @click="showReservationModal = true">
                             <div class="rounded-2xl bg-haven-blue p-2">
                                 <span>Reserve</span>
                             </div>
-                        </Link>
+                        </button>
                         <Link :href="route('wip')">
                             <div class="rounded-2xl bg-haven-blue p-2">
                                 <span>Notify disturbance</span>
@@ -171,6 +175,7 @@ const getDateString = (date: Date) => {
             </ContentCard>
         </div>
     </PublicAppLayout>
+    <ReservationOverlay :show="showReservationModal" :room="room" @close="showReservationModal = false"/>
 </template>
 
 <style scoped></style>

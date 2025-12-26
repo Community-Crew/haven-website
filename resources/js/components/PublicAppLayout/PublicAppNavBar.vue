@@ -25,7 +25,10 @@ const closeMenu = (): void => {
             <div class="flex justify-between items-center h-16">
 
                 <!-- Brand/Logo -->
-                <a href="#" class="text-xl font-bold">Haven Community</a>
+                <div>
+                    <a :href="route('home')" class="text-xl font-bold">Haven Community</a>
+                    <a v-if="user?.is_admin" :href="route('admin.index')" class="ml-8 bg-haven-yellow text-haven-black p-2 rounded-xl">Admin</a>
+                </div>
 
                 <!-- Desktop Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">

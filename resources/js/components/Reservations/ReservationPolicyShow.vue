@@ -42,39 +42,44 @@ const getIndexFromTime = (timeStr: string): number => {
 
 const timeLabels = computed(() => {
     return Array.from({ length: CONFIG.slotCount }, (_, index) => {
-        // Calculate total minutes from the start of the day (e.g., 8 * 60 = 480)
-        // Add 30 minutes for every index position
         const totalMinutes = CONFIG.startHour * 60 + index * 30;
-
         const hours = Math.floor(totalMinutes / 60);
         const minutes = totalMinutes % 60;
-
-        // Handle midnight wrap (24:00 -> 00:00) and formatting
         const displayH = (hours % 24).toString().padStart(2, '0');
         const displayM = minutes.toString().padStart(2, '0');
-
         return `${displayH}:${displayM}`;
     });
 });
 
 const processedGrid = computed(() => {
-    return props.policy.map((dayEvents) => {
+    if (!props.policy || props.policy.length === 0) return [];
+
+    // --- THE FIX ---
+    // The Input is [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
+    // We want [Mon, Tue, Wed, Thu, Fri, Sat, Sun] to match your labels.
+    // So we slice 1..end (Mon-Sat) and add index 0 (Sun) to the end.
+    const reorderedPolicy = [...props.policy.slice(1), props.policy[0]];
+
+    return reorderedPolicy.map((dayEvents) => {
         const slots: SlotTuple[] = Array.from(
             { length: CONFIG.slotCount },
             () => [CONFIG.defaultClass, CONFIG.defaultText],
         );
 
-        dayEvents.forEach((event) => {
-            const startIndex = getIndexFromTime(event.start);
-            const endIndex = getIndexFromTime(event.end);
+        // Safety check if dayEvents is null/undefined
+        if (dayEvents) {
+            dayEvents.forEach((event) => {
+                const startIndex = getIndexFromTime(event.start);
+                const endIndex = getIndexFromTime(event.end);
 
-            const safeStart = Math.max(0, startIndex);
-            const safeEnd = Math.min(CONFIG.slotCount, endIndex);
+                const safeStart = Math.max(0, startIndex);
+                const safeEnd = Math.min(CONFIG.slotCount, endIndex);
 
-            for (let i = safeStart; i < safeEnd; i++) {
-                slots[i] = [CONFIG.activeClass, CONFIG.activeText];
-            }
-        });
+                for (let i = safeStart; i < safeEnd; i++) {
+                    slots[i] = [CONFIG.activeClass, CONFIG.activeText];
+                }
+            });
+        }
         return slots;
     });
 });
@@ -82,7 +87,7 @@ const processedGrid = computed(() => {
 const getRangeString = (days: number[]) => {
     const daysSet = [...new Set(days)];
     if (daysSet.length == 0) {
-        return 'GeEn?!??!?!?';
+        return 'Unlimited'; // Changed from 'GeEn?!' to something cleaner
     } else if (daysSet.length == 1) {
         return `${daysSet[0]}`;
     }
