@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Public\ReservationController;
 use App\Http\Controllers\RoomController;
-use App\Http\Middleware\CheckRole;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -36,6 +36,8 @@ Route::get('privacy-policy', function () {
 route::get('wip', function () {
     return Inertia::render('WIP', []);
 })->name('wip');
+
+route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';

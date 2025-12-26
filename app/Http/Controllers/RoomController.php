@@ -69,14 +69,14 @@ class RoomController extends Controller
         $service = new ReservationPolicyService();
         $policy = [];
         for ($i = 0; $i < 7; $i++) {
-            $policy[$i] = $service->getMergedTimeSlots($i);
+            $policy[$i] = $service->getMergedTimeSlotsOnWeekday($i);
         }
         return Inertia::render('rooms/Show',
             [
                 'room' => $room,
                 'reservations' => $formattedReservations,
                 'policy' => $policy,
-                'maxDaysInAdvance' => $service->getDaysInAdvance()
+                'maxDaysInAdvance' => $service->getAllDaysInAdvance()
             ]);
     }
 
