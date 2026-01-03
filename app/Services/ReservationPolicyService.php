@@ -3,25 +3,25 @@
 namespace App\Services;
 
 use App\Models\ReservationPolicy;
+use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class ReservationPolicyService
 {
 
-    public function getMergedTimeSlots(Carbon $date)
+    public function getMergedTimeSlots(Carbon $date, Room $room): array
     {
-        $policies = $this->getUserPolicies();
+        $policies = $this->getUserPolicies($room);
 
         if ($policies->isEmpty()) {
             return [];
         }
 
-        // Calculate days difference (normalized to start of day)
         $today = Carbon::now()->startOfDay();
         $targetDate = $date->copy()->startOfDay();
 
-        // Prevent past dates
         if ($targetDate->lt($today)) {
             return [];
         }
@@ -30,11 +30,8 @@ class ReservationPolicyService
         $dayOfWeek = $date->dayOfWeek;
 
         $rawRanges = [];
-
         foreach ($policies as $policy) {
-            // CHECK: Is the date too far in the future?
-            // (Assuming 'days_in_advance' can be null for no limit)
-            if (isset($policy->days_in_advance) && $daysInFuture > $policy->days_in_advance) {
+            if (isset($policy->max_days_in_advance) && (int) $daysInFuture > (int) $policy->max_days_in_advance) {
                 continue;
             }
 
@@ -55,9 +52,9 @@ class ReservationPolicyService
      * Get slots for a generic day of the week (0=Sun, 6=Sat).
      * Ignores 'days_in_advance' (used for showing general policy).
      */
-    public function getMergedTimeSlotsOnWeekday(int $dayOfWeek)
+    public function getMergedTimeSlotsOnWeekday(int $dayOfWeek, Room $room)
     {
-        $policies = $this->getUserPolicies();
+        $policies = $this->getUserPolicies($room);
 
         if ($policies->isEmpty()) {
             return [];
@@ -66,8 +63,6 @@ class ReservationPolicyService
         $rawRanges = [];
 
         foreach ($policies as $policy) {
-            // NO CHECK for days_in_advance here.
-
             $schedule = $policy->weekly_schedule[$dayOfWeek] ?? null;
 
             if ($schedule) {
@@ -81,9 +76,9 @@ class ReservationPolicyService
         return $this->mergeRanges($rawRanges);
     }
 
-    public function getAllDaysInAdvance(): array
+    public function getAllDaysInAdvance(Room $room): array
     {
-        $policies = $this->getUserPolicies();
+        $policies = $this->getUserPolicies($room);
 
         if ($policies->isEmpty()) {
             return [];
@@ -96,14 +91,10 @@ class ReservationPolicyService
             ->all();
     }
 
-    // ----------------------------------------------------------------
-    // PRIVATE HELPERS
-    // ----------------------------------------------------------------
-
     /**
      * Helper to fetch policies based on session roles.
      */
-    private function getUserPolicies(): Collection
+    private function getUserPolicies(Room $room): Collection
     {
         $roles = session('roles');
 
@@ -111,7 +102,7 @@ class ReservationPolicyService
             return collect([]);
         }
 
-        return ReservationPolicy::whereIn('role_name', $roles)->get();
+        return ReservationPolicy::whereIn('role_name', $roles)->where('room_id', $room['id'])->get();
     }
 
     /**
@@ -132,14 +123,11 @@ class ReservationPolicyService
         $current = $rawRanges[0];
 
         foreach ($rawRanges as $range) {
-            // If the new range starts before (or exactly when) the current range ends
             if ($range['start'] <= $current['end']) {
-                // Extend the current range if the new range ends later
                 if ($range['end'] > $current['end']) {
                     $current['end'] = $range['end'];
                 }
             } else {
-                // No overlap, push current and start a new one
                 $merged[] = $current;
                 $current = $range;
             }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Models\Reservation;
+use App\Models\Room;
 use App\Services\ReservationPolicyService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -57,7 +58,7 @@ class ReservationController extends Controller
         $reqEnd = Carbon::createFromFormat('Y-m-d\TH:i', $validated['end_time'], $appTz);
 
 
-        $allowedSlots = $service->getMergedTimeSlots($reqStart);
+        $allowedSlots = $service->getMergedTimeSlots($reqStart, Room::findOrFail($validated['room']));
         $dateString = $reqStart->format('Y-m-d');
         $isWithinPolicy = false;
 

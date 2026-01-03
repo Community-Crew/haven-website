@@ -28,9 +28,13 @@ class ReservationCompliesWithRolePolicy implements ValidationRule
         $reqStart = Carbon::parse($startString);
         $reqEnd   = Carbon::parse($endString);
 
+        if($reqStart->startOfDay() <= $reqEnd->endOfDay() || !$reqStart->isSameDay($reqEnd)) {
+            return;
+        }
+
         $service = new ReservationPolicyService();
 
-        $validRanges = $service->getMergedTimeSlotsOnWeekday($reqStart->dayOfWeek());
+        $validRanges = $service->getMergedTimeSlots($reqStart);
 
         if (empty($validRanges)) {
             $fail('No booking options available.');
@@ -55,9 +59,5 @@ class ReservationCompliesWithRolePolicy implements ValidationRule
 
             $fail("Time unavailable. Your allowed slots are: $availableStr");
         }
-
-
-
-
     }
 }

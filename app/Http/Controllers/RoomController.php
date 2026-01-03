@@ -45,6 +45,7 @@ class RoomController extends Controller
     {
         $reservations = $room->reservations()
             ->whereTodayOrAfter('start_at')
+            ->where('status', '==', 'approved')
             ->with('user')
             ->orderBy('start_at')
             ->limit(15)->get();
@@ -69,14 +70,14 @@ class RoomController extends Controller
         $service = new ReservationPolicyService();
         $policy = [];
         for ($i = 0; $i < 7; $i++) {
-            $policy[$i] = $service->getMergedTimeSlotsOnWeekday($i);
+            $policy[$i] = $service->getMergedTimeSlotsOnWeekday($i, $room);
         }
         return Inertia::render('rooms/Show',
             [
                 'room' => $room,
                 'reservations' => $formattedReservations,
                 'policy' => $policy,
-                'maxDaysInAdvance' => $service->getAllDaysInAdvance()
+                'maxDaysInAdvance' => $service->getAllDaysInAdvance($room)
             ]);
     }
 
