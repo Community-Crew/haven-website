@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Public\ProfileController;
 use App\Http\Controllers\Public\ReservationController;
-use App\Http\Controllers\RoomController;
+use App\Http\Controllers\Public\RoomController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;

@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Public;
 
+use App\Http\Controllers\Controller;
+use App\Http\Enums\ReservationStatus;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -43,28 +45,31 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        $reservations = $room->reservations()
-            ->whereTodayOrAfter('start_at')
-            ->where('status', '==', 'approved')
-            ->with('user')
-            ->orderBy('start_at')
-            ->limit(15)->get();
+        if (request()->user() != null) {
+            $reservations = $room->reservations()
+                ->whereTodayOrAfter('start_at')
+                ->where('status', ReservationStatus::APPROVED->value)
+                ->with('user')
+                ->orderBy('start_at')
+                ->limit(15)->get();
+            $formattedReservations = $reservations->map(function ($reservation) {
+                $data = [
+                    'id' => $reservation->id,
+                    'start_at' => $reservation->start_at,
+                    'end_at' => $reservation->end_at,
+                    'name' => $reservation->name,
+                    'status' => $reservation->status,
+                ];
 
-        $formattedReservations = $reservations->map(function ($reservation) {
-            $data = [
-                'id' => $reservation->id,
-                'start_at' => $reservation->start_at,
-                'end_at' => $reservation->end_at,
-                'name' => $reservation->name,
-                'status' => $reservation->status,
-            ];
+                if ($reservation->share_user || $reservation->user == auth()->user()) {
+                    $data['user_name'] = $reservation->user->name;
+                }
 
-            if ($reservation->share_user || $reservation->user == auth()->user()) {
-                $data['user_name'] = $reservation->user->name;
-            }
-
-            return $data;
-        });
+                return $data;
+            });
+        } else {
+            $formattedReservations = [];
+        }
 
 
         $service = new ReservationPolicyService();
