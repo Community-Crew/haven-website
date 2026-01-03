@@ -29,11 +29,12 @@ const form = useForm({
 // 2. Generate 30-minute time slots (00:00, 00:30, ... 23:30)
 const timeSlots = computed(() => {
     const slots = [];
-    for (let i = 0; i < 24; i++) {
+    for (let i = 8; i < 24; i++) {
         const hour = i.toString().padStart(2, '0');
         slots.push(`${hour}:00`);
         slots.push(`${hour}:30`);
     }
+    slots.push('24:00')
     return slots;
 });
 
@@ -214,7 +215,7 @@ const submit = () => {
                                 <div class="ml-3 text-sm">
                                     <label for="share_name" class="font-medium text-gray-700">Show name publicly</label>
                                     <p class="text-xs text-gray-500">
-                                        Uncheck to show as "Anonymous" to others.
+                                        Uncheck to show as "Anonymous" to other residents.
                                     </p>
                                 </div>
                             </div>

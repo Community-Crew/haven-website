@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import ContentCard from '@/components/ContentCard.vue';
 import HeaderWave from '@/components/HeaderWave.vue';
+import ReservationOverlay from '@/components/Reservations/ReservationOverlay.vue';
 import ReservationPolicyShow from '@/components/Reservations/ReservationPolicyShow.vue';
 import S3Image from '@/components/S3Image.vue';
 import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
 import { Reservation, Room } from '@/types';
-import { Link } from '@inertiajs/vue3';
-import ReservationOverlay from '@/components/Reservations/ReservationOverlay.vue';
+import { Link, usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const props = defineProps<{
+const page = usePage();
+
+defineProps<{
     room: Room;
     reservations: Reservation[];
     policy: any[][];
@@ -83,7 +85,7 @@ const getDateString = (date: Date) => {
                 </ContentCard>
             </div>
             <div
-                class="w-full md:absolute md:inset-y-0 md:right-0 md:w-1/2 md:pl-4"
+                class="w-full hidden md:block md:absolute md:inset-y-0 md:right-0 md:w-1/2 md:pl-4"
             >
                 <ContentCard
                     position="end"
@@ -91,9 +93,13 @@ const getDateString = (date: Date) => {
                     class="h-full"
                 >
                     <ReservationPolicyShow
+                        v-if="page.props.auth.user"
                         :policy="policy"
                         :maxDaysInAdvance="maxDaysInAdvance"
                     />
+                    <div v-else class="text-center text-gray-600">
+                        You need to be logged in to see your policy.
+                    </div>
                 </ContentCard>
             </div>
         </div>
@@ -101,7 +107,7 @@ const getDateString = (date: Date) => {
         <div class="pt-8">
             <ContentCard position="full" title="Reservations">
                 <div v-if="reservations.length > 0">
-                    <div class="grid grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
                         <div
                             v-for="reservation in reservations"
                             :key="reservation.id"
@@ -170,12 +176,16 @@ const getDateString = (date: Date) => {
                     </div>
                 </div>
                 <div v-else class="py-8 text-center text-gray-600">
-                    No reservations found.
+                    No reservations found. <p v-if="!page.props.auth.user">(Are you logged in?)</p>
                 </div>
             </ContentCard>
         </div>
     </PublicAppLayout>
-    <ReservationOverlay :show="showReservationModal" :room="room" @close="showReservationModal = false"/>
+    <ReservationOverlay
+        :show="showReservationModal"
+        :room="room"
+        @close="showReservationModal = false"
+    />
 </template>
 
 <style scoped></style>
