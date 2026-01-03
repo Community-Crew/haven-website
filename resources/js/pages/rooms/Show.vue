@@ -72,9 +72,9 @@ const getDateString = (date: Date) => {
                     <hr class="my-6 border-t border-haven-blue/20" />
                     <div class="flex w-full content-center justify-end gap-4">
                         <button @click="showReservationModal = true">
-                            <div class="rounded-2xl bg-haven-blue p-2">
-                                <span>Reserve</span>
-                            </div>
+                            <span class="rounded-2xl bg-haven-blue p-2">
+                                Reserve
+                            </span>
                         </button>
                         <Link :href="route('wip')">
                             <div class="rounded-2xl bg-haven-blue p-2">
@@ -107,68 +107,42 @@ const getDateString = (date: Date) => {
         <div class="pt-8">
             <ContentCard position="full" title="Reservations">
                 <div v-if="reservations.length > 0">
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
+                    <div class="grid grid-cols-1 gap-4 items-stretch md:grid-cols-3 lg:grid-cols-5">
                         <div
                             v-for="reservation in reservations"
                             :key="reservation.id"
-                            class="rounded-2xl bg-white/30 p-2 shadow"
+                            class="rounded-2xl bg-white/30 p-2 shadow flex flex-col"
                         >
                             <div class="mx-2 h-40 text-haven-black">
-                                <p class="h-16 text-2xl font-medium">
+                                <p class="h-16 text-2xl font-medium line-clamp-2 break-all overflow-hidden leading-8">
                                     {{ reservation.name }}
                                 </p>
-                                <hr class="border-t-2 border-haven-blue/20" />
-                                <div
-                                    class="flex h-20 flex-col rounded-b-2xl p-1"
-                                >
-                                    <div class="grid w-full grid-cols-2">
-                                        <p class="justify-self-start">Date:</p>
-                                        <p class="justify-self-end font-medium">
-                                            {{
-                                                getDateString(
-                                                    new Date(
-                                                        reservation.start_at,
-                                                    ),
-                                                )
-                                            }}
-                                        </p>
-                                    </div>
-                                    <div class="grid w-full grid-cols-2">
-                                        <p class="justify-self-start">Time:</p>
-                                        <p class="justify-self-end font-medium">
-                                            {{
-                                                new Date(
-                                                    reservation.start_at,
-                                                ).toLocaleTimeString([], {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                })
-                                            }}
-                                            -
-                                            {{
-                                                new Date(
-                                                    reservation.end_at,
-                                                ).toLocaleTimeString([], {
-                                                    hour: '2-digit',
-                                                    minute: '2-digit',
-                                                })
-                                            }}
-                                        </p>
-                                    </div>
-                                    <div class="grid w-full grid-cols-2">
-                                        <p class="justify-self-start">Who:</p>
-                                        <p
-                                            v-if="reservation.user_name"
-                                            class="justify-self-end font-medium"
-                                        >
-                                            {{ reservation.user_name }}
-                                        </p>
-                                        <p
-                                            v-else
-                                            class="justify-self-end font-medium"
-                                        >
-                                            Anonymous
-                                        </p>
+                                <div>
+                                    <hr class="border-t-2 border-haven-blue/20" />
+                                    <div class="flex flex-col rounded-b-2xl py-2">
+                                        <div class="grid w-full grid-cols-2">
+                                            <p class="justify-self-start">Date:</p>
+                                            <p class="justify-self-end font-medium">
+                                                {{ getDateString(new Date(reservation.start_at)) }}
+                                            </p>
+                                        </div>
+                                        <div class="grid w-full grid-cols-2">
+                                            <p class="justify-self-start">Time:</p>
+                                            <p class="justify-self-end font-medium">
+                                                {{ new Date(reservation.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
+                                                -
+                                                {{ new Date(reservation.end_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
+                                            </p>
+                                        </div>
+                                        <div class="grid w-full grid-cols-2">
+                                            <p class="justify-self-start">Who:</p>
+                                            <p v-if="reservation.user_name" class="justify-self-end font-medium">
+                                                {{ reservation.user_name }}
+                                            </p>
+                                            <p v-else class="justify-self-end font-medium">
+                                                Anonymous
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

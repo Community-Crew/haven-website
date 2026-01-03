@@ -95,7 +95,7 @@ const reset = () => {
                                 class="place w-full rounded-2xl bg-haven-white/45 p-3 shadow"
                             >
                                 <div class="grid grid-cols-5">
-                                    <p class="font-medium text-haven-black">
+                                    <p class="font-medium text-haven-black line-clamp-1 truncate mr-2">
                                         {{ reservation.name }}
                                     </p>
                                     <p class="text-sm text-gray-500">
