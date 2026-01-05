@@ -6,14 +6,11 @@ const isOpen = ref(false);
 const CONSENT_KEY = 'mmmmh_koekjes';
 
 onMounted(() => {
-    // Check if user has already made a choice
     const consent = localStorage.getItem(CONSENT_KEY);
 
-    // If no choice exists, show the banner
     if (consent === null) {
         isOpen.value = true;
     } else if (consent === 'accepted') {
-        // If they previously accepted, load your tracking scripts here
         initializeAnalytics();
     }
 });
@@ -21,27 +18,11 @@ onMounted(() => {
 const decline = () => {
     localStorage.setItem(CONSENT_KEY, 'declined');
     isOpen.value = false;
-    // Optionally remove existing cookies here if needed
 };
 
 
 const initializeAnalytics = () => {
-    if ((window as any).dataLayer) return; // Prevent double loading
-
-    console.log('Analytics initialized');
-
-    // Example: Load Google Analytics (Replace G-XXXXXXXXXX with your ID)
-    /*
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
-    document.head.appendChild(script);
-
-    (window as any).dataLayer = (window as any).dataLayer || [];
-    function gtag(...args: any[]) { (window as any).dataLayer.push(args); }
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-    */
+    if ((window as any).dataLayer) return;
 };
 
 const accept = () => {
@@ -89,10 +70,6 @@ const accept = () => {
                     >
                         Helemaal prima
                     </button>
-
-                    <!-- Optional 'Decline' button.
-                         Since you only use functional cookies, legally you often don't strictly need a decline
-                         for tracking, but it gives users a feeling of control. -->
                     <button
                         @click="decline"
                         class="w-full justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors"
