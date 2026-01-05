@@ -1,33 +1,53 @@
 <script setup lang="ts">
 const appVersion = import.meta.env.VITE_APP_VERSION;
+const resetCookies = () => {
+    localStorage.removeItem('mmmmh_koekjes');
+    window.location.reload();
+};
 </script>
 
 <template>
     <footer class="relative z-10">
-        <div class="absolute bottom-full left-0 w-full leading-none pointer-events-none">
+        <div
+            class="pointer-events-none absolute bottom-full left-0 w-full leading-none"
+        >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 1440 200"
                 class="h-auto w-full"
                 preserveAspectRatio="none"
             >
-                <path class="pointer-events-auto fill-haven-blue"
+                <path
+                    class="pointer-events-auto fill-haven-blue"
                     d="M0,120L60,110C120,100,240,80,360,90C480,100,600,140,720,140C840,140,960,100,1080,96.7C1200,93,1320,127,1380,140L1440,153.3L1440,200L1380,200C1320,200,1200,200,1080,200C960,200,840,200,720,200C600,200,480,200,360,200C240,200,120,200,60,200L0,200Z"
                 ></path>
             </svg>
         </div>
         <p
-            class="hidden sm:flex absolute right-6 bottom-4 font-mono text-xs text-white/50 select-none"
+            class="absolute right-6 bottom-4 hidden font-mono text-xs text-white/50 select-none sm:flex"
         >
             {{ appVersion }}
         </p>
         <div
-            class="hidden absolute bottom-8 left-6 sm:flex items-center gap-x-1 font-mono text-xs text-white/50 select-none"
+            class="absolute bottom-8 left-6 hidden items-center gap-x-1 font-mono text-xs text-white/50 select-none sm:flex"
         >
-            <a class="font-semibold text-white/75 hover:underline" :href="route('privacy-policy')">Privacy Policy</a>
+            <a
+                class="font-semibold text-white/75 hover:underline"
+                :href="route('privacy-policy')"
+                >Privacy Policy</a
+            >
+            <button
+                @click="resetCookies"
+                class="font-semibold text-white/75 hover:underline pl-4"
+            >
+                Cookie Preferences
+            </button>
         </div>
         <div
-            class="hidden absolute bottom-4 left-6 sm:flex items-center gap-x-1 font-mono text-xs text-white/50 select-none"
+            class="absolute bottom-9 left-35 hidden items-center gap-x-1 font-mono text-xs text-white/50 select-none sm:flex"
+        ></div>
+        <div
+            class="absolute bottom-4 left-6 hidden items-center gap-x-1 font-mono text-xs text-white/50 select-none sm:flex"
         >
             <p>Made with</p>
             <svg
@@ -41,9 +61,12 @@ const appVersion = import.meta.env.VITE_APP_VERSION;
                 ></path>
             </svg>
             <p>in Eindhoven, By</p>
-            <a class="font-semibold text-white/75 hover:underline" href="https://github.com/Kroffie">Tim</a>
+            <a
+                class="font-semibold text-white/75 hover:underline"
+                href="https://github.com/Kroffie"
+                >Tim</a
+            >
         </div>
-
     </footer>
 </template>
 
