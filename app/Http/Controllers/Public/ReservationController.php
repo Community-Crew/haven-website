@@ -75,7 +75,7 @@ class ReservationController extends Controller
                 $appTz
             );
 
-            if ($slot['end'] === '00:00') {
+            if ($slot['end'] === '24:00') {
                 $policyEnd->addDay()->startOfDay();
             }
 
