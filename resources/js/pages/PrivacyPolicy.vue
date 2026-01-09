@@ -56,6 +56,7 @@ import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
                         <li><strong>NAW-gegevens:</strong> Je naam, adres en woonplaats. Dit hebben we nodig om te weten wie er in de community zit (of om eventueel iets naar je op te sturen).</li>
                         <li><strong>Reserveringen van gedeelde ruimtes:</strong> Foto’s die gemaakt zijn van gedeelde ruimtes. Tijd en datum van de reservering.</li>
                         <li><strong>Tech-data (IP & Sessie):</strong> We slaan tijdelijk je IP-adres op en gebruiken sessie-informatie. Dit is puur technisch: zo onthoudt de site dat jij het bent als je doorklikt naar een volgende pagina.</li>
+                        <li><strong>Foutrapportages:</strong> Gaat er iets stuk op de site? Dan leggen we automatisch vast wat er gebeurde. Hierbij kijken we naar wat je aanklikte, welk apparaat je gebruikte en (als je ingelogd bent) welk account daarbij betrokken was. Zo kunnen we bugs pletten en de site repareren.</li>
                     </ul>
                 </section>
 
@@ -68,6 +69,7 @@ import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
                         <li><strong>Veiligheid:</strong> IP-adressen helpen ons om hackers of spammers buiten de deur te houden.</li>
                         <li><strong>Reservaties:</strong> Om je toegang te geven tot reserveren van gedeelde ruimtes.</li>
                         <li><strong>Berichtgeving:</strong> Zodat wij je op de hoogte kunnen houden van activiteiten.</li>
+                        <li><strong>Verbetering & Debugging:</strong> Niemand houdt van een site die crasht. We gebruiken foutrapportages om technische problemen op te sporen en op te lossen.</li>
                     </ol>
                 </section>
 
@@ -77,13 +79,14 @@ import PublicAppLayout from '@/layouts/PublicAppLayout.vue';
                     <ul class="list-disc list-outside ml-5 space-y-2">
                         <li><strong>NAW:</strong> Zolang je lid bent van de community. Zeg je je lidmaatschap op? Dan verwijderen we je gegevens.</li>
                         <li><strong>IP & Sessie:</strong> Dit wordt heel snel weer verwijderd. Sessie-info verdwijnt vaak direct als je je browser afsluit.</li>
+                        <li><strong>Foutrapportages & Logs:</strong> Om technische problemen op te lossen en de veiligheid te garanderen, bewaren we server-logs en foutmeldingen maximaal 90 dagen. Daarna worden deze automatisch vernietigd. Oude bugs zijn immers oud nieuws.</li>
                     </ul>
                 </section>
 
                 <section>
                     <h3 class="text-xl font-bold mb-3 text-gray-900">5. Delen we dit met anderen?</h3>
                     <p>
-                        Nee, we verkopen niks door. Het enige moment dat "derden" jouw data zien, is puur technisch. Denk aan het hostingbedrijf waar onze servers draaien. Met hen hebben we afspraken gemaakt dat ze met hun poten van jouw data afblijven (een verwerkersovereenkomst). Verder behoud Vestide het recht om toegang te blokkeren naar havencommunity.nl.
+                        Nee, we verkopen niks door. Het enige moment dat "derden" jouw data zien, is puur technisch. Denk aan het hostingbedrijf waar onze servers draaien. Met hen hebben we afspraken gemaakt dat ze met hun poten van jouw data afblijven (een verwerkersovereenkomst). Verder behoud Vestide het recht om toegang te blokkeren naar havencommunity.nl. Ook onze analysetools en foutopsporing draaien we volledig zelf op onze eigen servers. Er gaan dus geen gegevens over jouw surfgedrag of crashes naar externe partijen zoals Google of advertentienetwerken. Alles blijft binnen de Haven-muren.
                     </p>
                 </section>
 
