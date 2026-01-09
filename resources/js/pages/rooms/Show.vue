@@ -72,12 +72,12 @@ const getDateString = (date: Date) => {
                     <hr class="my-6 border-t border-haven-blue/20" />
                     <div class="flex w-full content-center justify-end gap-4">
                         <button @click="showReservationModal = true">
-                            <span class="rounded-2xl bg-haven-blue p-2">
+                            <span class="rounded-2xl bg-haven-blue p-2 text-white">
                                 Reserve
                             </span>
                         </button>
                         <Link :href="route('wip')">
-                            <div class="rounded-2xl bg-haven-blue p-2">
+                            <div class="rounded-2xl bg-haven-blue p-2 text-white">
                                 <span>Notify disturbance</span>
                             </div>
                         </Link>
