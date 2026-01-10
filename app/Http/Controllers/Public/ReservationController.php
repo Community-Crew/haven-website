@@ -10,6 +10,10 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Sentry\Severity;
+use Sentry\State\Scope;
+use function Sentry\captureMessage;
+use function Sentry\withScope;
 
 class ReservationController extends Controller
 {
@@ -58,7 +62,8 @@ class ReservationController extends Controller
         $reqEnd = Carbon::createFromFormat('Y-m-d\TH:i', $validated['end_time'], $appTz);
 
 
-        $allowedSlots = $service->getMergedTimeSlots($reqStart, Room::findOrFail($validated['room']));
+        $room = Room::findOrFail($validated['room']);
+        $allowedSlots = $service->getMergedTimeSlots($reqStart, $room);
         $dateString = $reqStart->format('Y-m-d');
         $isWithinPolicy = false;
 
@@ -86,6 +91,24 @@ class ReservationController extends Controller
         }
 
         if (!$isWithinPolicy) {
+            withScope(function (Scope $scope) use ($request, $reqStart, $reqEnd, $allowedSlots, $room) {
+
+                $scope->setUser([
+                    'id' => $request->user()->id,
+                    'email' => $request->user()->email,
+                ]);
+
+                $scope->setContext('policy_debug', [
+                    'room_name' => $room->name,
+                    'requested_start_tz' => $reqStart->format('Y-m-d H:i:s P'), // Includes Timezone offset
+                    'requested_end_tz'   => $reqEnd->format('Y-m-d H:i:s P'),
+                    'allowed_slots_raw'  => $allowedSlots, // Shows exactly what the Service returned
+                ]);
+
+                $scope->setLevel(Severity::warning());
+
+                captureMessage('Reservation Rejected: Outside Policy');
+            });
             throw ValidationException::withMessages([
                 'start_time' => 'The selected time is outside your allowed reservation hours.',
             ]);
