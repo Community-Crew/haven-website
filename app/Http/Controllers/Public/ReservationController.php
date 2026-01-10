@@ -134,7 +134,7 @@ class ReservationController extends Controller
             'status' => 'approved',
             'start_at' => $reqStart,
             'end_at' => $reqEnd,
-            'share_name' => $validated['share_name'],
+            'share_user' => $validated['share_name'],
         ]);
     }
 }
