@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Models\Reservation;
+use App\Models\ReservationPolicy;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
 use Illuminate\Http\Request;
@@ -103,6 +104,8 @@ class ReservationController extends Controller
                     'requested_start_tz' => $reqStart->format('Y-m-d H:i:s P'), // Includes Timezone offset
                     'requested_end_tz'   => $reqEnd->format('Y-m-d H:i:s P'),
                     'allowed_slots_raw'  => $allowedSlots, // Shows exactly what the Service returned
+                    'roles' => session('roles'),
+                    'policy' => ReservationPolicy::whereIn('role_name', session('roles'))->where('room_id', $room['id'])->get()
                 ]);
 
                 $scope->setLevel(Severity::warning());
@@ -134,7 +137,7 @@ class ReservationController extends Controller
             'status' => 'approved',
             'start_at' => $reqStart,
             'end_at' => $reqEnd,
-            'share_name' => $validated['share_name'],
+            'share_user' => $validated['share_name'],
         ]);
     }
 }
