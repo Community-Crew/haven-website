@@ -12,7 +12,7 @@ Route::get('/', function () {
     return Inertia::render('Home', []);
 })->name('home');
 
-Route::resource('rooms', RoomController::class);
+Route::resource('rooms', RoomController::class)->only(['index', 'show']);
 
 Route::middleware(['auth'])->group(function () {
     Route::get('profile', [ProfileController::class, 'index'])->middleware(['auth'])->name('profile');
