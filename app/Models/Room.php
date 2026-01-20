@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Http\Enums\RoomStatus;
 use App\Traits\HasS3Image;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Spatie\Sluggable\HasSlug;
