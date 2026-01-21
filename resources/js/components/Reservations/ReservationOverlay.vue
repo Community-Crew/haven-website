@@ -20,7 +20,7 @@ const endTimeStr = ref('');
 
 const form = useForm({
     name: '',
-    start_time: '', // These will be constructed from local state
+    start_time: '',
     end_time: '',
     share_name: true,
     room: props.room.id,
@@ -129,7 +129,7 @@ const submit = () => {
                             @click="$emit('close')"
                             class="text-gray-400 hover:text-gray-600 focus:outline-none"
                         >
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="h-6 w-6" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>

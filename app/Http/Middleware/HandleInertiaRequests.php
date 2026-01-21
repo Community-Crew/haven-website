@@ -47,7 +47,7 @@ class HandleInertiaRequests extends Middleware
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'created_at' => $request->user()->created_at,
-                    'is_admin' => in_array('view-dashboard', session('roles'))
+                    'is_admin' => in_array('view-dashboard', session('roles', []))
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

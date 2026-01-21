@@ -4,6 +4,7 @@ import PublicAppNavBar from '@/components/PublicAppLayout/PublicAppNavBar.vue';
 import ErrorPopup from '@/components/ErrorPopup.vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import CookieConsent from '@/components/CookieConsent.vue';
 
 const page = usePage();
 const error = computed(()=> page.props.session)
@@ -19,6 +20,7 @@ const error = computed(()=> page.props.session)
         </main>
         <Footer />
     </div>
+    <CookieConsent/>
 </template>
 
 <style scoped></style>
