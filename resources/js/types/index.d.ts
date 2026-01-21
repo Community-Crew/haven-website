@@ -108,7 +108,7 @@ export interface Room {
     slug: string;
     description: string;
     location: string;
-    image_path: string;
+    image_url: string;
     status: RoomStatus;
 }
 

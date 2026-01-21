@@ -18,13 +18,14 @@ class Room extends Model
         'slug',
         'description',
         'location',
-        'image_path',
         'status',
     ];
 
     protected $casts = [
         'status' => RoomStatus::class,
     ];
+
+    protected $appends = ['image_url'];
 
     public function getSlugOptions(): SlugOptions
     {
