@@ -38,7 +38,7 @@ const getCardPosition = (index: number) => {
                     <div class="relative pb-2">
                         <S3Image
                             class="aspect-video rounded-2xl bg-background"
-                            :src="room.image_path"
+                            :src="room.image_url"
                         />
                         <div
                             class="absolute bottom-8 left-0 z-1 h-12 w-fit content-center rounded-r-2xl bg-haven-blue/85 pl-10"
