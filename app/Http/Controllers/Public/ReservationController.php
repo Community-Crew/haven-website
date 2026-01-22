@@ -92,26 +92,6 @@ class ReservationController extends Controller
         }
 
         if (!$isWithinPolicy) {
-            withScope(function (Scope $scope) use ($request, $reqStart, $reqEnd, $allowedSlots, $room) {
-
-                $scope->setUser([
-                    'id' => $request->user()->id,
-                    'email' => $request->user()->email,
-                ]);
-
-                $scope->setContext('policy_debug', [
-                    'room_name' => $room->name,
-                    'requested_start_tz' => $reqStart->format('Y-m-d H:i:s P'), // Includes Timezone offset
-                    'requested_end_tz'   => $reqEnd->format('Y-m-d H:i:s P'),
-                    'allowed_slots_raw'  => $allowedSlots, // Shows exactly what the Service returned
-                    'roles' => session('roles'),
-                    'policy' => ReservationPolicy::whereIn('role_name', session('roles'))->where('room_id', $room['id'])->get()
-                ]);
-
-                $scope->setLevel(Severity::warning());
-
-                captureMessage('Reservation Rejected: Outside Policy');
-            });
             throw ValidationException::withMessages([
                 'start_time' => 'The selected time is outside your allowed reservation hours.',
             ]);
