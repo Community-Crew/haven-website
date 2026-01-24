@@ -29,8 +29,8 @@ defineProps<{
                                     :key="room.id"
                                     :href="
                                         route(
-                                            'admin.reservations.show',
-                                            room.id,
+                                            'admin.rooms.show',
+                                            room.slug,
                                         )
                                     "
                                     class="place w-full rounded-2xl bg-haven-white/45 p-3 shadow"
