@@ -33,10 +33,10 @@ class RoomController extends Controller
 
     }
 
-    public function show(Room $room){
+    public function show(Room $room)
+    {
 //        $this->authorize('view', $room);
-
-        return Inertia::render('dashboard/rooms/Show', ['room' => $room]);
+        return Inertia::render('dashboard/rooms/Show', ['room' => $room, 'statusOptions' => RoomStatus::cases()]);
 
     }
 
@@ -47,16 +47,16 @@ class RoomController extends Controller
 
     public function update(Request $request, Room $room)
     {
-        $data = $request->validate([
+        $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',
             'location' => 'required|string',
-            'status' => ['required',new Enum(RoomStatus::class)],
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => ['required', new Enum(RoomStatus::class)],
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5000',
         ]);
 
         if ($request->hasFile('image')) {
-            if ($room->image_path && Storage::disk('hetzner')->exists($room->image_path)){
+            if ($room->image_path && Storage::disk('hetzner')->exists($room->image_path)) {
                 Storage::disk('hetzner')->delete($room->image_path);
             }
 
