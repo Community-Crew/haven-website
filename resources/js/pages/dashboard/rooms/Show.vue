@@ -38,7 +38,7 @@ const form = useForm<RoomForm>({
     description: props.room.description,
     location: props.room.location,
     image: null,
-    status: props.room.status,
+    status: props.room.status.value,
 });
 
 const handleFileChange = (event: Event) => {
