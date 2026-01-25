@@ -18,7 +18,7 @@ class ProfileController extends Controller
             ->orderBy('start_at', 'desc')
             ->where('start_at', '>=', now())
             ->with('room')
-            ->paginate(5)
+            ->paginate(6)
             ->withQueryString();
 
         return Inertia::render('Profile', ['unit' => $unit, 'groups' => $groups, 'reservations' => $reservations]);
