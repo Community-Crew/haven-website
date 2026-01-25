@@ -85,8 +85,9 @@ export interface UnitFilters {
 
 export interface ReservationFilters {
     search: string;
-    room: string;
-    status: string;
+    room: string | null;
+    status: string | null;
+    date: date;
 }
 
 export interface registrationCode {
@@ -97,6 +98,14 @@ export interface registrationCode {
 
 export interface RoomStatus {
     name: string;
+    label: string;
+    text_color: string;
+    background_color: string;
+}
+
+export interface ReservationStatus {
+    name: string;
+    value: string;
     label: string;
     text_color: string;
     background_color: string;

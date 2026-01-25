@@ -35,6 +35,7 @@ const closeMenu = (): void => {
                 <!-- Desktop Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a :href="route('admin.index')" class="hover:text-haven-white transition-colors duration-300">Home</a>
+                    <a :href="route('admin.rooms.index')" class="hover:text-haven-white transition-colors duration-300">Rooms</a>
                     <a :href="route('admin.reservations.index')" class="hover:text-haven-white transition-colors duration-300">Reservations</a>
                     <a :href="route('admin.units.index')" class="hover:text-haven-white transition-colors duration-300">Units</a>
                     <div></div>

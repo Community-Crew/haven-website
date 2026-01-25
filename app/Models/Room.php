@@ -19,6 +19,7 @@ class Room extends Model
         'description',
         'location',
         'status',
+        'image_path',
     ];
 
     protected $casts = [
