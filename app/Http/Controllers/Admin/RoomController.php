@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Enums\ReservationStatus;
 use App\Http\Enums\RoomStatus;
+use App\Models\Reservation;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -33,10 +35,28 @@ class RoomController extends Controller
 
     }
 
-    public function show(Room $room)
+    public function show(Request $request, Room $room)
     {
 //        $this->authorize('view', $room);
-        return Inertia::render('dashboard/rooms/Show', ['room' => $room, 'statusOptions' => RoomStatus::cases()]);
+        $query = Reservation::query()->with('room', 'user');
+
+        $query->where('room_id', $room->id);
+        $query->orderBy('start_at');
+
+        $query->whereDate('start_at', '>=', $request->input('date') ?: now());
+        $query->when($request->input('status'), function ($query, $status) {
+            $query->where('status', $status);
+        });
+
+        $reservations = $query->paginate(5)->withQueryString();
+
+        return Inertia::render('dashboard/rooms/Show', [
+            'room' => $room,
+            'statusOptions' => RoomStatus::cases(),
+            'reservationStatusOptions' => ReservationStatus::cases(),
+            'filters' => request()->only('status', 'date'),
+            'reservations' => $reservations
+        ]);
 
     }
 
