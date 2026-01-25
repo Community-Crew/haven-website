@@ -46,6 +46,7 @@ enum RoomStatus: string implements JsonSerializable
     {
         return [
             'name' => $this->name,
+            'value' => $this->value,
             'label' => $this->label(),
             'text_color' => $this->text_color(),
             'background_color' => $this->background_color(),

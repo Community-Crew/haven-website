@@ -3,25 +3,40 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 trait HasS3Image
 {
-    public function initializeS3Image()
-    {
-        $this->appends[] = 'image_url';
-    }
-
-    protected function imageUrl()
+    protected function imageUrl(): Attribute
     {
         return Attribute::make(
-            get: function () {
-                if (empty($this->image_path)) {
-                    return Storage::disk('hetzner')->temporaryUrl("placeholder.gif", now()->addMinutes(5));
-                }
-
-                return Storage::disk('hetzner')->temporaryUrl($this->image_path, now()->addMinutes(5));
-            }
+            get: fn () => $this->generateImageUrl()
         );
     }
+
+    protected function generateImageUrl(int $minutes = 15, string $placeholder = 'placeholder.gif'): ?string
+    {
+        {
+            $disk = Storage::disk('hetzner');
+
+            $key = $this->image_path ?: $placeholder;
+
+            try {
+                if (! $disk->exists($key) && $key !== $placeholder) {
+                    $key = $placeholder;
+                }
+
+                if (! $disk->exists($key)) {
+                    return null;
+                }
+
+                return $disk->temporaryUrl($key, Carbon::now()->addMinutes($minutes));
+            } catch (Throwable $e) {
+                return null;
+            }
+        }
+    }
+
 }

@@ -28,15 +28,16 @@ class ReservationController extends Controller
 
         $query = Reservation::query()->with('user', 'room');
 
+        $query->whereDate('start_at', '>=', $request->input('date') ?: now());
 
         $query->when($request->input('room'), function ($query, $room) {
-            $roomObject = Room::where('name', $room)->first();
-            $query->where('room_id', $roomObject->id);
+            $query->whereRelation('room', 'name', $room);
         });
 
         $query->when($request->input('status'), function ($query, $status) {
             $query->where('status', $status);
         });
+
 
         $query->orderBy('start_at');
 
@@ -47,7 +48,7 @@ class ReservationController extends Controller
         return Inertia::render('dashboard/reservations/Index',
             [
                 'reservations' => $reservations,
-                'filters' => request()->only('building', 'floor'),
+                'filters' => request()->only('room', 'status', 'date'),
                 'rooms' => Room::all()->pluck('name'),
                 'statuses' => $statuses,
 
@@ -80,7 +81,7 @@ class ReservationController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         $startAt = Carbon::parse($validated['start_time'], 'Europe/Amsterdam');
-        $endAt   = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
+        $endAt = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
 
         if (!$user) {
             return redirect()->route('admin.reservations.create')->with('error', 'No user with this email address.');
@@ -139,7 +140,7 @@ class ReservationController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         $startAt = Carbon::parse($validated['start_time'], 'Europe/Amsterdam');
-        $endAt   = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
+        $endAt = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
 
         if (!$user) {
             return redirect()->route('admin.reservations.create')->with('error', 'No user with this email address.');
