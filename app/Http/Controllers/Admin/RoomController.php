@@ -19,7 +19,7 @@ class RoomController extends Controller
 
     public function index(Request $request)
     {
-//        $this->authorize('viewAny');
+        $this->authorize('viewAny');
         $rooms = Room::all();
 
         return Inertia::render('dashboard/rooms/Index', ['rooms' => $rooms]);
@@ -37,7 +37,7 @@ class RoomController extends Controller
 
     public function show(Request $request, Room $room)
     {
-//        $this->authorize('view', $room);
+        $this->authorize('view', $room);
         $query = Reservation::query()->with('room', 'user');
 
         $query->where('room_id', $room->id);
@@ -60,13 +60,10 @@ class RoomController extends Controller
 
     }
 
-    public function edit(Room $room)
-    {
-
-    }
-
     public function update(Request $request, Room $room)
     {
+        $this->authorize('update', $room);
+
         $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',

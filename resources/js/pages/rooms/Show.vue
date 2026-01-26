@@ -70,16 +70,16 @@ const getDateString = (date: Date) => {
                         </div>
                     </div>
                     <hr class="my-6 border-t border-haven-blue/20" />
-                    <div class="flex w-full content-center justify-end gap-4">
+                    <div v-if="page.props.auth.user" class="flex w-full content-center justify-end gap-4">
                         <button @click="showReservationModal = true">
                             <span class="rounded-2xl bg-haven-blue p-2">
                                 Reserve
                             </span>
                         </button>
                         <Link :href="route('wip')">
-                            <div class="rounded-2xl bg-haven-blue p-2">
-                                <span>Notify disturbance</span>
-                            </div>
+                            <button>
+                                <span class="rounded-2xl bg-haven-blue p-2">Notify disturbance</span>
+                            </button>
                         </Link>
                     </div>
                 </ContentCard>

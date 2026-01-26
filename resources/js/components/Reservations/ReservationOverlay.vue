@@ -1,19 +1,25 @@
 <script setup lang="ts">
-import { Room } from '@/types';
-import { useForm } from '@inertiajs/vue3';
-import { getCurrentInstance, watch, ref, computed } from 'vue';
+import { Reservation, Room } from '@/types';
+import { router, useForm } from '@inertiajs/vue3';
+import { computed, getCurrentInstance, nextTick, ref, watch } from 'vue';
 
 const app = getCurrentInstance();
 const route = app?.appContext.config.globalProperties.route;
 
-const props = defineProps<{
-    show: boolean;
-    room: Room;
-}>();
+const props = withDefaults(
+    defineProps<{
+        show: boolean;
+        room: Room;
+        edit?: boolean;
+        reservation?: Reservation;
+    }>(),
+    {
+        edit: false,
+    },
+);
 
 const emit = defineEmits(['close']);
 
-// 1. Local state for splitting date and time
 const bookingDate = ref('');
 const startTimeStr = ref('');
 const endTimeStr = ref('');
@@ -23,10 +29,10 @@ const form = useForm({
     start_time: '',
     end_time: '',
     share_name: true,
-    room: props.room.id,
+    room_id: props.room.id,
 });
 
-// 2. Generate 30-minute time slots (00:00, 00:30, ... 23:30)
+// Generate 30-minute time slots (08:00 to 24:00)
 const timeSlots = computed(() => {
     const slots = [];
     for (let i = 8; i < 24; i++) {
@@ -34,63 +40,116 @@ const timeSlots = computed(() => {
         slots.push(`${hour}:00`);
         slots.push(`${hour}:30`);
     }
-    slots.push('24:00')
+    slots.push('24:00');
     return slots;
 });
 
-// 3. Filter End Time options to ensure they are AFTER start time
 const endTimeOptions = computed(() => {
     if (!startTimeStr.value) return [];
-
-    // Get index of selected start time
     const startIndex = timeSlots.value.indexOf(startTimeStr.value);
-
-    // Return all slots AFTER the start time
-    // We stick to the "Same Day" rule, so we don't wrap to next day
     return timeSlots.value.slice(startIndex + 1);
 });
 
-// 4. Watch for changes in local state to update the actual Form object
 watch([bookingDate, startTimeStr, endTimeStr], () => {
     if (bookingDate.value && startTimeStr.value) {
         form.start_time = `${bookingDate.value}T${startTimeStr.value}`;
-    } else {
-        form.start_time = '';
     }
-
     if (bookingDate.value && endTimeStr.value) {
         form.end_time = `${bookingDate.value}T${endTimeStr.value}`;
-    } else {
-        form.end_time = '';
     }
 });
 
-// Reset form when modal opens/closes
+const extractTime = (dateStr: string) => {
+    if (!dateStr) return '';
+    const timePart = dateStr.split(/[T ]/)[1];
+    if (!timePart) return '';
+
+    const time = timePart.substring(0, 5);
+
+    if (time === '00:00') return '24:00';
+
+    return time;
+};
+
+// Helper: extract YYYY-MM-DD
+const extractDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    return dateStr.split(/[T ]/)[0];
+};
+
 watch(
     () => props.show,
-    (newVal) => {
-        if (!newVal) {
+    async (isOpen) => {
+        if (isOpen) {
+            if (props.edit && props.reservation) {
+                // 1. Populate standard fields
+                form.name = props.reservation.name;
+                form.share_name = !!props.reservation.share_user;
+                form.room_id = props.room.id;
+
+                // 2. Parse raw strings directly
+                const rawStart = props.reservation.start_at;
+                const rawEnd = props.reservation.end_at;
+                console.log(rawStart, rawEnd);
+
+                bookingDate.value = extractDate(rawStart);
+
+                // 3. Set times
+                const sTime = extractTime(rawStart);
+                const eTime = extractTime(rawEnd);
+
+                await nextTick();
+
+                if (timeSlots.value.includes(sTime)) {
+                    startTimeStr.value = sTime;
+                }
+                await nextTick();
+
+                endTimeStr.value = eTime;
+            } else {
+                form.reset();
+                form.clearErrors();
+                bookingDate.value = new Date().toISOString().split('T')[0];
+                startTimeStr.value = '';
+                endTimeStr.value = '';
+                form.room_id = props.room.id;
+            }
+        } else {
             form.reset();
             form.clearErrors();
-            // Reset local state
             bookingDate.value = '';
             startTimeStr.value = '';
             endTimeStr.value = '';
-        } else {
-            // Optional: Default to Today
-            const today = new Date();
-            bookingDate.value = today.toISOString().split('T')[0];
         }
     },
+    { immediate: true },
 );
 
 const submit = () => {
-    form.post(route('reservations.store'), {
+    if (props.edit && props.reservation) {
+        form.put(route('reservations.update', props.reservation.id), {
+            preserveScroll: true,
+            onSuccess: () => {
+                form.reset();
+                emit('close');
+            },
+        });
+    } else {
+        form.post(route('reservations.store'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                form.reset();
+                emit('close');
+            },
+        });
+    }
+};
+
+const cancelReservation = () => {
+    if (!props.reservation) return;
+    router.delete(route('reservations.destroy', props.reservation.id), {
         preserveScroll: true,
-        onSuccess: () => {
-            form.reset();
-            emit('close');
-        },
+        onSuccess: () => emit('close'),
     });
 };
 </script>
@@ -123,14 +182,25 @@ const submit = () => {
                         class="flex items-center justify-between border-b bg-haven-blue px-6 py-4"
                     >
                         <h3 class="text-lg font-bold text-haven-yellow">
-                            Book {{ room.name }}
+                            {{
+                                edit ? 'Edit Reservation' : `Book ${room.name}`
+                            }}
                         </h3>
                         <button
                             @click="$emit('close')"
                             class="text-gray-400 hover:text-gray-600 focus:outline-none"
                         >
-                            <svg class="h-6 w-6" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            <svg
+                                class="h-6 w-6"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                ></path>
                             </svg>
                         </button>
                     </div>
@@ -139,55 +209,85 @@ const submit = () => {
                         <div class="space-y-4 px-6 py-6">
                             <!-- Event Name -->
                             <div>
-                                <label class="mb-1 block text-sm font-bold text-haven-yellow">Event Name</label>
+                                <label
+                                    class="mb-1 block text-sm font-bold text-haven-yellow"
+                                    >Event Name</label
+                                >
                                 <input
                                     v-model="form.name"
                                     type="text"
                                     placeholder="e.g. Team Sync"
                                     class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    :class="{ 'border-red-500': form.errors.name }"
+                                    :class="{
+                                        'border-red-500': form.errors.name,
+                                    }"
                                 />
-                                <p v-if="form.errors.name" class="mt-1 text-sm text-red-500">
+                                <p
+                                    v-if="form.errors.name"
+                                    class="mt-1 text-sm text-red-500"
+                                >
                                     {{ form.errors.name }}
                                 </p>
                             </div>
 
-                            <!-- Single Date Picker (Enforces Same Day Rule) -->
+                            <!-- Date Picker -->
                             <div>
-                                <label class="mb-1 block text-sm font-bold text-haven-yellow">Date</label>
+                                <label
+                                    class="mb-1 block text-sm font-bold text-haven-yellow"
+                                    >Date</label
+                                >
                                 <input
                                     v-model="bookingDate"
                                     type="date"
-                                    :min="new Date().toISOString().split('T')[0]"
+                                    :min="
+                                        new Date().toISOString().split('T')[0]
+                                    "
                                     class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                    :class="{ 'border-red-500': form.errors.start_time || form.errors.end_time }"
                                 />
                             </div>
 
-                            <!-- Time Slots (Enforces 30-min Rule) -->
+                            <!-- Time Slots -->
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="mb-1 block text-sm font-bold text-haven-yellow">Start Time</label>
+                                    <label
+                                        class="mb-1 block text-sm font-bold text-haven-yellow"
+                                        >Start Time</label
+                                    >
                                     <select
                                         v-model="startTimeStr"
                                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         :disabled="!bookingDate"
                                     >
-                                        <option value="" disabled>Select Start</option>
-                                        <option v-for="time in timeSlots" :key="time" :value="time">
+                                        <option value="" disabled>
+                                            Select Start
+                                        </option>
+                                        <option
+                                            v-for="time in timeSlots"
+                                            :key="time"
+                                            :value="time"
+                                        >
                                             {{ time }}
                                         </option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="mb-1 block text-sm font-bold text-haven-yellow">End Time</label>
+                                    <label
+                                        class="mb-1 block text-sm font-bold text-haven-yellow"
+                                        >End Time</label
+                                    >
                                     <select
                                         v-model="endTimeStr"
                                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         :disabled="!startTimeStr"
                                     >
-                                        <option value="" disabled>Select End</option>
-                                        <option v-for="time in endTimeOptions" :key="time" :value="time">
+                                        <option value="" disabled>
+                                            Select End
+                                        </option>
+                                        <option
+                                            v-for="time in endTimeOptions"
+                                            :key="time"
+                                            :value="time"
+                                        >
                                             {{ time }}
                                         </option>
                                     </select>
@@ -195,15 +295,23 @@ const submit = () => {
                             </div>
 
                             <!-- Backend Error Messages -->
-                            <div v-if="form.errors.start_time" class="text-sm text-red-500">
+                            <div
+                                v-if="form.errors.start_time"
+                                class="text-sm text-red-500"
+                            >
                                 {{ form.errors.start_time }}
                             </div>
-                            <div v-if="form.errors.end_time" class="text-sm text-red-500">
+                            <div
+                                v-if="form.errors.end_time"
+                                class="text-sm text-red-500"
+                            >
                                 {{ form.errors.end_time }}
                             </div>
 
                             <!-- Privacy Toggle -->
-                            <div class="flex items-start rounded-md bg-haven-light-blue p-3">
+                            <div
+                                class="flex items-start rounded-md bg-haven-light-blue p-3"
+                            >
                                 <div class="flex h-5 items-center">
                                     <input
                                         v-model="form.share_name"
@@ -213,24 +321,53 @@ const submit = () => {
                                     />
                                 </div>
                                 <div class="ml-3 text-sm">
-                                    <label for="share_name" class="font-medium text-gray-700">Show name publicly</label>
+                                    <label
+                                        for="share_name"
+                                        class="font-medium text-gray-700"
+                                        >Show name publicly</label
+                                    >
                                     <p class="text-xs text-gray-500">
-                                        Uncheck to show as "Anonymous" to other residents.
+                                        Uncheck to show as "Anonymous" to other
+                                        residents.
                                     </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Footer Actions -->
-                        <div class="flex items-center justify-end gap-3 border-t bg-haven-green px-6 py-4">
-                            <button
-                                type="submit"
-                                :disabled="form.processing"
-                                class="rounded-lg bg-haven-blue px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
-                            >
-                                <span v-if="form.processing">Checking...</span>
-                                <span v-else>Confirm Booking</span>
-                            </button>
+                        <div
+                            class="flex items-center justify-between border-t bg-haven-green px-6 py-4"
+                        >
+                            <!-- Left: Cancel Button (Only in Edit Mode) -->
+                            <div>
+                                <button
+                                    v-if="edit"
+                                    type="button"
+                                    @click="cancelReservation"
+                                    class="text-sm font-medium text-red-600 hover:text-red-800 focus:outline-none"
+                                >
+                                    Cancel Reservation
+                                </button>
+                            </div>
+
+                            <!-- Right: Submit Button -->
+                            <div class="flex gap-3">
+
+                                <button
+                                    type="submit"
+                                    :disabled="form.processing"
+                                    class="rounded-lg bg-haven-blue px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+                                >
+                                    <span v-if="form.processing"
+                                        >Processing...</span
+                                    >
+                                    <span v-else>{{
+                                        edit
+                                            ? 'Update Booking'
+                                            : 'Confirm Booking'
+                                    }}</span>
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

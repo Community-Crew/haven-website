@@ -177,7 +177,7 @@ const reset = () => {
                     </div>
                 </div>
                 <Pagination
-                    class="justify-center"
+                    class="justify-center mt-4"
                     :links="reservations.links"
                 />
             </div>
