@@ -37,7 +37,7 @@ route::get('wip', function () {
     return Inertia::render('WIP', []);
 })->name('wip');
 
-route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
+route::Resource('reservations', ReservationController::class)->only(['store', 'destroy', 'update']);
 
 require __DIR__ . '/auth.php';
 require __DIR__ . '/admin.php';
