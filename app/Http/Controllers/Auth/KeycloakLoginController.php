@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
+use App\Models\Organisation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,7 @@ class KeycloakLoginController extends Controller
         } catch (InvalidStateException) {
             return redirect('auth/login/redirect');
         }
+
         $user = User::updateOrCreate(
             ['keycloak_id' => $keycloak_user->getId()],
             [
@@ -31,7 +33,6 @@ class KeycloakLoginController extends Controller
         );
         $user_is_validated = $keycloak_user->user['validated'] ?? "no";
 
-        // Get groups
         $access_token = $keycloak_user->token;
         list($header, $payload, $signature) = explode(".", $access_token);
         $claims = json_decode(base64_decode($payload), true);
@@ -43,8 +44,7 @@ class KeycloakLoginController extends Controller
         Session::put('roles', $roles);
 
         $this->syncUserGroups($user, $groupsFromToken);
-
-
+        $this->updateUserOrganizationRoles($user, $roles);
 
         if ($user_is_validated == 'yes') {
             Auth::login($user);
@@ -70,13 +70,39 @@ class KeycloakLoginController extends Controller
     {
         $groupIds = [];
         foreach ($groupsFromToken as $groupName) {
-            $group = Group::firstOrCreate(
-                ['name' => $groupName],
-            );
+            $group = Group::firstOrCreate(['name' => $groupName]);
             $groupIds[] = $group->id;
         }
 
         $user->groups()->sync($groupIds);
+    }
+
+    protected function updateUserOrganizationRoles(User $user, array $roles)
+    {
+        // Initialize identifiers to manage the organization roles
+        $organisationRoles = [];
+
+        // Loop through the user roles
+        foreach ($roles as $role) {
+            if (str_starts_with($role, 'organisation-') && str_contains($role, '-member')) {
+                $parts = explode('-', $role);
+                $organisationId = intval($parts[1]);
+                $organisationRoles[] = $organisationId;
+
+                $organisation = Organisation::find($organisationId);
+                if ($organisation) {
+                    $organisation->users()->attach($user->id);
+                }
+            }
+        }
+
+        // Remove user from organizations where they no longer have the role
+        $organisations = Organisation::all();
+        foreach ($organisations as $organisation) {
+            if (!in_array($organisation->id, $organisationRoles)) {
+                $organisation->users()->detach($user->id);
+            }
+        }
     }
 
 }
