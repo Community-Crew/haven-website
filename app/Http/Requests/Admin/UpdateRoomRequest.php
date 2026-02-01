@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Enums\RoomStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class UpdateRoomRequest extends FormRequest
 {

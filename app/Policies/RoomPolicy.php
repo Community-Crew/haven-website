@@ -56,33 +56,33 @@ class RoomPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Unit $unit): bool
+    public function delete(User $user, Room $room): bool
     {
         $roles = $this->getUserRoles();
 
         return in_array('admin-'.$this->resource.'-delete', $roles)
-            || in_array('admin-'.$this->resource.'-delete-'.$unit->id, $roles);
+            || in_array('admin-'.$this->resource.'-delete-'.$room->id, $roles);
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Unit $unit): bool
+    public function restore(User $user, Room $room): bool
     {
         $roles = $this->getUserRoles();
 
         return in_array('admin-'.$this->resource.'-restore', $roles)
-            || in_array('admin-'.$this->resource.'-restore-'.$unit->id, $roles);
+            || in_array('admin-'.$this->resource.'-restore-'.$room->id, $roles);
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Unit $unit): bool
+    public function forceDelete(User $user, Room $room): bool
     {
         $roles = $this->getUserRoles();
 
         return in_array('admin-'.$this->resource.'-force_delete', $roles)
-            || in_array('admin-'.$this->resource.'-force_delete-'.$unit->id, $roles);
+            || in_array('admin-'.$this->resource.'-force_delete-'.$room->id, $roles);
     }
 }

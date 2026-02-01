@@ -32,7 +32,7 @@ class RoomController extends Controller
                 ->with('user', 'organisation')
                 ->orderBy('start_at')
                 ->limit(15)->get();
-            $formattedReservations = $reservations->map(function ($reservation) {
+            $formattedReservations = $reservations->map(function ($reservation) use ($request) {
                 $data = [
                     'id' => $reservation->id,
                     'start_at' => $reservation->start_at,
