@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\Admin\UpdateReservationRequest;
 use App\Http\Requests\Admin\StoreReservationRequest;
@@ -24,7 +26,7 @@ class ReservationController extends Controller
      * @param Request
      * @return \Inertia\Response
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', Reservation::class);
 
@@ -59,7 +61,7 @@ class ReservationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): Response
     {
         Gate::authorize('create', Reservation::class);
 
@@ -69,7 +71,7 @@ class ReservationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreReservationRequest $request)
+    public function store(StoreReservationRequest $request): RedirectResponse
     {
         Gate::authorize('create', Reservation::class);
         $validated = $request->validated();
@@ -100,7 +102,7 @@ class ReservationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Reservation $reservation)
+    public function show(Reservation $reservation): Response
     {
         Gate::authorize('view', $reservation);
         $reservation = $reservation->load('user', 'room');
@@ -121,7 +123,7 @@ class ReservationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateReservationRequest $request, Reservation $reservation)
+    public function update(UpdateReservationRequest $request, Reservation $reservation): RedirectResponse
     {
         Gate::authorize('update', $reservation);
         $validated = $request->validated();

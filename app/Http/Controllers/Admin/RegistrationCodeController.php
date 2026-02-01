@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\Admin\StoreRegistrationCodeRequest;
 use App\Http\Controllers\Controller;
@@ -17,7 +19,7 @@ class RegistrationCodeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', RegistrationCode::class);
 
@@ -42,7 +44,7 @@ class RegistrationCodeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRegistrationCodeRequest $request)
+    public function store(StoreRegistrationCodeRequest $request): RedirectResponse
     {
         Gate::authorize('create', RegistrationCode::class);
         $validated = $request->validated();
@@ -57,7 +59,7 @@ class RegistrationCodeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(RegistrationCode $registrationCode)
+    public function show(RegistrationCode $registrationCode): Response
     {
         Gate::authorize('view', $registrationCode);
         $unit = $registrationCode->unit()->first();
@@ -84,7 +86,7 @@ class RegistrationCodeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RegistrationCode $registrationCode)
+    public function destroy(RegistrationCode $registrationCode): RedirectResponse
     {
         Gate::authorize('delete', $registrationCode);
         $registrationCode->delete();

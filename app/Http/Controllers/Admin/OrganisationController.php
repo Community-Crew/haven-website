@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Admin\UpdateOrganisationRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Organisation;
@@ -12,21 +14,21 @@ use Inertia\Inertia;
 
 class OrganisationController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $organisations = Organisation::all();
 
         return Inertia::render('dashboard/organisations/Index', ['organisations' => $organisations]);
     }
 
-    public function show(Organisation $organisation)
+    public function show(Organisation $organisation): Response
     {
         $organisation->load('users');
 
         return Inertia::render('dashboard/organisations/Show', ['organisation' => $organisation]);
     }
 
-    public function update(UpdateOrganisationRequest $request, Organisation $organisation)
+    public function update(UpdateOrganisationRequest $request, Organisation $organisation): RedirectResponse
     {
 
         if ($request->hasFile('image')) {
@@ -46,7 +48,7 @@ class OrganisationController extends Controller
         return redirect()->route('admin.organisations.show', $organisation->slug);
     }
 
-    public function detachUser(Request $request, Organisation $organisation, User $user)
+    public function detachUser(Request $request, Organisation $organisation, User $user): RedirectResponse
     {
         $organisation->users()->detach($user->id);
 

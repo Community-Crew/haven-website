@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Group;
 use App\Models\Organisation;
@@ -61,7 +62,7 @@ class KeycloakLoginController extends Controller
         return Socialite::driver('keycloak')->redirect();
     }
 
-    public function register(Request $request)
+    public function register(Request $request): RedirectResponse
     {
         return redirect(config('services.keycloak.base_url').config('services.keycloak.realm').'account');
     }

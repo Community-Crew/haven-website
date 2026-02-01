@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Public;
 
+use Inertia\Response;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ProfileController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $unit = $request->user()->unit()->first();
         $groups = $request->user()->groups()->pluck('name')->join(', ');

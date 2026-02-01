@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Utility;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Utility\StoreImageRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use Intervention\Image\Laravel\Facades\Image;
 
 class ImageController extends Controller
 {
-    public function store(StoreImageRequest $request)
+    public function store(StoreImageRequest $request): RedirectResponse
     {
 
         $file = $request->file('image');

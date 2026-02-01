@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Http\Enums\RoomStatus;
 use App\Traits\HasS3Image;
 use Illuminate\Database\Eloquent\Model;
@@ -59,7 +60,7 @@ class Room extends Model
         });
     }
 
-    public function reservations()
+    public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
     }

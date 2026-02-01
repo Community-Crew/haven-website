@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Http\Controllers\Controller;
@@ -17,7 +19,7 @@ use Inertia\Inertia;
 class RoomController extends Controller
 {
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', Room::class);
         $rooms = Room::all();
@@ -29,7 +31,7 @@ class RoomController extends Controller
 
     public function store(Request $request) {}
 
-    public function show(Request $request, Room $room)
+    public function show(Request $request, Room $room): Response
     {
         Gate::authorize('view', $room);
         $query = Reservation::query()->with('room', 'user');
@@ -54,7 +56,7 @@ class RoomController extends Controller
 
     }
 
-    public function update(UpdateRoomRequest $request, Room $room)
+    public function update(UpdateRoomRequest $request, Room $room): RedirectResponse
     {
         Gate::authorize('update', $room);
 

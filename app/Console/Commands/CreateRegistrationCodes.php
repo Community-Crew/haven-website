@@ -24,7 +24,7 @@ class CreateRegistrationCodes extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $subparUnits = 0;
         Unit::all()->each(function (Unit $unit) use (&$subparUnits) {

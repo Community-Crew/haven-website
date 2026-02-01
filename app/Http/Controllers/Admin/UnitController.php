@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Inertia\Response;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\Unit;
@@ -17,7 +18,7 @@ class UnitController extends Controller
      *
      * @throws AuthorizationException
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', Unit::class);
 
@@ -69,7 +70,7 @@ class UnitController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Unit $unit)
+    public function show(Unit $unit): Response
     {
         return Inertia::render('dashboard/units/Show', [
             'unit' => $unit,

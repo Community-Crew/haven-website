@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use Illuminate\Http\RedirectResponse;
 use App\Http\Enums\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\Room;
@@ -18,7 +19,7 @@ class ReservationController extends Controller
     /**
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         // 1. Validate inputs using shared rules
         $validated = $request->validate($this->getValidationRules($request));
@@ -50,7 +51,7 @@ class ReservationController extends Controller
     /**
      * @throws ValidationException
      */
-    public function update(Request $request, Reservation $reservation)
+    public function update(Request $request, Reservation $reservation): RedirectResponse
     {
         // 1. Authorization
         if ($reservation->user_id !== $request->user()->id) {
@@ -89,7 +90,7 @@ class ReservationController extends Controller
         return redirect()->back()->with('success', 'Reservation updated successfully.');
     }
 
-    public function destroy(Request $request, Reservation $reservation)
+    public function destroy(Request $request, Reservation $reservation): RedirectResponse
     {
         if ($reservation->user_id !== $request->user()->id) {
             abort(403, 'You can only cancel your own reservations.');

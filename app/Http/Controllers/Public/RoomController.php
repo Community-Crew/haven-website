@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use Inertia\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
@@ -18,7 +19,7 @@ class RoomController extends Controller
      *
      * @throws AuthorizationException
      */
-    public function index()
+    public function index(): Response
     {
         return Inertia::render('rooms/Index', ['rooms' => Room::all()]);
     }
