@@ -14,11 +14,30 @@ class StoreReservationRequest extends FormRequest
     public function rules()
     {
         return [
-'name'       => 'required|string|max:255',
-'email'      => 'required|email|max:255',
-'room'       => 'required|exists:rooms,id',
-'start_time' => 'required|date|after:now',
-'end_time'   => 'required|date|after:start_time',
+'name'       => [
+                'required',
+                'string',
+                'max:255',
+            ],
+'email'      => [
+                'required',
+                'email',
+                'max:255',
+            ],
+'room'       => [
+                'required',
+                'exists:rooms,id',
+            ],
+'start_time' => [
+                'required',
+                'date',
+                'after:now',
+            ],
+'end_time'   => [
+                'required',
+                'date',
+                'after:start_time',
+            ],
 ];
     }
 }

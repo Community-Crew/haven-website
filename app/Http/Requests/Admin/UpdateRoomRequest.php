@@ -14,14 +14,28 @@ class UpdateRoomRequest extends FormRequest
     public function rules()
     {
         return [
-'name'        => 'required|string',
-'description' => 'required|string',
-'location'    => 'required|string',
+'name'        => [
+                'required',
+                'string',
+            ],
+'description' => [
+                'required',
+                'string',
+            ],
+'location'    => [
+                'required',
+                'string',
+            ],
 'status'      => [
 'required',
 new Enum(RoomStatus::class),
 ],
-'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5000',
+'image'       => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif',
+                'max:5000',
+            ],
 ];
     }
 }

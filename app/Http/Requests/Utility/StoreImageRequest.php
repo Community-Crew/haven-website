@@ -13,6 +13,11 @@ class StoreImageRequest extends FormRequest
      */
     public function rules()
     {
-        return ['image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:10240'];
+        return ['image' => [
+                'required',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg',
+                'max:10240',
+            ],];
     }
 }
