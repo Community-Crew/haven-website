@@ -168,9 +168,10 @@ class ReservationController extends Controller
                 'nullable',
                 'exists:organisations,id',
                 function ($attribute, $value, $fail) use ($user) {
-                    if ($value !== null && ! $user->reservations->contains($value)) {
+                    if ($value !== null && ! $user->organisations->contains($value)) {
                         return $fail('You can only use organisations you are a member of.');
                     }
+                    return true;
                 },
             ],
         ];
