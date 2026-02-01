@@ -52,7 +52,7 @@ class RegistrationCodeController extends Controller
 
         $unit->registrationCodes()->create();
 
-        return Redirect::back()->with('success', 'New Registration Code has been created.');
+        return redirect()->back()->with('success', 'New Registration Code has been created.');
     }
 
     /**
@@ -90,7 +90,7 @@ class RegistrationCodeController extends Controller
         $this->authorize('delete', $registrationCode);
         $registrationCode->delete();
 
-        return Redirect::back()->with('success', 'Registration Code has been deleted.');
+        return redirect()->back()->with('success', 'Registration Code has been deleted.');
     }
 
     /**

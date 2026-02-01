@@ -20,7 +20,7 @@ class KeycloakLoginController extends Controller
         try {
             $keycloak_user = Socialite::driver('keycloak')->user();
         } catch (InvalidStateException) {
-            return redirect('auth/login/redirect');
+            return redirect()->to('auth/login/redirect');
         }
 
         $user = User::updateOrCreate(
@@ -48,7 +48,7 @@ class KeycloakLoginController extends Controller
         if ($user_is_validated == 'yes') {
             Auth::login($user);
 
-            return redirect('/');
+            return redirect()->to('/');
         } else {
             $request->session()->put('keycloak_id', $user->keycloak_id);
 

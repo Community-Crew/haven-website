@@ -76,6 +76,6 @@ class RoomController extends Controller
 
         $room->save();
 
-        return back();
+        return redirect()->back();
     }
 }

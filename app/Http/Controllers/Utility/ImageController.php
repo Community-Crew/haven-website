@@ -22,7 +22,7 @@ class ImageController extends Controller
 
         Storage::disk('local')->put($filename, (string) $image, 'public');
 
-        return back()->with('success', 'Image uploaded successfully');
+        return redirect()->back()->with('success', 'Image uploaded successfully');
 
     }
 }

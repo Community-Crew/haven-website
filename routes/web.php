@@ -26,7 +26,7 @@ Route::get('images/placeholder', function () {
         );
     });
 
-    return redirect($url);
+    return redirect()->to($url);
 })->name('image.placeholder');
 
 Route::get('privacy-policy', function () {
