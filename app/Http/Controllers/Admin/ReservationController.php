@@ -44,7 +44,7 @@ class ReservationController extends Controller
 
         $reservations = $query->paginate(25)->withQueryString();
         $enumReflectionStatues = new ReflectionEnum(ReservationStatus::class);
-        $statuses = array_map(fn ($case) => $case->getValue()->value, $enumReflectionStatues->getCases());
+        $statuses = array_map(fn($case) => $case->getValue()->value, $enumReflectionStatues->getCases());
 
         return Inertia::render('dashboard/reservations/Index',
             [
@@ -79,7 +79,7 @@ class ReservationController extends Controller
         $startAt = Carbon::parse($validated['start_time'], 'Europe/Amsterdam');
         $endAt = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
 
-        if (! $user) {
+        if (!$user) {
             return redirect()->route('admin.reservations.create')->with('error', 'No user with this email address.');
         }
 
@@ -105,7 +105,7 @@ class ReservationController extends Controller
         Gate::authorize('view', $reservation);
         $reservation = $reservation->load('user', 'room');
         $enumReflectionStatues = new ReflectionEnum(ReservationStatus::class);
-        $statuses = array_map(fn ($case) => $case->getValue()->value, $enumReflectionStatues->getCases());
+        $statuses = array_map(fn($case) => $case->getValue()->value, $enumReflectionStatues->getCases());
 
         return Inertia::render('dashboard/reservations/Show', ['reservation' => $reservation, 'rooms' => Room::all(), 'statuses' => $statuses]);
     }
@@ -131,7 +131,7 @@ class ReservationController extends Controller
         $startAt = Carbon::parse($validated['start_time'], 'Europe/Amsterdam');
         $endAt = Carbon::parse($validated['end_time'], 'Europe/Amsterdam');
 
-        if (! $user) {
+        if (!$user) {
             return redirect()->route('admin.reservations.create')->with('error', 'No user with this email address.');
         }
 
