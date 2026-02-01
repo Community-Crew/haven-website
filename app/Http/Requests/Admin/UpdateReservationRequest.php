@@ -12,33 +12,33 @@ class UpdateReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-'name'       => [
+            'name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-'email'      => [
+            'email' => [
                 'required',
                 'email',
                 'max:255',
             ],
-'room'       => [
+            'room' => [
                 'required',
                 'exists:rooms,id',
             ],
-'status'     => [
+            'status' => [
                 'required',
             ],
-'start_time' => [
+            'start_time' => [
                 'required',
                 'date',
                 'after:now',
             ],
-'end_time'   => [
+            'end_time' => [
                 'required',
                 'date',
                 'after:start_time',
             ],
-];
+        ];
     }
 }

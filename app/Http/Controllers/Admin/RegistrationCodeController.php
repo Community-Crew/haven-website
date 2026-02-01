@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Gate;
-use App\Http\Requests\Admin\StoreRegistrationCodeRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreRegistrationCodeRequest;
 use App\Models\RegistrationCode;
 use App\Models\Unit;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class RegistrationCodeController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      */

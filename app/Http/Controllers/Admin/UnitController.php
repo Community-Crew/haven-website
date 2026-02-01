@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Inertia\Response;
-use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\Unit;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class UnitController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *

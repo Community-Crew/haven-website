@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Gate;
-use App\Http\Requests\Admin\UpdateReservationRequest;
-use App\Http\Requests\Admin\StoreReservationRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
+use App\Http\Requests\Admin\StoreReservationRequest;
+use App\Http\Requests\Admin\UpdateReservationRequest;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 use ReflectionEnum;
 
 class ReservationController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *

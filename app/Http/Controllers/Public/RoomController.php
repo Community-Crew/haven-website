@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Public;
 
-use Inertia\Response;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class RoomController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *

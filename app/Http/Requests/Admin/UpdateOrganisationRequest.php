@@ -12,20 +12,20 @@ class UpdateOrganisationRequest extends FormRequest
     public function rules(): array
     {
         return [
-'name'  => [
+            'name' => [
                 'required',
                 'string',
             ],
-'about' => [
+            'about' => [
                 'required',
                 'string',
             ],
-'image' => [
+            'image' => [
                 'nullable',
                 'image',
                 'mimes:jpeg,png,jpg,gif,svg,webp',
                 'max:5000',
             ],
-];
+        ];
     }
 }

@@ -2,23 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Gate;
-use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
 use App\Http\Enums\RoomStatus;
+use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Models\Reservation;
 use App\Models\Room;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rules\Enum;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class RoomController extends Controller
 {
-
     public function index(Request $request): Response
     {
         Gate::authorize('viewAny', Room::class);
@@ -59,7 +57,6 @@ class RoomController extends Controller
     public function update(UpdateRoomRequest $request, Room $room): RedirectResponse
     {
         Gate::authorize('update', $room);
-
 
         if ($request->hasFile('image')) {
             if ($room->image_path && Storage::disk('hetzner')->exists($room->image_path)) {

@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Utility;
 
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Utility\StoreImageRequest;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Utility\StoreImageRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
 

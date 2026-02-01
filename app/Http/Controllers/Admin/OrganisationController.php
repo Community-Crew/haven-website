@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Admin\UpdateOrganisationRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateOrganisationRequest;
 use App\Models\Organisation;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class OrganisationController extends Controller
 {

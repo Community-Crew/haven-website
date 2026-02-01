@@ -12,8 +12,8 @@ class StoreRegistrationCodeRequest extends FormRequest
     public function rules(): array
     {
         return ['unit_id' => [
-                'required',
-                'exists:units,id',
-            ],];
+            'required',
+            'exists:units,id',
+        ], ];
     }
 }
