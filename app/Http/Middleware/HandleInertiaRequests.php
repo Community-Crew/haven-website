@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -42,12 +41,12 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'session' => session('error'),
             'auth' => [
-                'user' => fn() => $request->user() ? [
+                'user' => fn () => $request->user() ? [
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
                     'created_at' => $request->user()->created_at,
-                    'is_admin' => in_array('view-dashboard', session('roles', []))
+                    'is_admin' => in_array('view-dashboard', session('roles', [])),
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

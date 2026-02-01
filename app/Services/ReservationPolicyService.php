@@ -6,11 +6,9 @@ use App\Models\ReservationPolicy;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class ReservationPolicyService
 {
-
     public function getMergedTimeSlots(Carbon $date, Room $room): array
     {
         $policies = $this->getUserPolicies($room);
@@ -40,7 +38,7 @@ class ReservationPolicyService
             if ($schedule) {
                 $rawRanges[] = [
                     'start' => $schedule['start'],
-                    'end'   => $schedule['end']
+                    'end' => $schedule['end'],
                 ];
             }
         }
@@ -68,7 +66,7 @@ class ReservationPolicyService
             if ($schedule) {
                 $rawRanges[] = [
                     'start' => $schedule['start'],
-                    'end'   => $schedule['end']
+                    'end' => $schedule['end'],
                 ];
             }
         }

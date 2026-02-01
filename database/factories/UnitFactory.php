@@ -17,12 +17,13 @@ class UnitFactory extends Factory
     public function definition(): array
     {
         $buildings = ['Castor', 'Pollux', 'Terra'];
-        $floor = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14"];
-        $room = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16"];
+        $floor = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14'];
+        $room = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16'];
+
         return [
             'building' => fake()->randomElement($buildings),
             'number' => fake()->randomElement($floor).fake()->randomElement($room),
-            'max_residents' => $this->faker->numberBetween(1,6),
+            'max_residents' => $this->faker->numberBetween(1, 6),
         ];
     }
 }

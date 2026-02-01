@@ -5,20 +5,21 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Unit;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class UnitController extends Controller
 {
-    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
+     *
      * @throws AuthorizationException
      */
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
-        $this->authorize('viewAny', Unit::class);
+        Gate::authorize('viewAny', Unit::class);
 
         $query = Unit::query()->withCount('users as residents');
 
@@ -31,9 +32,10 @@ class UnitController extends Controller
         });
 
         $units = $query->paginate(30)->withQueryString();
+
         return Inertia::render('dashboard/units/Index', [
             'units' => $units,
-            'filters' => request()->only('building', 'floor'),
+            'filters' => $request->only('building', 'floor'),
             'buildings' => Unit::query()
                 ->select('building')
                 ->distinct()
@@ -67,12 +69,12 @@ class UnitController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Unit $unit)
+    public function show(Unit $unit): Response
     {
         return Inertia::render('dashboard/units/Show', [
-            "unit" => $unit,
-            "users" => $unit->users,
-            "registrationCodes" => $unit->registrationCodes,
+            'unit' => $unit,
+            'users' => $unit->users,
+            'registrationCodes' => $unit->registrationCodes,
         ]);
     }
 

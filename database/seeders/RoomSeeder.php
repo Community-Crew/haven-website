@@ -12,7 +12,7 @@ class RoomSeeder extends Seeder
      */
     public function run(): void
     {
-        $path = database_path("seeders/data/rooms.json");
+        $path = database_path('seeders/data/rooms.json');
         $json = file_exists($path) ? file_get_contents($path) : [];
         $rows = json_decode($json, true) ?: [];
 

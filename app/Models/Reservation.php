@@ -13,20 +13,20 @@ class Reservation extends Model
     use HasFactory;
 
     protected $fillable = [
-        "name",
-        "start_at",
-        "end_at",
-        "room_id",
-        "user_id",
-        "share_user",
-        "status",
-        "organisation_id"
+        'name',
+        'start_at',
+        'end_at',
+        'room_id',
+        'user_id',
+        'share_user',
+        'status',
+        'organisation_id',
     ];
 
     protected $casts = [
-        "status" => ReservationStatus::class,
-        "start_at" => "datetime",
-        "end_at" => "datetime"
+        'status' => ReservationStatus::class,
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

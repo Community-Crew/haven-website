@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index(Response $response)
+    public function index(Response $response): \Inertia\Response
     {
         return Inertia::render('dashboard/Index', []);
     }

@@ -5,39 +5,33 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
 use App\Http\Enums\RoomStatus;
+use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Models\Reservation;
 use App\Models\Room;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rules\Enum;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class RoomController extends Controller
 {
-    use AuthorizesRequests;
-
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
-        $this->authorize('viewAny', Room::class);
+        Gate::authorize('viewAny', Room::class);
         $rooms = Room::all();
 
         return Inertia::render('dashboard/rooms/Index', ['rooms' => $rooms]);
     }
 
-    public function create()
+    public function create() {}
+
+    public function store(Request $request) {}
+
+    public function show(Request $request, Room $room): Response
     {
-
-    }
-
-    public function store(Request $request)
-    {
-
-    }
-
-    public function show(Request $request, Room $room)
-    {
-        $this->authorize('view', $room);
+        Gate::authorize('view', $room);
         $query = Reservation::query()->with('room', 'user');
 
         $query->where('room_id', $room->id);
@@ -54,23 +48,15 @@ class RoomController extends Controller
             'room' => $room,
             'statusOptions' => RoomStatus::cases(),
             'reservationStatusOptions' => ReservationStatus::cases(),
-            'filters' => request()->only('status', 'date'),
-            'reservations' => $reservations
+            'filters' => $request->only('status', 'date'),
+            'reservations' => $reservations,
         ]);
 
     }
 
-    public function update(Request $request, Room $room)
+    public function update(UpdateRoomRequest $request, Room $room): RedirectResponse
     {
-        $this->authorize('update', $room);
-
-        $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'location' => 'required|string',
-            'status' => ['required', new Enum(RoomStatus::class)],
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5000',
-        ]);
+        Gate::authorize('update', $room);
 
         if ($request->hasFile('image')) {
             if ($room->image_path && Storage::disk('hetzner')->exists($room->image_path)) {
@@ -88,6 +74,6 @@ class RoomController extends Controller
 
         $room->save();
 
-        return back();
+        return redirect()->back();
     }
 }

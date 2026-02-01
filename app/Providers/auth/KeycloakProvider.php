@@ -2,7 +2,6 @@
 
 namespace App\Providers\auth;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Two\AbstractProvider;
@@ -11,7 +10,6 @@ use Laravel\Socialite\Two\User;
 
 class KeycloakProvider extends AbstractProvider implements ProviderInterface
 {
-
     /**
      * The scopes being requested.
      *
@@ -53,6 +51,7 @@ class KeycloakProvider extends AbstractProvider implements ProviderInterface
     {
         $baseUrl = rtrim(config('services.keycloak.base_url'), '/');
         $realm = config('services.keycloak.realm');
+
         return "{$baseUrl}/realms/{$realm}/protocol/openid-connect/token";
     }
 

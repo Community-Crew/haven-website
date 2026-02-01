@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 
 class AccountValidationController extends Controller
@@ -19,7 +18,7 @@ class AccountValidationController extends Controller
     {
         $keycloak_id = $request->session()->get('keycloak_id');
 
-        if (!$keycloak_id) {
+        if (! $keycloak_id) {
             return Redirect::route('/');
         }
 
@@ -30,8 +29,7 @@ class AccountValidationController extends Controller
             return Inertia::render('auth/Validation', ['error' => 'Invalid registration code']);
         }
 
-        if ($registrationCode['is_used'])
-        {
+        if ($registrationCode['is_used']) {
             return Inertia::render('auth/Validation', ['error' => 'Registration code has been used already!']);
         }
 
@@ -45,9 +43,6 @@ class AccountValidationController extends Controller
         $registrationCode['is_used'] = true;
         $registrationCode->save();
 
-
-
-
         Auth::login($user, true);
         $request->session()->regenerate();
 
@@ -57,7 +52,7 @@ class AccountValidationController extends Controller
     private function updateUserInKeycloak(string $keycloak_id)
     {
         try {
-            $tokenResponse = Http::asForm()->post(config('keycloak.authServerUrl') . '/realms/' . config('keycloak.realm') . '/protocol/openid-connect/token', [
+            $tokenResponse = Http::asForm()->post(config('keycloak.authServerUrl').'/realms/'.config('keycloak.realm').'/protocol/openid-connect/token', [
                 'client_id' => config('keycloak.client_id'),
                 'client_secret' => config('keycloak.client_secret'),
                 'grant_type' => 'client_credentials',
@@ -68,17 +63,17 @@ class AccountValidationController extends Controller
             }
 
             $accessToken = $tokenResponse->json()['access_token'];
-            $userUrl = config('keycloak.authServerUrl') . '/admin/realms/' . config('keycloak.realm') . '/users/' . $keycloak_id;
+            $userUrl = config('keycloak.authServerUrl').'/admin/realms/'.config('keycloak.realm').'/users/'.$keycloak_id;
 
             $getResponse = Http::withToken($accessToken)->get($userUrl);
             if ($getResponse->failed()) {
-                Log::error('Failed to GET Keycloak user ' . $keycloak_id . ': ' . $getResponse->body());
+                Log::error('Failed to GET Keycloak user '.$keycloak_id.': '.$getResponse->body());
+
                 return false;
             }
             $userRepresentation = $getResponse->json();
 
             $userRepresentation['attributes']['validated'] = ['yes'];
-
 
             $updateResponse = Http::withToken($accessToken)->put($userUrl, $userRepresentation);
 
@@ -91,8 +86,9 @@ class AccountValidationController extends Controller
             }
 
             return $updateResponse->successful();
-        }catch (\Exception $exception){
-            Log::error('Keycloak user update failed: ' . $exception->getMessage());
+        } catch (\Exception $exception) {
+            Log::error('Keycloak user update failed: '.$exception->getMessage());
+
             return false;
         }
 

@@ -11,7 +11,7 @@ class RegistrationCode extends Model
     /** @use HasFactory<\Database\Factories\RegistrationCodeFactory> */
     use HasFactory;
 
-    protected $fillable =[
+    protected $fillable = [
         'unit_id',
         'is_used',
     ];
