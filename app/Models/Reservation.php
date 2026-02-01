@@ -20,6 +20,7 @@ class Reservation extends Model
         "user_id",
         "share_user",
         "status",
+        "organisation_id"
     ];
 
     protected $casts = [
@@ -36,6 +37,11 @@ class Reservation extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function organisation(): BelongsTo
+    {
+        return $this->belongsTo(Organisation::class);
     }
 
     public function clashes(): HasMany

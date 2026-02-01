@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\OrganisationController;
 use App\Http\Controllers\Admin\RegistrationCodeController;
 use App\Http\Controllers\Admin\ReservationController;
 use App\Http\Controllers\Admin\RoomController;
@@ -14,4 +15,6 @@ Route::prefix('admin')->middleware(['auth', 'role:view-dashboard'])->name('admin
     Route::get('registration-codes/print/{registrationCode}', [RegistrationCodeController::class, 'print'])->name('registration-codes.print');
     Route::Resource('reservations', ReservationController::class);
     Route::Resource('rooms', RoomController::class);
+    Route::Resource('organisations', OrganisationController::class);
+    Route::delete('organisations/{organisation}/users/{user}', [OrganisationController::class, 'detachUser'])->name('organisations.users.detach');
 });

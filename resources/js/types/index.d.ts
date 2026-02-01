@@ -129,6 +129,15 @@ export interface Reservation {
     end_at: string;
     user_name: string;
     user: User;
+    organisation: Organisation | null;
+}
+
+export interface Organisation {
+    id: number;
+    name: string;
+    about: string;
+    image_path: string;
+    slug: string;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

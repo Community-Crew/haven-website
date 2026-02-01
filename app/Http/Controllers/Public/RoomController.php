@@ -29,7 +29,7 @@ class RoomController extends Controller
             $reservations = $room->reservations()
                 ->whereTodayOrAfter('start_at')
                 ->where('status', ReservationStatus::APPROVED->value)
-                ->with('user')
+                ->with('user', 'organisation')
                 ->orderBy('start_at')
                 ->limit(15)->get();
             $formattedReservations = $reservations->map(function ($reservation) {
@@ -39,6 +39,7 @@ class RoomController extends Controller
                     'end_at' => $reservation->end_at,
                     'name' => $reservation->name,
                     'status' => $reservation->status,
+                    'organisation' => $reservation->organisation,
                 ];
 
                 if ($reservation->share_user || $reservation->user == auth()->user()) {
@@ -62,7 +63,8 @@ class RoomController extends Controller
                 'room' => $room,
                 'reservations' => $formattedReservations,
                 'policy' => $policy,
-                'maxDaysInAdvance' => $service->getAllDaysInAdvance($room)
+                'maxDaysInAdvance' => $service->getAllDaysInAdvance($room),
+                'userOrganisations' => request()->user()->organisations,
             ]);
     }
 }
