@@ -16,7 +16,7 @@ class ProfileController extends Controller
 
         $reservations = $request->user()
             ->reservations()
-            ->orderBy('start_at', 'desc')
+            ->orderByDesc('start_at')
             ->where('start_at', '>=', now())
             ->with(['room', 'organisation'])
             ->paginate(6)
