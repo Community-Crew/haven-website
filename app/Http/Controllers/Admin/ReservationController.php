@@ -93,7 +93,7 @@ class ReservationController extends Controller
         ]);
 
         return redirect()->route('admin.reservations.create')
-            ->with('success', "Reservation created and linked to user: {$user->name}.");
+            ->with('success', "Reservation created and linked to user: $user->name.");
 
     }
 
