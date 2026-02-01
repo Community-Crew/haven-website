@@ -24,7 +24,6 @@ class ReservationController extends Controller
      * Display a listing of the resource.
      *
      * @param Request
-     * @return \Inertia\Response
      */
     public function index(Request $request): Response
     {
