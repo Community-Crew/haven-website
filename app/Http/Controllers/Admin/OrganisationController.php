@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\UpdateOrganisationRequest;
 use App\Http\Controllers\Controller;
 use App\Models\Organisation;
 use App\Models\User;
@@ -25,13 +26,8 @@ class OrganisationController extends Controller
         return Inertia::render('dashboard/organisations/Show', ['organisation' => $organisation]);
     }
 
-    public function update(Request $request, Organisation $organisation)
+    public function update(UpdateOrganisationRequest $request, Organisation $organisation)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'about' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5000',
-        ]);
 
         if ($request->hasFile('image')) {
             if ($organisation->image_path && Storage::disk('hetzner')->exists($organisation->image_path)) {

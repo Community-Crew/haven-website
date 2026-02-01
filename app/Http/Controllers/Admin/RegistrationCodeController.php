@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\StoreRegistrationCodeRequest;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationCode;
 use App\Models\Unit;
@@ -42,12 +43,10 @@ class RegistrationCodeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRegistrationCodeRequest $request)
     {
         $this->authorize('create', RegistrationCode::class);
-        $validated = $request->validate([
-            'unit_id' => 'required|exists:units,id',
-        ]);
+        $validated = $request->validated();
 
         $unit = Unit::findOrFail($validated['unit_id']);
 

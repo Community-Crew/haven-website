@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
 use App\Http\Enums\RoomStatus;
@@ -54,17 +55,10 @@ class RoomController extends Controller
 
     }
 
-    public function update(Request $request, Room $room)
+    public function update(UpdateRoomRequest $request, Room $room)
     {
         $this->authorize('update', $room);
 
-        $request->validate([
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'location' => 'required|string',
-            'status' => ['required', new Enum(RoomStatus::class)],
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5000',
-        ]);
 
         if ($request->hasFile('image')) {
             if ($room->image_path && Storage::disk('hetzner')->exists($room->image_path)) {

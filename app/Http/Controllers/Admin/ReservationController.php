@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\UpdateReservationRequest;
+use App\Http\Requests\Admin\StoreReservationRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
 use App\Models\Reservation;
@@ -68,16 +70,10 @@ class ReservationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreReservationRequest $request)
     {
         $this->authorize('create', Reservation::class);
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'room' => 'required|exists:rooms,id',
-            'start_time' => 'required|date|after:now',
-            'end_time' => 'required|date|after:start_time',
-        ]);
+        $validated = $request->validated();
 
         $user = User::where('email', $validated['email'])->first();
 
@@ -126,17 +122,10 @@ class ReservationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Reservation $reservation)
+    public function update(UpdateReservationRequest $request, Reservation $reservation)
     {
         $this->authorize('update', $reservation);
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'room' => 'required|exists:rooms,id',
-            'status' => 'required',
-            'start_time' => 'required|date|after:now',
-            'end_time' => 'required|date|after:start_time',
-        ]);
+        $validated = $request->validated();
 
         $user = User::where('email', $validated['email'])->first();
 
