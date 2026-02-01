@@ -171,6 +171,7 @@ class ReservationController extends Controller
                     if ($value !== null && ! $user->organisations->contains($value)) {
                         return $fail('You can only use organisations you are a member of.');
                     }
+
                     return true;
                 },
             ],
