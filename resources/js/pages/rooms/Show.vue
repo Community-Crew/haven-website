@@ -180,8 +180,31 @@ const getDateString = (date: Date) => {
                                             <p class="justify-self-start">
                                                 Who:
                                             </p>
+                                            <div
+                                                v-if="
+                                                    reservation.user_name &&
+                                                    reservation.organisation
+                                                "
+                                                class="flex items-center justify-end font-medium"
+                                            >
+                                                <S3Image
+                                                    :src="
+                                                        reservation.organisation
+                                                            .image_url
+                                                    "
+                                                    class="ml-2 inline"
+                                                />
+                                                <p class="inline">
+                                                    {{
+                                                        reservation.organisation
+                                                            .name
+                                                    }}
+                                                </p>
+                                            </div>
                                             <p
-                                                v-if="reservation.user_name"
+                                                v-else-if="
+                                                    reservation.user_name
+                                                "
                                                 class="justify-self-end font-medium"
                                             >
                                                 {{ reservation.user_name }}
