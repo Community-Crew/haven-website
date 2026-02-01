@@ -18,25 +18,24 @@ trait HasS3Image
 
     protected function generateImageUrl(int $minutes = 15, string $placeholder = 'placeholder.gif'): ?string
     {
-        {
-            $disk = Storage::disk('hetzner');
 
-            $key = $this->image_path ?: $placeholder;
+        $disk = Storage::disk('hetzner');
 
-            try {
-                if (! $disk->exists($key) && $key !== $placeholder) {
-                    $key = $placeholder;
-                }
+        $key = $this->image_path ?: $placeholder;
 
-                if (! $disk->exists($key)) {
-                    return null;
-                }
+        try {
+            if (! $disk->exists($key) && $key !== $placeholder) {
+                $key = $placeholder;
+            }
 
-                return $disk->temporaryUrl($key, Carbon::now()->addMinutes($minutes));
-            } catch (Throwable $e) {
+            if (! $disk->exists($key)) {
                 return null;
             }
-        }
-    }
 
+            return $disk->temporaryUrl($key, Carbon::now()->addMinutes($minutes));
+        } catch (Throwable $e) {
+            return null;
+        }
+
+    }
 }

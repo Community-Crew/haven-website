@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\RegistrationCode;
 use App\Models\Unit;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RegistrationCodeSeeder extends Seeder
@@ -17,7 +16,7 @@ class RegistrationCodeSeeder extends Seeder
         $units = Unit::all();
 
         $units->each(function (Unit $unit) {
-            $number = fake()->numberBetween(0,3);
+            $number = fake()->numberBetween(0, 3);
             RegistrationCode::factory()
                 ->count($number)
                 ->create([

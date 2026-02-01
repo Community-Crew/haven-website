@@ -54,5 +54,4 @@ class Unit extends Model
             }
         );
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 return [
     'authServerUrl' => env('KEYCLOAK_BASE_URL'),
     'realm' => env('KEYCLOAK_REALM'),

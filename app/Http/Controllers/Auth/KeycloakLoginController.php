@@ -6,13 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Group;
 use App\Models\Organisation;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
 use Laravel\Socialite\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
-
 
 class KeycloakLoginController extends Controller
 {
@@ -21,34 +20,35 @@ class KeycloakLoginController extends Controller
         try {
             $keycloak_user = Socialite::driver('keycloak')->user();
         } catch (InvalidStateException) {
-            return redirect('auth/login/redirect');
+            return redirect()->to('auth/login/redirect');
         }
 
         $user = User::updateOrCreate(
             ['keycloak_id' => $keycloak_user->getId()],
             [
                 'name' => $keycloak_user->getName(),
-                'email' => $keycloak_user->getEmail()
+                'email' => $keycloak_user->getEmail(),
             ]
         );
-        $user_is_validated = $keycloak_user->user['validated'] ?? "no";
+        $user_is_validated = $keycloak_user->user['validated'] ?? 'no';
 
         $access_token = $keycloak_user->token;
-        list($header, $payload, $signature) = explode(".", $access_token);
+        [$header, $payload, $signature] = explode('.', $access_token);
         $claims = json_decode(base64_decode($payload), true);
 
         $clientName = config('services.keycloak.client_id');
         $roles = $claims['resource_access'][$clientName]['roles'] ?? [];
         $groupsFromToken = $claims['groups'] ?? [];
 
-        Session::put('roles', $roles);
+        $request->session()->put('roles', $roles);
 
         $this->syncUserGroups($user, $groupsFromToken);
         $this->updateUserOrganizationRoles($user, $roles);
 
         if ($user_is_validated == 'yes') {
             Auth::login($user);
-            return redirect('/');
+
+            return redirect()->to('/');
         } else {
             $request->session()->put('keycloak_id', $user->keycloak_id);
 
@@ -61,9 +61,9 @@ class KeycloakLoginController extends Controller
         return Socialite::driver('keycloak')->redirect();
     }
 
-    public function register(Request $request)
+    public function register(Request $request): RedirectResponse
     {
-        return redirect(config('services.keycloak.base_url') . config('services.keycloak.realm') . 'account');
+        return redirect(config('services.keycloak.base_url').config('services.keycloak.realm').'account');
     }
 
     protected function syncUserGroups(User $user, array $groupsFromToken)
@@ -91,7 +91,7 @@ class KeycloakLoginController extends Controller
 
                 $organisation = Organisation::find($organisationId);
                 if ($organisation) {
-                    if (!$organisation->users()->where('users.id', $user->id)->exists()) {
+                    if (! $organisation->users()->where('users.id', $user->id)->exists()) {
                         $organisation->users()->attach($user->id);
                     }
                 }
@@ -101,10 +101,9 @@ class KeycloakLoginController extends Controller
         // Remove user from organizations where they no longer have the role
         $organisations = Organisation::all();
         foreach ($organisations as $organisation) {
-            if (!in_array($organisation->id, $organisationRoles)) {
+            if (! in_array($organisation->id, $organisationRoles)) {
                 $organisation->users()->detach($user->id);
             }
         }
     }
-
 }

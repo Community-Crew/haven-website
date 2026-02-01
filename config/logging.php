@@ -131,7 +131,7 @@ return [
 
         'sentry' => [
             'driver' => 'sentry',
-        ]
+        ],
 
     ],
 

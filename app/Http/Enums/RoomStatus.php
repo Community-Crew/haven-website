@@ -41,7 +41,6 @@ enum RoomStatus: string implements JsonSerializable
         };
     }
 
-
     public function jsonSerialize(): mixed
     {
         return [
