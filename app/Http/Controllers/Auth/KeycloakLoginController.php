@@ -40,7 +40,7 @@ class KeycloakLoginController extends Controller
         $roles = $claims['resource_access'][$clientName]['roles'] ?? [];
         $groupsFromToken = $claims['groups'] ?? [];
 
-        Session::put('roles', $roles);
+        $request->session()->put('roles', $roles);
 
         $this->syncUserGroups($user, $groupsFromToken);
         $this->updateUserOrganizationRoles($user, $roles);

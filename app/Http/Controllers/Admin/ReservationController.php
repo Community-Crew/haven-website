@@ -50,7 +50,7 @@ class ReservationController extends Controller
         return Inertia::render('dashboard/reservations/Index',
             [
                 'reservations' => $reservations,
-                'filters' => request()->only('room', 'status', 'date'),
+                'filters' => $request->only('room', 'status', 'date'),
                 'rooms' => Room::all()->pluck('name'),
                 'statuses' => $statuses,
 

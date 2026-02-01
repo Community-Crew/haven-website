@@ -49,7 +49,7 @@ class RoomController extends Controller
             'room' => $room,
             'statusOptions' => RoomStatus::cases(),
             'reservationStatusOptions' => ReservationStatus::cases(),
-            'filters' => request()->only('status', 'date'),
+            'filters' => $request->only('status', 'date'),
             'reservations' => $reservations,
         ]);
 

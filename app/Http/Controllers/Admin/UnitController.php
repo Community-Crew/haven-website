@@ -36,7 +36,7 @@ class UnitController extends Controller
 
         return Inertia::render('dashboard/units/Index', [
             'units' => $units,
-            'filters' => request()->only('building', 'floor'),
+            'filters' => $request->only('building', 'floor'),
             'buildings' => Unit::query()
                 ->select('building')
                 ->distinct()

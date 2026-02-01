@@ -16,7 +16,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        $roles = Session::get('roles');
+        $roles = $request->session()->get('roles');
         if (in_array($role, $roles)) {
             return $next($request);
         }

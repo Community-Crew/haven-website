@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
 use App\Models\Room;
@@ -24,9 +25,9 @@ class RoomController extends Controller
         return Inertia::render('rooms/Index', ['rooms' => Room::all()]);
     }
 
-    public function show(Room $room)
+    public function show(Request $request, Room $room)
     {
-        if (request()->user() != null) {
+        if ($request->user() != null) {
             $reservations = $room->reservations()
                 ->whereTodayOrAfter('start_at')
                 ->where('status', ReservationStatus::APPROVED->value)
@@ -43,7 +44,7 @@ class RoomController extends Controller
                     'organisation' => $reservation->organisation,
                 ];
 
-                if ($reservation->share_user || $reservation->user == auth()->user()) {
+                if ($reservation->share_user || $reservation->user == $request->user()) {
                     $data['user_name'] = $reservation->user->name;
                 }
 
@@ -65,7 +66,7 @@ class RoomController extends Controller
                 'reservations' => $formattedReservations,
                 'policy' => $policy,
                 'maxDaysInAdvance' => $service->getAllDaysInAdvance($room),
-                'userOrganisations' => request()->user()->organisations,
+                'userOrganisations' => $request->user()->organisations,
             ]);
     }
 }
