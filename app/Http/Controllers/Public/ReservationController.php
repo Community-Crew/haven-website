@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Enums\ReservationStatus;
-use App\Models\Organisation;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
@@ -61,7 +60,7 @@ class ReservationController extends Controller
             abort(403, 'You can only edit future reservations.');
         }
 
-        if (!($reservation->status == ReservationStatus::APPROVED || $reservation->status == ReservationStatus::PENDING)) {
+        if (! ($reservation->status == ReservationStatus::APPROVED || $reservation->status == ReservationStatus::PENDING)) {
             abort(403, 'You can only edit approved or pending reservations.');
         }
 
@@ -100,14 +99,16 @@ class ReservationController extends Controller
         }
 
         $reservation->update([
-            'status' => ReservationStatus::CANCELLED
+            'status' => ReservationStatus::CANCELLED,
         ]);
+
         return redirect()->back()->with('success', 'Reservation cancelled.');
     }
 
     private function getValidationRules(Request $request): array
     {
         $user = $request->user();
+
         return [
             'name' => 'required|string|max:255',
             'share_name' => 'required|boolean',
@@ -118,11 +119,18 @@ class ReservationController extends Controller
                 'required', 'string',
                 function ($attribute, $value, $fail) {
                     $date = $this->parseDateTime($value);
-                    if (!$date) return $fail('Invalid date.');
-                    if ($date->isPast()) return $fail('Start time must be in the future.');
-                    if ($date->minute !== 0 && $date->minute !== 30) return $fail('Start time must be on the hour or half-hour.');
+                    if (! $date) {
+                        return $fail('Invalid date.');
+                    }
+                    if ($date->isPast()) {
+                        return $fail('Start time must be in the future.');
+                    }
+                    if ($date->minute !== 0 && $date->minute !== 30) {
+                        return $fail('Start time must be on the hour or half-hour.');
+                    }
+
                     return true;
-                }
+                },
             ],
 
             'end_time' => [
@@ -131,31 +139,38 @@ class ReservationController extends Controller
                     $start = $this->parseDateTime($request->input('start_time'));
                     $end = $this->parseDateTime($value);
 
-                    if (!$end) return $fail('Invalid date.');
+                    if (! $end) {
+                        return $fail('Invalid date.');
+                    }
 
-                    if ($start && $end->lte($start)) return $fail('End time must be after start.');
+                    if ($start && $end->lte($start)) {
+                        return $fail('End time must be after start.');
+                    }
 
-                    if ($end->minute !== 0 && $end->minute !== 30) return $fail('End time must be on the hour or half-hour.');
+                    if ($end->minute !== 0 && $end->minute !== 30) {
+                        return $fail('End time must be on the hour or half-hour.');
+                    }
 
                     if ($start) {
                         $isSameDay = $start->isSameDay($end);
                         $isMidnightNextDay = $end->format('H:i') === '00:00' && $end->isSameDay($start->copy()->addDay());
 
-                        if (!$isSameDay && !$isMidnightNextDay) {
+                        if (! $isSameDay && ! $isMidnightNextDay) {
                             $fail('The start and end time must be on the same day.');
                         }
                     }
+
                     return true;
-                }
+                },
             ],
             'organisation' => [
                 'nullable',
                 'exists:organisations,id',
                 function ($attribute, $value, $fail) use ($user) {
-                    if ($value !== null && !$user->reservations->contains($value)) {
+                    if ($value !== null && ! $user->reservations->contains($value)) {
                         return $fail('You can only use organisations you are a member of.');
                     }
-                }
+                },
             ],
         ];
     }
@@ -165,7 +180,9 @@ class ReservationController extends Controller
      */
     private function parseDateTime(?string $timeString): ?Carbon
     {
-        if (!$timeString) return null;
+        if (! $timeString) {
+            return null;
+        }
 
         if (str_ends_with($timeString, 'T24:00')) {
             try {
@@ -187,14 +204,14 @@ class ReservationController extends Controller
 
     private function ensureWithinPolicy(Room $room, Carbon $reqStart, Carbon $reqEnd)
     {
-        $service = new ReservationPolicyService();
+        $service = new ReservationPolicyService;
         $allowedSlots = $service->getMergedTimeSlots($reqStart, $room);
         $dateString = $reqStart->format('Y-m-d');
         $isWithinPolicy = false;
 
         foreach ($allowedSlots as $slot) {
-            $policyStart = Carbon::createFromFormat('Y-m-d H:i', $dateString . ' ' . $slot['start'], $this->timezone);
-            $policyEnd = Carbon::createFromFormat('Y-m-d H:i', $dateString . ' ' . $slot['end'], $this->timezone);
+            $policyStart = Carbon::createFromFormat('Y-m-d H:i', $dateString.' '.$slot['start'], $this->timezone);
+            $policyEnd = Carbon::createFromFormat('Y-m-d H:i', $dateString.' '.$slot['end'], $this->timezone);
 
             if ($slot['end'] === '24:00') {
                 $policyEnd->addDay()->startOfDay();
@@ -206,7 +223,7 @@ class ReservationController extends Controller
             }
         }
 
-        if (!$isWithinPolicy) {
+        if (! $isWithinPolicy) {
             throw ValidationException::withMessages([
                 'start_time' => 'The selected time is outside your allowed reservation hours.',
             ]);

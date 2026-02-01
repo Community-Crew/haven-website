@@ -39,5 +39,5 @@ route::get('wip', function () {
 
 route::Resource('reservations', ReservationController::class)->only(['store', 'destroy', 'update']);
 
-require __DIR__ . '/auth.php';
-require __DIR__ . '/admin.php';
+require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';

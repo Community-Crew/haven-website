@@ -14,7 +14,6 @@ class RegistrationCodeController extends Controller
 {
     use AuthorizesRequests;
 
-
     /**
      * Display a listing of the resource.
      */
@@ -29,7 +28,7 @@ class RegistrationCodeController extends Controller
             ->where('floor', $floor)
             ->get();
 
-        return Inertia::render('dashboard/registrationCodes/Index', ["units" => $units]);
+        return Inertia::render('dashboard/registrationCodes/Index', ['units' => $units]);
     }
 
     /**
@@ -53,6 +52,7 @@ class RegistrationCodeController extends Controller
         $unit = Unit::findOrFail($validated['unit_id']);
 
         $unit->registrationCodes()->create();
+
         return Redirect::back()->with('success', 'New Registration Code has been created.');
     }
 
@@ -63,6 +63,7 @@ class RegistrationCodeController extends Controller
     {
         $this->authorize('view', $registrationCode);
         $unit = $registrationCode->unit()->first();
+
         return Inertia::render('dashboard/registrationCodes/Show', ['regCode' => $registrationCode, 'unit' => $unit]);
     }
 
@@ -89,6 +90,7 @@ class RegistrationCodeController extends Controller
     {
         $this->authorize('delete', $registrationCode);
         $registrationCode->delete();
+
         return Redirect::back()->with('success', 'Registration Code has been deleted.');
     }
 

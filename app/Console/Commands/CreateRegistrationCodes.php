@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\RegistrationCode;
 use App\Models\Unit;
 use Illuminate\Console\Command;
 
@@ -32,9 +31,9 @@ class CreateRegistrationCodes extends Command
             $registrationCodes = $unit->registrationCodes();
             $activeCodes = $registrationCodes->where('is_used', false);
             $registeredUsers = $unit->users()->count();
-            $unregisteredUsersPerUnit = $unit['max_residents']- $registeredUsers;
+            $unregisteredUsersPerUnit = $unit['max_residents'] - $registeredUsers;
 
-            if($unregisteredUsersPerUnit > 0 && $activeCodes->count() < $unregisteredUsersPerUnit) {
+            if ($unregisteredUsersPerUnit > 0 && $activeCodes->count() < $unregisteredUsersPerUnit) {
                 for ($i = 0; $i < $unregisteredUsersPerUnit; $i++) {
                     $unit->registrationCodes()->create();
                 }

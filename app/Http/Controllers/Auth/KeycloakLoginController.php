@@ -13,7 +13,6 @@ use Inertia\Inertia;
 use Laravel\Socialite\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
 
-
 class KeycloakLoginController extends Controller
 {
     public function callback(Request $request)
@@ -28,13 +27,13 @@ class KeycloakLoginController extends Controller
             ['keycloak_id' => $keycloak_user->getId()],
             [
                 'name' => $keycloak_user->getName(),
-                'email' => $keycloak_user->getEmail()
+                'email' => $keycloak_user->getEmail(),
             ]
         );
-        $user_is_validated = $keycloak_user->user['validated'] ?? "no";
+        $user_is_validated = $keycloak_user->user['validated'] ?? 'no';
 
         $access_token = $keycloak_user->token;
-        list($header, $payload, $signature) = explode(".", $access_token);
+        [$header, $payload, $signature] = explode('.', $access_token);
         $claims = json_decode(base64_decode($payload), true);
 
         $clientName = config('services.keycloak.client_id');
@@ -48,6 +47,7 @@ class KeycloakLoginController extends Controller
 
         if ($user_is_validated == 'yes') {
             Auth::login($user);
+
             return redirect('/');
         } else {
             $request->session()->put('keycloak_id', $user->keycloak_id);
@@ -63,7 +63,7 @@ class KeycloakLoginController extends Controller
 
     public function register(Request $request)
     {
-        return redirect(config('services.keycloak.base_url') . config('services.keycloak.realm') . 'account');
+        return redirect(config('services.keycloak.base_url').config('services.keycloak.realm').'account');
     }
 
     protected function syncUserGroups(User $user, array $groupsFromToken)
@@ -91,7 +91,7 @@ class KeycloakLoginController extends Controller
 
                 $organisation = Organisation::find($organisationId);
                 if ($organisation) {
-                    if (!$organisation->users()->where('users.id', $user->id)->exists()) {
+                    if (! $organisation->users()->where('users.id', $user->id)->exists()) {
                         $organisation->users()->attach($user->id);
                     }
                 }
@@ -101,10 +101,9 @@ class KeycloakLoginController extends Controller
         // Remove user from organizations where they no longer have the role
         $organisations = Organisation::all();
         foreach ($organisations as $organisation) {
-            if (!in_array($organisation->id, $organisationRoles)) {
+            if (! in_array($organisation->id, $organisationRoles)) {
                 $organisation->users()->detach($user->id);
             }
         }
     }
-
 }

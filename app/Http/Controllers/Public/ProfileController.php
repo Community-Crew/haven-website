@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Models\Organisation;
-use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -29,7 +27,7 @@ class ProfileController extends Controller
                 'unit' => $unit,
                 'groups' => $groups,
                 'reservations' => $reservations,
-                'organisations' => $organisations
+                'organisations' => $organisations,
             ]);
     }
 }

@@ -16,7 +16,7 @@ class ImageController extends Controller
         ]);
 
         $file = $request->file('image');
-        $filename = "images/".uniqid()."_"."webp";
+        $filename = 'images/'.uniqid().'_'.'webp';
 
         $image = Image::read($file)
             ->scaleDown(width: 1200)

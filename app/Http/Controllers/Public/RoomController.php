@@ -8,7 +8,6 @@ use App\Models\Room;
 use App\Services\ReservationPolicyService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class RoomController extends Controller
@@ -17,12 +16,14 @@ class RoomController extends Controller
 
     /**
      * Display a listing of the resource.
+     *
      * @throws AuthorizationException
      */
     public function index()
     {
         return Inertia::render('rooms/Index', ['rooms' => Room::all()]);
     }
+
     public function show(Room $room)
     {
         if (request()->user() != null) {
@@ -52,12 +53,12 @@ class RoomController extends Controller
             $formattedReservations = [];
         }
 
-
-        $service = new ReservationPolicyService();
+        $service = new ReservationPolicyService;
         $policy = [];
         for ($i = 0; $i < 7; $i++) {
             $policy[$i] = $service->getMergedTimeSlotsOnWeekday($i, $room);
         }
+
         return Inertia::render('rooms/Show',
             [
                 'room' => $room,

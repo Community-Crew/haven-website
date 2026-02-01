@@ -7,8 +7,8 @@ use App\Http\Enums\ReservationStatus;
 use App\Http\Enums\RoomStatus;
 use App\Models\Reservation;
 use App\Models\Room;
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Enum;
 use Inertia\Inertia;
@@ -25,15 +25,9 @@ class RoomController extends Controller
         return Inertia::render('dashboard/rooms/Index', ['rooms' => $rooms]);
     }
 
-    public function create()
-    {
+    public function create() {}
 
-    }
-
-    public function store(Request $request)
-    {
-
-    }
+    public function store(Request $request) {}
 
     public function show(Request $request, Room $room)
     {
@@ -55,7 +49,7 @@ class RoomController extends Controller
             'statusOptions' => RoomStatus::cases(),
             'reservationStatusOptions' => ReservationStatus::cases(),
             'filters' => request()->only('status', 'date'),
-            'reservations' => $reservations
+            'reservations' => $reservations,
         ]);
 
     }

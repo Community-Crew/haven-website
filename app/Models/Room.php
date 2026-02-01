@@ -11,7 +11,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Room extends Model
 {
-    use HasSlug, HasS3Image;
+    use HasS3Image, HasSlug;
 
     protected $fillable = [
         'name',
@@ -72,5 +72,4 @@ class Room extends Model
 
         return $attributes;
     }
-
 }

@@ -17,9 +17,10 @@ class CheckRole
     public function handle(Request $request, Closure $next, string $role): Response
     {
         $roles = Session::get('roles');
-        if(in_array($role, $roles)) {
+        if (in_array($role, $roles)) {
             return $next($request);
         }
-        return redirect()->back()->with('error', ['Geen permissie (' . $role . ' Benodigd)']);
+
+        return redirect()->back()->with('error', ['Geen permissie ('.$role.' Benodigd)']);
     }
 }

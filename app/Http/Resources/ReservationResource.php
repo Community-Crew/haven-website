@@ -23,7 +23,7 @@ class ReservationResource extends JsonResource
                 return [
                     'name' => $this->user->name,
                 ];
-            })
+            }),
         ];
     }
 }

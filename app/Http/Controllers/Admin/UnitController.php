@@ -12,8 +12,10 @@ use Inertia\Inertia;
 class UnitController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
+     *
      * @throws AuthorizationException
      */
     public function index(Request $request)
@@ -31,6 +33,7 @@ class UnitController extends Controller
         });
 
         $units = $query->paginate(30)->withQueryString();
+
         return Inertia::render('dashboard/units/Index', [
             'units' => $units,
             'filters' => request()->only('building', 'floor'),
@@ -70,9 +73,9 @@ class UnitController extends Controller
     public function show(Unit $unit)
     {
         return Inertia::render('dashboard/units/Show', [
-            "unit" => $unit,
-            "users" => $unit->users,
-            "registrationCodes" => $unit->registrationCodes,
+            'unit' => $unit,
+            'users' => $unit->users,
+            'registrationCodes' => $unit->registrationCodes,
         ]);
     }
 

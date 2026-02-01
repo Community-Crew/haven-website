@@ -14,6 +14,7 @@ class UnitPolicy
         // Get roles from session and ensure it's an array, default to empty array if null.
         return (array) session('roles', []);
     }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -28,6 +29,7 @@ class UnitPolicy
     public function view(User $user, Unit $unit): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-view-'.$unit->id, $roles)
             || $this->viewAny($user); // You can re-use viewAny for the general permission
     }
@@ -46,6 +48,7 @@ class UnitPolicy
     public function update(User $user, Unit $unit): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-update', $roles)
             || in_array('admin-'.$this->resource.'-update-'.$unit->id, $roles);
     }
@@ -56,6 +59,7 @@ class UnitPolicy
     public function delete(User $user, Unit $unit): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-delete', $roles)
             || in_array('admin-'.$this->resource.'-delete-'.$unit->id, $roles);
     }
@@ -66,6 +70,7 @@ class UnitPolicy
     public function restore(User $user, Unit $unit): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-restore', $roles)
             || in_array('admin-'.$this->resource.'-restore-'.$unit->id, $roles);
     }
@@ -76,6 +81,7 @@ class UnitPolicy
     public function forceDelete(User $user, Unit $unit): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-force_delete', $roles)
             || in_array('admin-'.$this->resource.'-force_delete-'.$unit->id, $roles);
     }

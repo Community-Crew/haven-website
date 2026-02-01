@@ -14,12 +14,14 @@ class OrganisationController extends Controller
     public function index()
     {
         $organisations = Organisation::all();
+
         return Inertia::render('dashboard/organisations/Index', ['organisations' => $organisations]);
     }
 
     public function show(Organisation $organisation)
     {
         $organisation->load('users');
+
         return Inertia::render('dashboard/organisations/Show', ['organisation' => $organisation]);
     }
 
@@ -32,7 +34,7 @@ class OrganisationController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if($organisation->image_path && Storage::disk('hetzner')->exists($organisation->image_path)){
+            if ($organisation->image_path && Storage::disk('hetzner')->exists($organisation->image_path)) {
                 Storage::disk('hetzner')->delete($organisation->image_path);
             }
 
@@ -54,5 +56,4 @@ class OrganisationController extends Controller
 
         return redirect()->route('admin.organisations.show', $organisation->slug);
     }
-
 }
