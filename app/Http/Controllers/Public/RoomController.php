@@ -8,12 +8,10 @@ use App\Http\Enums\ReservationStatus;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 
 class RoomController extends Controller
 {
-    use AuthorizesRequests;
 
     /**
      * Display a listing of the resource.

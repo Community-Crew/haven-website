@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Enums\ReservationStatus;
 use App\Http\Enums\RoomStatus;
 use App\Models\Reservation;
 use App\Models\Room;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Enum;
@@ -16,11 +16,10 @@ use Inertia\Inertia;
 
 class RoomController extends Controller
 {
-    use AuthorizesRequests;
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Room::class);
+        Gate::authorize('viewAny', Room::class);
         $rooms = Room::all();
 
         return Inertia::render('dashboard/rooms/Index', ['rooms' => $rooms]);
@@ -32,7 +31,7 @@ class RoomController extends Controller
 
     public function show(Request $request, Room $room)
     {
-        $this->authorize('view', $room);
+        Gate::authorize('view', $room);
         $query = Reservation::query()->with('room', 'user');
 
         $query->where('room_id', $room->id);
@@ -57,7 +56,7 @@ class RoomController extends Controller
 
     public function update(UpdateRoomRequest $request, Room $room)
     {
-        $this->authorize('update', $room);
+        Gate::authorize('update', $room);
 
 
         if ($request->hasFile('image')) {

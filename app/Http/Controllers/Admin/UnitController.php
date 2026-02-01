@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Controllers\Controller;
 use App\Models\Unit;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class UnitController extends Controller
 {
-    use AuthorizesRequests;
 
     /**
      * Display a listing of the resource.
@@ -20,7 +19,7 @@ class UnitController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Unit::class);
+        Gate::authorize('viewAny', Unit::class);
 
         $query = Unit::query()->withCount('users as residents');
 

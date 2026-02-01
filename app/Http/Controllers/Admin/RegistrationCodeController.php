@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\Admin\StoreRegistrationCodeRequest;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationCode;
 use App\Models\Unit;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class RegistrationCodeController extends Controller
 {
-    use AuthorizesRequests;
 
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', RegistrationCode::class);
+        Gate::authorize('viewAny', RegistrationCode::class);
 
         $building = $request->get('building');
         $floor = $request->get('floor');
@@ -37,7 +36,7 @@ class RegistrationCodeController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', RegistrationCode::class);
+        Gate::authorize('create', RegistrationCode::class);
     }
 
     /**
@@ -45,7 +44,7 @@ class RegistrationCodeController extends Controller
      */
     public function store(StoreRegistrationCodeRequest $request)
     {
-        $this->authorize('create', RegistrationCode::class);
+        Gate::authorize('create', RegistrationCode::class);
         $validated = $request->validated();
 
         $unit = Unit::findOrFail($validated['unit_id']);
@@ -60,7 +59,7 @@ class RegistrationCodeController extends Controller
      */
     public function show(RegistrationCode $registrationCode)
     {
-        $this->authorize('view', $registrationCode);
+        Gate::authorize('view', $registrationCode);
         $unit = $registrationCode->unit()->first();
 
         return Inertia::render('dashboard/registrationCodes/Show', ['regCode' => $registrationCode, 'unit' => $unit]);
@@ -71,7 +70,7 @@ class RegistrationCodeController extends Controller
      */
     public function edit(RegistrationCode $registrationCode)
     {
-        $this->authorize('update', $registrationCode);
+        Gate::authorize('update', $registrationCode);
     }
 
     /**
@@ -79,7 +78,7 @@ class RegistrationCodeController extends Controller
      */
     public function update(Request $request, RegistrationCode $registrationCode)
     {
-        $this->authorize('update', $registrationCode);
+        Gate::authorize('update', $registrationCode);
     }
 
     /**
@@ -87,7 +86,7 @@ class RegistrationCodeController extends Controller
      */
     public function destroy(RegistrationCode $registrationCode)
     {
-        $this->authorize('delete', $registrationCode);
+        Gate::authorize('delete', $registrationCode);
         $registrationCode->delete();
 
         return redirect()->back()->with('success', 'Registration Code has been deleted.');
@@ -98,6 +97,6 @@ class RegistrationCodeController extends Controller
      */
     public function print(RegistrationCode $registrationCode)
     {
-        $this->authorize('print', $registrationCode);
+        Gate::authorize('print', $registrationCode);
     }
 }

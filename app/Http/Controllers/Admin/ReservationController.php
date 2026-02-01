@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\Admin\UpdateReservationRequest;
 use App\Http\Requests\Admin\StoreReservationRequest;
 use App\Http\Controllers\Controller;
@@ -9,7 +10,6 @@ use App\Http\Enums\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\User;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -17,7 +17,6 @@ use ReflectionEnum;
 
 class ReservationController extends Controller
 {
-    use AuthorizesRequests;
 
     /**
      * Display a listing of the resource.
@@ -27,7 +26,7 @@ class ReservationController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', Reservation::class);
+        Gate::authorize('viewAny', Reservation::class);
 
         $query = Reservation::query()->with('user', 'room');
 
@@ -62,7 +61,7 @@ class ReservationController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', Reservation::class);
+        Gate::authorize('create', Reservation::class);
 
         return Inertia::render('dashboard/reservations/Create', ['rooms' => Room::all()]);
     }
@@ -72,7 +71,7 @@ class ReservationController extends Controller
      */
     public function store(StoreReservationRequest $request)
     {
-        $this->authorize('create', Reservation::class);
+        Gate::authorize('create', Reservation::class);
         $validated = $request->validated();
 
         $user = User::where('email', $validated['email'])->first();
@@ -103,7 +102,7 @@ class ReservationController extends Controller
      */
     public function show(Reservation $reservation)
     {
-        $this->authorize('view', $reservation);
+        Gate::authorize('view', $reservation);
         $reservation = $reservation->load('user', 'room');
         $enumReflectionStatues = new ReflectionEnum(ReservationStatus::class);
         $statuses = array_map(fn ($case) => $case->getValue()->value, $enumReflectionStatues->getCases());
@@ -124,7 +123,7 @@ class ReservationController extends Controller
      */
     public function update(UpdateReservationRequest $request, Reservation $reservation)
     {
-        $this->authorize('update', $reservation);
+        Gate::authorize('update', $reservation);
         $validated = $request->validated();
 
         $user = User::where('email', $validated['email'])->first();
