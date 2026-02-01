@@ -91,7 +91,9 @@ class KeycloakLoginController extends Controller
 
                 $organisation = Organisation::find($organisationId);
                 if ($organisation) {
-                    $organisation->users()->attach($user->id);
+                    if (!$organisation->users()->where('users.id', $user->id)->exists()) {
+                        $organisation->users()->attach($user->id);
+                    }
                 }
             }
         }

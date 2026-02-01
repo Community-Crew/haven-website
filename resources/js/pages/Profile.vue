@@ -92,7 +92,6 @@ const prevSlide = () => {
 
 const startRotation = () => {
     if (carouselItems.value.length > 1) {
-        // @ts-ignore
         autoRotateInterval.value = setInterval(nextSlide, 6000);
     }
 };
@@ -160,7 +159,7 @@ onUnmounted(() => stopRotation());
                                 @click="prevSlide"
                                 class="absolute left-[-10px] md:left-0 top-1/2 z-20 -translate-y-1/2 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-haven-blue focus:outline-none"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-5 w-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-5 w-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                                 </svg>
                             </button>
@@ -219,17 +218,17 @@ onUnmounted(() => stopRotation());
                                         <!-- Header Wrapper: Same Min-Height for Alignment -->
                                         <div class="flex min-h-[5.5rem] items-end justify-between gap-4 text-haven-black pb-1">
                                             <!-- Name (Left) -->
-                                            <h2 class="text-2xl font-bold leading-tight mb-0.5">
+                                            <h2 class="text-2xl font-bold leading-tight mb-0.5 place-self-center">
                                                 {{ currentItem.data.name }}
                                             </h2>
 
                                             <!-- Logo (Right) -->
                                             <div class="flex-shrink-0 mb-1">
                                                 <img
-                                                    v-if="currentItem.data.logo"
-                                                    :src="currentItem.data.logo"
+                                                    v-if="currentItem.data.image_url"
+                                                    :src="currentItem.data.image_url"
                                                     :alt="currentItem.data.name"
-                                                    class="h-14 w-14 object-contain"
+                                                    class="h-32 w-32 object-contain"
                                                 />
                                                 <div
                                                     v-else
@@ -240,7 +239,7 @@ onUnmounted(() => stopRotation());
                                             </div>
                                         </div>
 
-                                        <hr class="my-6 border-t border-haven-blue/20" />
+                                        <hr class="mb-4 border-t border-haven-blue/20" />
 
                                         <div class="space-y-4">
                                             <p class="whitespace-pre-line text-brand-dark-blue/80">
@@ -258,7 +257,7 @@ onUnmounted(() => stopRotation());
                                 @click="nextSlide"
                                 class="absolute right-[-10px] md:right-0 top-1/2 z-20 -translate-y-1/2 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-haven-blue focus:outline-none"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-5 w-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-5 w-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                                 </svg>
                             </button>
@@ -266,7 +265,7 @@ onUnmounted(() => stopRotation());
                             <!-- Dots Indicator (Pushed to bottom) -->
                             <div v-if="carouselItems.length > 1" class="mt-auto pt-6 flex justify-center gap-2">
                                 <button
-                                    v-for="(item, index) in carouselItems"
+                                    v-for="(index) in carouselItems"
                                     :key="index"
                                     @click="currentIndex = index"
                                     class="h-2 rounded-full transition-all duration-300"
@@ -334,7 +333,7 @@ onUnmounted(() => stopRotation());
                                     @click="openEditModal(reservation)"
                                     class="group flex items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-haven-blue shadow-sm ring-1 ring-inset ring-gray-300 transition-colors hover:bg-gray-50"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-gray-400 group-hover:text-haven-blue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="h-4 w-4 text-gray-400 group-hover:text-haven-blue">
                                         <path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" />
                                         <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" />
                                     </svg>
@@ -368,15 +367,3 @@ onUnmounted(() => stopRotation());
         />
     </PublicAppLayout>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-</style>
