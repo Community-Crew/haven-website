@@ -16,7 +16,7 @@ jobs:
         env:
           POSTGRES_DB: test
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: null
+          POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
         options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -54,4 +54,4 @@ jobs:
           DB_PORT: ${{ job.services.postgres.ports['5432'] }}
           DB_USERNAME: postgres
           DB_DATABASE: test
-          DB_PASSWORD: null
+          DB_PASSWORD: password
