@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Reservation, Room } from '@/types';
+import { Organisation, Reservation, Room } from '@/types';
 import { router, useForm } from '@inertiajs/vue3';
 import { computed, getCurrentInstance, nextTick, ref, watch } from 'vue';
 
@@ -12,6 +12,7 @@ const props = withDefaults(
         room: Room;
         edit?: boolean;
         reservation?: Reservation;
+        organisations?: Organisation[];
     }>(),
     {
         edit: false,
@@ -30,6 +31,7 @@ const form = useForm({
     end_time: '',
     share_name: true,
     room_id: props.room.id,
+    organisation: (props.reservation && props.reservation.organisation) ? props.reservation.organisation.id : null,
 });
 
 // Generate 30-minute time slots (08:00 to 24:00)
@@ -61,7 +63,10 @@ watch([bookingDate, startTimeStr, endTimeStr], () => {
 
 const extractTime = (dateStr: string) => {
     if (!dateStr) return '';
-    const timePart = dateStr.split(/[T ]/)[1];
+    const timePart = new Date(dateStr).toLocaleString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+    });
     if (!timePart) return '';
 
     const time = timePart.substring(0, 5);
@@ -90,7 +95,6 @@ watch(
                 // 2. Parse raw strings directly
                 const rawStart = props.reservation.start_at;
                 const rawEnd = props.reservation.end_at;
-                console.log(rawStart, rawEnd);
 
                 bookingDate.value = extractDate(rawStart);
 
@@ -332,6 +336,29 @@ const cancelReservation = () => {
                                     </p>
                                 </div>
                             </div>
+                            <div v-if="organisations">
+                                <div>
+                                    <label
+                                        class="mb-1 block text-sm font-bold text-haven-yellow"
+                                        >Organisation</label
+                                    >
+                                    <select
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        v-model="form.organisation"
+                                    >
+                                        <option :value="null" selected="true">
+                                            none
+                                        </option>
+                                        <option
+                                            v-for="organisation in organisations"
+                                            v-bind:key="organisation.id"
+                                            :value="organisation.id"
+                                        >
+                                            {{ organisation.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Footer Actions -->
@@ -352,7 +379,6 @@ const cancelReservation = () => {
 
                             <!-- Right: Submit Button -->
                             <div class="flex gap-3">
-
                                 <button
                                     type="submit"
                                     :disabled="form.processing"

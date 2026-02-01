@@ -63,7 +63,8 @@ class RoomController extends Controller
                 'room' => $room,
                 'reservations' => $formattedReservations,
                 'policy' => $policy,
-                'maxDaysInAdvance' => $service->getAllDaysInAdvance($room)
+                'maxDaysInAdvance' => $service->getAllDaysInAdvance($room),
+                'userOrganisations' => request()->user()->organisations,
             ]);
     }
 }

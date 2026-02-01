@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            $table->foreignId('organisations_id')->nullable()->constrained()->after('user_id');
+            $table->foreignId('organisation_id')->nullable()->constrained()->after('user_id');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('reservations', function (Blueprint $table) {
-            $table->dropForeign(['organisations_id']);
-            $table->dropColumn('organisations_id');
+            $table->dropForeign(['organisation_id']);
+            $table->dropColumn('organisation_id');
         });
     }
 };

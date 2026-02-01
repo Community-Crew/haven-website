@@ -20,7 +20,7 @@ class ProfileController extends Controller
             ->reservations()
             ->orderBy('start_at', 'desc')
             ->where('start_at', '>=', now())
-            ->with('room')
+            ->with(['room', 'organisation'])
             ->paginate(6)
             ->withQueryString();
 

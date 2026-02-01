@@ -363,6 +363,7 @@ onUnmounted(() => stopRotation());
             :room="selectedRoom"
             :reservation="selectedReservation"
             :edit="true"
+            :organisations="organisations"
             @close="closeModal"
         />
     </PublicAppLayout>

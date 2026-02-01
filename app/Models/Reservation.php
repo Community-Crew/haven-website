@@ -20,7 +20,7 @@ class Reservation extends Model
         "user_id",
         "share_user",
         "status",
-        "organization_id"
+        "organisation_id"
     ];
 
     protected $casts = [

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Enums\ReservationStatus;
+use App\Models\Organisation;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
@@ -41,6 +42,7 @@ class ReservationController extends Controller
             'start_at' => $reqStart,
             'end_at' => $reqEnd,
             'share_user' => $validated['share_name'],
+            'organisation' => $validated['organisation'],
         ]);
 
         return redirect()->back()->with('success', 'Reservation created successfully.');
@@ -69,7 +71,7 @@ class ReservationController extends Controller
         // 3. Prepare data
         $reqStart = $this->parseDateTime($validated['start_time']);
         $reqEnd = $this->parseDateTime($validated['end_time']);
-        $room = Room::findOrFail($validated['room'] ?? $validated['room_id']);
+        $room = Room::findOrFail($validated['room_id']);
 
         // 4. Logic Checks (Policy & Overlap - excluding current ID)
         $this->ensureWithinPolicy($room, $reqStart, $reqEnd);
@@ -82,6 +84,7 @@ class ReservationController extends Controller
             'start_at' => $reqStart,
             'end_at' => $reqEnd,
             'share_user' => $validated['share_name'],
+            'organisation_id' => $validated['organisation'],
         ]);
 
         return redirect()->back()->with('success', 'Reservation updated successfully.');
@@ -104,12 +107,12 @@ class ReservationController extends Controller
 
     private function getValidationRules(Request $request): array
     {
+        $user = $request->user();
         return [
             'name' => 'required|string|max:255',
             'share_name' => 'required|boolean',
 
-            'room' => 'required_without:room_id|exists:rooms,id',
-            'room_id' => 'required_without:room|exists:rooms,id',
+            'room_id' => 'required|exists:rooms,id',
 
             'start_time' => [
                 'required', 'string',
@@ -143,6 +146,15 @@ class ReservationController extends Controller
                         }
                     }
                     return true;
+                }
+            ],
+            'organisation' => [
+                'nullable',
+                'exists:organisations,id',
+                function ($attribute, $value, $fail) use ($user) {
+                    if ($value !== null && !$user->reservations->contains($value)) {
+                        return $fail('You can only use organisations you are a member of.');
+                    }
                 }
             ],
         ];
