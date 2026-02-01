@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\Organisation;
-use App\Models\RegistrationCode;
 use App\Models\User;
 
 class OrganisationPolicy
@@ -15,6 +14,7 @@ class OrganisationPolicy
         // Get roles from session and ensure it's an array, default to empty array if null.
         return (array) session('roles', []);
     }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -29,6 +29,7 @@ class OrganisationPolicy
     public function view(User $user, Organisation $organisation): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-view-'.$organisation->id, $roles)
             || $this->viewAny($user); // You can re-use viewAny for the general permission
     }
@@ -47,6 +48,7 @@ class OrganisationPolicy
     public function update(User $user, Organisation $organisation): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-update', $roles)
             || in_array('admin-'.$this->resource.'-update-'.$organisation->id, $roles);
     }
@@ -57,6 +59,7 @@ class OrganisationPolicy
     public function delete(User $user, Organisation $organisation): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-delete', $roles)
             || in_array('admin-'.$this->resource.'-delete-'.$organisation->id, $roles);
     }
@@ -67,6 +70,7 @@ class OrganisationPolicy
     public function restore(User $user, Organisation $organisation): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-restore', $roles)
             || in_array('admin-'.$this->resource.'-restore-'.$organisation->id, $roles);
     }
@@ -77,6 +81,7 @@ class OrganisationPolicy
     public function forceDelete(User $user, Organisation $organisation): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-force_delete', $roles)
             || in_array('admin-'.$this->resource.'-force_delete-'.$organisation->id, $roles);
     }

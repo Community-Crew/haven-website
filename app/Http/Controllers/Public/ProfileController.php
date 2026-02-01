@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Models\Organisation;
-use App\Models\Reservation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ProfileController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $unit = $request->user()->unit()->first();
         $groups = $request->user()->groups()->pluck('name')->join(', ');
@@ -18,7 +17,7 @@ class ProfileController extends Controller
 
         $reservations = $request->user()
             ->reservations()
-            ->orderBy('start_at', 'desc')
+            ->orderByDesc('start_at')
             ->where('start_at', '>=', now())
             ->with(['room', 'organisation'])
             ->paginate(6)
@@ -29,7 +28,7 @@ class ProfileController extends Controller
                 'unit' => $unit,
                 'groups' => $groups,
                 'reservations' => $reservations,
-                'organisations' => $organisations
+                'organisations' => $organisations,
             ]);
     }
 }

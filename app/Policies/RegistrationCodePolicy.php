@@ -14,6 +14,7 @@ class RegistrationCodePolicy
         // Get roles from session and ensure it's an array, default to empty array if null.
         return (array) session('roles', []);
     }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -28,6 +29,7 @@ class RegistrationCodePolicy
     public function view(User $user, RegistrationCode $registrationCode): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-view-'.$registrationCode->id, $roles)
             || $this->viewAny($user); // You can re-use viewAny for the general permission
     }
@@ -46,6 +48,7 @@ class RegistrationCodePolicy
     public function update(User $user, RegistrationCode $registrationCode): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-update', $roles)
             || in_array('admin-'.$this->resource.'-update-'.$registrationCode->id, $roles);
     }
@@ -56,6 +59,7 @@ class RegistrationCodePolicy
     public function delete(User $user, RegistrationCode $registrationCode): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-delete', $roles)
             || in_array('admin-'.$this->resource.'-delete-'.$registrationCode->id, $roles);
     }
@@ -66,6 +70,7 @@ class RegistrationCodePolicy
     public function restore(User $user, RegistrationCode $registrationCode): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-restore', $roles)
             || in_array('admin-'.$this->resource.'-restore-'.$registrationCode->id, $roles);
     }
@@ -76,6 +81,7 @@ class RegistrationCodePolicy
     public function forceDelete(User $user, RegistrationCode $registrationCode): bool
     {
         $roles = $this->getUserRoles();
+
         return in_array('admin-'.$this->resource.'-force_delete', $roles)
             || in_array('admin-'.$this->resource.'-force_delete-'.$registrationCode->id, $roles);
     }

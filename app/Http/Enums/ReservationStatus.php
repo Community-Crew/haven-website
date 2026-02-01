@@ -1,7 +1,7 @@
 <?php
 
-
 namespace App\Http\Enums;
+
 use JsonSerializable;
 
 enum ReservationStatus: string implements JsonSerializable

@@ -17,13 +17,15 @@ class ValidRegistrationCode implements ValidationRule
     {
         $code = RegistrationCode::where('code', $value)->first();
 
-        if (!$code) {
+        if (! $code) {
             $fail('Registration code not found.');
+
             return;
         }
 
         if ($code->is_used) {
             $fail('Registration code has been used.');
+
             return;
         }
     }

@@ -18,14 +18,15 @@ class ReservationFactory extends Factory
     public function definition(): array
     {
         $startAt = $this->faker->dateTimeBetween('now', '+3 weeks');
+
         return [
-            "name" => $this->faker->name(),
-            "start_at" => $startAt,
-            "end_at" => $this->faker->dateTimeBetween($startAt, '+3 weeks'),
-            "share_user" => $this->faker->randomElement([true, false]),
-            "user_id" => 1,
-            "status" => $this->faker->randomElement(["pending", "approved", "rejected", "cancelled"]),
-            "room_id" => $this->faker->randomElement(Room::all()->pluck("id")->toArray()),
+            'name' => $this->faker->name(),
+            'start_at' => $startAt,
+            'end_at' => $this->faker->dateTimeBetween($startAt, '+3 weeks'),
+            'share_user' => $this->faker->randomElement([true, false]),
+            'user_id' => 1,
+            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected', 'cancelled']),
+            'room_id' => $this->faker->randomElement(Room::all()->pluck('id')->toArray()),
         ];
     }
 }

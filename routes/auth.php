@@ -14,4 +14,3 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('validate', [AccountValidationController::class, 'store'])->name('validate');
     Route::get('logout', [LogoutController::class, 'logout'])->name('logout');
 });
-

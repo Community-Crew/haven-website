@@ -3,36 +3,36 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateOrganisationRequest;
 use App\Models\Organisation;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class OrganisationController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
         $organisations = Organisation::all();
+
         return Inertia::render('dashboard/organisations/Index', ['organisations' => $organisations]);
     }
 
-    public function show(Organisation $organisation)
+    public function show(Organisation $organisation): Response
     {
         $organisation->load('users');
+
         return Inertia::render('dashboard/organisations/Show', ['organisation' => $organisation]);
     }
 
-    public function update(Request $request, Organisation $organisation)
+    public function update(UpdateOrganisationRequest $request, Organisation $organisation): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'about' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5000',
-        ]);
 
         if ($request->hasFile('image')) {
-            if($organisation->image_path && Storage::disk('hetzner')->exists($organisation->image_path)){
+            if ($organisation->image_path && Storage::disk('hetzner')->exists($organisation->image_path)) {
                 Storage::disk('hetzner')->delete($organisation->image_path);
             }
 
@@ -48,11 +48,10 @@ class OrganisationController extends Controller
         return redirect()->route('admin.organisations.show', $organisation->slug);
     }
 
-    public function detachUser(Request $request, Organisation $organisation, User $user)
+    public function detachUser(Request $request, Organisation $organisation, User $user): RedirectResponse
     {
         $organisation->users()->detach($user->id);
 
         return redirect()->route('admin.organisations.show', $organisation->slug);
     }
-
 }

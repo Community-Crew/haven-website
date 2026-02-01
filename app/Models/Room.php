@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Http\Enums\RoomStatus;
 use App\Traits\HasS3Image;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 class Room extends Model
 {
-    use HasSlug, HasS3Image;
+    use HasS3Image, HasSlug;
 
     protected $fillable = [
         'name',
@@ -59,7 +60,7 @@ class Room extends Model
         });
     }
 
-    public function reservations()
+    public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
     }
@@ -72,5 +73,4 @@ class Room extends Model
 
         return $attributes;
     }
-
 }
