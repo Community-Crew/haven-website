@@ -19,7 +19,7 @@ class RoomController extends Controller
 
     public function index(Request $request)
     {
-        $this->authorize('viewAny');
+        $this->authorize('viewAny', Room::class);
         $rooms = Room::all();
 
         return Inertia::render('dashboard/rooms/Index', ['rooms' => $rooms]);
