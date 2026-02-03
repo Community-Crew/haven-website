@@ -189,17 +189,13 @@ const getDateString = (date: Date) => {
                                             >
                                                 <S3Image
                                                     :src="
-                                                        reservation.organisation
-                                                            .image_url
-                                                    "
-                                                    class="ml-2 inline"
+                                            reservation.organisation.image_url
+                                        "
+                                                    class="ml-2 inline h-8 w-8 rounded-full"
                                                 />
-                                                <p class="inline">
-                                                    {{
-                                                        reservation.organisation
-                                                            .name
-                                                    }}
-                                                </p>
+                                                <div class="inline text-haven-black">
+                                                    {{ reservation.organisation.name }}
+                                                </div>
                                             </div>
                                             <p
                                                 v-else-if="

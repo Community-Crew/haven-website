@@ -27,7 +27,7 @@ class RoomController extends Controller
 
     public function create() {}
 
-    public function store(Request $request) {}
+    public function store(UpdateRoomRequest $request) {}
 
     public function show(Request $request, Room $room): Response
     {
@@ -74,6 +74,6 @@ class RoomController extends Controller
 
         $room->save();
 
-        return redirect()->back();
+        return redirect()->to(route('admin.rooms.show', $room))->with('success', 'Room updated.');
     }
 }
