@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Enums\ReservationStatus;
-use App\Http\Enums\RoomStatus;
-use App\Models\Organisation;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
