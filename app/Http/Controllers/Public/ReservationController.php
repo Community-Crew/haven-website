@@ -236,6 +236,7 @@ class ReservationController extends Controller
     private function ensureNoOverlap(int $roomId, Carbon $start, Carbon $end, ?int $excludeId = null)
     {
         $query = Reservation::where('room_id', $roomId)
+            ->where('status', ReservationStatus::APPROVED)
             ->where(function ($q) use ($start, $end) {
                 $q->where('start_at', '<', $end)
                     ->where('end_at', '>', $start);
