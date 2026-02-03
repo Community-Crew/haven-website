@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Enums\ReservationStatus;
+use App\Http\Enums\RoomStatus;
 use App\Models\Organisation;
 use App\Models\Reservation;
 use App\Models\Room;
@@ -176,15 +177,6 @@ class ReservationController extends Controller
                     return true;
                 },
             ],
-            'organisation' => [
-                'nullable',
-                'exists:organisations,id',
-                function ($attribute, $value, $fail) use ($user) {
-                    if ($value !== null && !$user->reservations->contains($value)) {
-                        return $fail('You can only use organisations you are a member of.');
-                    }
-                }
-            ],
         ];
     }
 
@@ -246,6 +238,7 @@ class ReservationController extends Controller
     private function ensureNoOverlap(int $roomId, Carbon $start, Carbon $end, ?int $excludeId = null)
     {
         $query = Reservation::where('room_id', $roomId)
+            ->where('status', ReservationStatus::APPROVED)
             ->where(function ($q) use ($start, $end) {
                 $q->where('start_at', '<', $end)
                     ->where('end_at', '>', $start);
