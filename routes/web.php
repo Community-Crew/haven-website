@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Public\AgendaItemController;
+use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ProfileController;
 use App\Http\Controllers\Public\ReservationController;
 use App\Http\Controllers\Public\RoomController;
@@ -8,9 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Home', []);
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::resource('rooms', RoomController::class)->only(['index', 'show']);
 
@@ -38,6 +38,9 @@ route::get('wip', function () {
 })->name('wip');
 
 route::Resource('reservations', ReservationController::class)->only(['store', 'destroy', 'update']);
+Route::Resource('agendas.items', AgendaItemController::class)->parameters([
+    'items' => 'agendaItem:slug',
+]);
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';

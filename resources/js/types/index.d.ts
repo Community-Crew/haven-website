@@ -140,4 +140,28 @@ export interface Organisation {
     slug: string;
 }
 
+export interface Agenda {
+    id: number;
+    name: string;
+    slug: string;
+    description: string;
+    public: boolean;
+}
+
+export interface AgendaItem {
+    id: number;
+    title: string;
+    description: string;
+    short_description: string;
+    image_path: string;
+    slug: string;
+    start_date: string;
+    end_date: string;
+    user: User;
+    organisation: Organisation;
+    agenda: Agenda;
+    image_url: string;
+
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;

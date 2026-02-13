@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AgendaController;
+use App\Http\Controllers\Admin\AgendaItemController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrganisationController;
 use App\Http\Controllers\Admin\RegistrationCodeController;
@@ -17,4 +19,8 @@ Route::prefix('admin')->middleware(['auth', 'role:view-dashboard'])->name('admin
     Route::Resource('rooms', RoomController::class);
     Route::Resource('organisations', OrganisationController::class);
     Route::delete('organisations/{organisation}/users/{user}', [OrganisationController::class, 'detachUser'])->name('organisations.users.detach');
+    Route::Resource('agendas', AgendaController::class);
+    Route::Resource('agendas.items', AgendaItemController::class)->parameters([
+        'items' => 'agendaItem:slug',
+    ]);
 });
