@@ -73,7 +73,7 @@ defineProps<{
 
                             <div v-else class="py-16 text-center">
                                 <p class="font-semibold text-gray-500">
-                                    No rooms found.
+                                    No items found.
                                 </p>
                             </div>
                         </div>

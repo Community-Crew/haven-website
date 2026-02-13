@@ -80,7 +80,7 @@ class AgendaItemController extends Controller
     public function show(Agenda $agenda, AgendaItem $agendaItem)
     {
         Gate::authorize('view', $agendaItem);
-        $agendaItem = $agendaItem->load('organisation');
+        $agendaItem->load('organisation', 'agenda');
         return Inertia::render('dashboard/agendaItems/Show', ['agendaItem' => $agendaItem]);
     }
 
@@ -106,5 +106,7 @@ class AgendaItemController extends Controller
     public function destroy(Agenda $agenda, AgendaItem $agendaItem)
     {
         Gate::authorize('delete', $agendaItem);
+        $agendaItem->delete();
+        return redirect()->to(Route('admin.agendas.show', [$agenda->slug]))->with('success', 'Agenda item deleted successfully!');
     }
 }
