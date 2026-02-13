@@ -18,10 +18,7 @@ class AgendaItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Agenda $agenda)
-    {
-
-    }
+    public function index(Agenda $agenda) {}
 
     /**
      * Show the form for creating a new resource.
@@ -29,10 +26,11 @@ class AgendaItemController extends Controller
     public function create(Agenda $agenda, Request $request): Response
     {
         Gate::authorize('create', AgendaItem::class);
+
         return Inertia::render('dashboard/agendaItems/Create',
             [
                 'agenda' => $agenda,
-                'organisations' => $request->user()->organisations()->get()
+                'organisations' => $request->user()->organisations()->get(),
             ]);
     }
 
@@ -45,7 +43,7 @@ class AgendaItemController extends Controller
         $validatedData = $request->validated();
 
         $organisation = Organisation::findorFail($validatedData['organisation']);
-        if (!$organisation->users()->where('user_id', $request->user()->id)->exists()
+        if (! $organisation->users()->where('user_id', $request->user()->id)->exists()
         ) {
             return redirect()->back()->withErrors(['membership' => 'You do not have permission to add items to this agenda.']);
         }
@@ -81,6 +79,7 @@ class AgendaItemController extends Controller
     {
         Gate::authorize('view', $agendaItem);
         $agendaItem->load('organisation', 'agenda');
+
         return Inertia::render('dashboard/agendaItems/Show', ['agendaItem' => $agendaItem]);
     }
 
@@ -107,6 +106,7 @@ class AgendaItemController extends Controller
     {
         Gate::authorize('delete', $agendaItem);
         $agendaItem->delete();
+
         return redirect()->to(Route('admin.agendas.show', [$agenda->slug]))->with('success', 'Agenda item deleted successfully!');
     }
 }

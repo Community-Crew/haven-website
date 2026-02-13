@@ -8,7 +8,7 @@ trait RoleBasedPermissions
 {
     protected function hasRole(User $user, string $action, $resourceId = null): bool
     {
-        $roles = (array)session('roles', []);
+        $roles = (array) session('roles', []);
         $resource = $this->resource;
 
         // Check both general permission and specific resource permission

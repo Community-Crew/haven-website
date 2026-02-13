@@ -11,18 +11,16 @@ use Inertia\Response;
 
 class AgendaItemController extends Controller
 {
-    public function index()
-    {
-
-    }
+    public function index() {}
 
     public function show(Request $request, Agenda $agenda, AgendaItem $agendaItem): Response
     {
-        if (!($request->user() || $agenda->public)){
+        if (! ($request->user() || $agenda->public)) {
             abort(404);
         }
 
         $agendaItem->load(['agenda', 'organisation']);
+
         return Inertia::render('agendaItems/Show', ['agenda' => $agenda, 'agendaItem' => $agendaItem]);
     }
 }

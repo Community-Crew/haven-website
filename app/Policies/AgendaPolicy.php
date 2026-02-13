@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\Agenda;
-use App\Models\AgendaItem;
 use App\Models\User;
 use App\Policies\Traits\RoleBasedPermissions;
 
@@ -18,7 +17,8 @@ class AgendaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasRole($user, 'view');    }
+        return $this->hasRole($user, 'view');
+    }
 
     /**
      * Determine whether the user can view the model.
@@ -33,7 +33,8 @@ class AgendaPolicy
      */
     public function create(User $user): bool
     {
-        return $this->hasRole($user, 'create');    }
+        return $this->hasRole($user, 'create');
+    }
 
     /**
      * Determine whether the user can update the model.

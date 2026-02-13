@@ -17,7 +17,8 @@ class OrganisationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasRole($user, 'view');    }
+        return $this->hasRole($user, 'view');
+    }
 
     /**
      * Determine whether the user can view the model.
@@ -32,7 +33,8 @@ class OrganisationPolicy
      */
     public function create(User $user): bool
     {
-        return $this->hasRole($user, 'create');    }
+        return $this->hasRole($user, 'create');
+    }
 
     /**
      * Determine whether the user can update the model.

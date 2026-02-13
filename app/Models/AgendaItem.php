@@ -11,7 +11,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class AgendaItem extends Model
 {
-    use softDeletes, HasSlug, HasS3Image;
+    use HasS3Image, HasSlug, softDeletes;
 
     public $timestamps = true;
 
