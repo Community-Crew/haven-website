@@ -180,7 +180,7 @@ const detachUser = (userId: number) => {
                 </div>
             </ContentCard>
             <ContentCard class="mt-4" title="Members">
-                <div class="grid grid-cols-2">
+                <div class="grid grid-cols-2 gap-2">
                     <div
                         v-for="member in organisation.users"
                         v-bind:key="member.id"
@@ -196,7 +196,6 @@ const detachUser = (userId: number) => {
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="16"
                                 height="16"
-                                fill="currentColor"
                                 class="bi bi-trash-fill"
                                 viewBox="0 0 16 16"
                             >
