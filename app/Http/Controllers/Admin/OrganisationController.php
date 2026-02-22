@@ -25,7 +25,7 @@ class OrganisationController extends Controller
 
     public function show(Organisation $organisation): Response
     {
-        Gate::authorize('view', Organisation::class);
+        Gate::authorize('view', $organisation);
         $organisation->load('users');
 
         return Inertia::render('dashboard/organisations/Show', ['organisation' => $organisation]);
