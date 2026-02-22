@@ -3,6 +3,8 @@ import { ref } from 'vue';
 import NavBarProfile from '@/components/PublicAppLayout/NavBarProfile.vue';
 import { computed } from 'vue'
 import { usePage } from '@inertiajs/vue3';
+import DropdownMenu from '@/components/Navbar/DropdownMenu.vue';
+import DropdownMenuElement from '@/components/Navbar/DropdownMenuElement.vue';
 
 
 const page = usePage();
@@ -30,16 +32,23 @@ const closeMenu = (): void => {
                     <p class="text-xs align-bottom pt-2">ADMIN</p>
                     <a :href="route('home')" class="ml-8 bg-haven-yellow text-haven-black p-2 rounded-xl">Back to site</a>
                 </div>
-
-
                 <!-- Desktop Navigation Links -->
+
                 <div class="hidden md:flex items-center space-x-8">
                     <a :href="route('admin.index')" class="hover:text-haven-white transition-colors duration-300">Home</a>
-                    <a :href="route('admin.rooms.index')" class="hover:text-haven-white transition-colors duration-300">Rooms</a>
-                    <a :href="route('admin.reservations.index')" class="hover:text-haven-white transition-colors duration-300">Reservations</a>
-                    <a :href="route('admin.units.index')" class="hover:text-haven-white transition-colors duration-300">Units</a>
+                    <DropdownMenu title="Communication" id="communication-dropdown">
+                        <DropdownMenuElement title="Agendas" :route="route('admin.agendas.index')"/>
+                    </DropdownMenu>
+                    <DropdownMenu title="Booking" id="booking-dropdown">
+                        <DropdownMenuElement title="Rooms" :route="route('admin.rooms.index')"/>
+                        <DropdownMenuElement title="Reservations" :route="route('admin.reservations.index')"/>
+                    </DropdownMenu>
+                    <DropdownMenu title="Admin" id="admin-dropdown">
+                        <DropdownMenuElement title="Units" :route="route('admin.units.index')"/>
+                        <DropdownMenuElement title="Organisations" :route="route('admin.organisations.index')"/>
+                    </DropdownMenu>
                     <div></div>
-                    <NavBarProfile></NavBarProfile>
+                    <NavBarProfile/>
                 </div>
 
                 <div class="md:hidden flex items-center">

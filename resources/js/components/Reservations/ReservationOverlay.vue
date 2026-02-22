@@ -336,7 +336,7 @@ const cancelReservation = () => {
                                     </p>
                                 </div>
                             </div>
-                            <div v-if="organisations">
+                            <div v-if="organisations && organisations.length > 0">
                                 <div>
                                     <label
                                         class="mb-1 block text-sm font-bold text-haven-yellow"
