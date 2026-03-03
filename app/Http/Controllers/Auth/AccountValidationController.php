@@ -19,7 +19,7 @@ class AccountValidationController extends Controller
         $keycloak_id = $request->session()->get('keycloak_id');
 
         if (! $keycloak_id) {
-            return Redirect::route('/');
+            return Redirect::route('home');
         }
 
         $code = $request->get('registration_code');
