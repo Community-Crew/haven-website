@@ -4,7 +4,6 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
-import { initializeTheme } from './composables/useAppearance';
 import VueForm from '@vueform/vueform';
 import vueformConfig from './../../vueform.config';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
@@ -31,4 +30,3 @@ createInertiaApp({
 });
 
 // This will set light / dark mode on page load...
-initializeTheme();

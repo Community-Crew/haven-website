@@ -2,28 +2,28 @@
 import ContentCard from '@/components/ContentCard.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
-import type { Agenda, Organisation } from '@/types';
+import type { Agenda, AgendaItem, Organisation } from '@/types';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps<{
     agenda: Agenda;
+    agendaItem: AgendaItem;
     organisations: Organisation[];
 }>();
 
 const isLoading = ref(false);
 
 const form = useForm({
-    title: '',
-    description: '',
-    shortDescription: '',
+    title: props.agendaItem.title,
+    description: props.agendaItem.description,
+    shortDescription: props.agendaItem.short_description,
     image: null as File | null,
-    start_date: '',
-    end_date: '',
-    organisation: props.organisations.length > 0 ? props.organisations[0].id : null,
+    start_date: props.agendaItem.start_date,
+    end_date: props.agendaItem.end_date,
+    organisation: props.agendaItem.organisation.id,
     agenda_id: props.agenda.id,
 });
-
 
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -36,14 +36,14 @@ const submitForm = async () => {
     isLoading.value = true;
 
     try {
-        console.log("Form Data:", form);
-        form.post(`/admin/agendas/${props.agenda.slug}/items`, {});
+        form.put(`/admin/agendas/${props.agenda.slug}/items/${props.agendaItem.slug}`, {});
     } catch (error) {
         console.error('Error submitting data:', error);
     } finally {
         isLoading.value = false;
     }
 };
+
 </script>
 
 <template>
@@ -53,7 +53,7 @@ const submitForm = async () => {
             class="mt-8 grid grid-cols-1 items-start gap-8 lg:grid-cols-2"
         >
             <ContentCard
-                :title="`New item for: ${props.agenda.name}`"
+                :title="`Edit: ${props.agendaItem.title}`"
                 position="start"
             >
                 <div class="flex flex-col gap-4">
@@ -127,7 +127,7 @@ const submitForm = async () => {
             </ContentCard>
 
             <ContentCard title="Description" position="end" class="h-full">
-                <div class="grid grid-cols-1 gap-4 h-full">
+                <div class="grid h-full grid-cols-1 gap-4">
                     <TextEditor
                         class="h-full"
                         v-model="form.description"
@@ -150,7 +150,7 @@ const submitForm = async () => {
                         <button
                             type="submit"
                             :disabled="isLoading"
-                            class="rounded-lg px-6 py-2.5 h-fit font-medium text-white transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none self-end"
+                            class="h-fit self-end rounded-lg px-6 py-2.5 font-medium text-white transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                             :class="[
                                 isLoading
                                     ? 'cursor-not-allowed bg-blue-300'
@@ -158,7 +158,7 @@ const submitForm = async () => {
                             ]"
                         >
                             <span v-if="isLoading">Saving...</span>
-                            <span v-else>Create Item</span>
+                            <span v-else>Save Item</span>
                         </button>
                     </div>
                 </div>

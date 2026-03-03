@@ -75,13 +75,13 @@ const deleteAgendaItem = () => {
                             >Delete</span
                         >
                     </button>
-                    <button
+                    <a
                         class="flex h-12 w-full cursor-pointer items-center justify-center rounded-2xl bg-haven-blue shadow-2xl transition-transform hover:scale-105"
+                        :href="route('admin.agendas.items.edit', [props.agendaItem.agenda.slug, props.agendaItem.slug])"
                     >
                         <span class="font-semibold text-white"
-                        >Edit (WIP)</span
-                        >
-                    </button>
+                        >Edit</span>
+                    </a>
                 </div>
             </ContentCard>
             <ContentCard position="end" title="Description">
