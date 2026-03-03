@@ -25,7 +25,7 @@ class OrganisationController extends Controller
 
     public function show(Organisation $organisation): Response
     {
-        Gate::authorize('view', $organisation);
+        Gate::authorize('view', Organisation::class);
         $organisation->load('users');
 
         return Inertia::render('dashboard/organisations/Show', ['organisation' => $organisation]);
@@ -33,7 +33,7 @@ class OrganisationController extends Controller
 
     public function update(UpdateOrganisationRequest $request, Organisation $organisation): RedirectResponse
     {
-        Gate::authorize('update', $organisation);
+        Gate::authorize('update', Organisation::class);
         if ($request->hasFile('image')) {
             if ($organisation->image_path && Storage::disk('hetzner')->exists($organisation->image_path)) {
                 Storage::disk('hetzner')->delete($organisation->image_path);
@@ -53,7 +53,7 @@ class OrganisationController extends Controller
 
     public function detachUser(Request $request, Organisation $organisation, User $user): RedirectResponse
     {
-        Gate::authorize('update', $organisation);
+        Gate::authorize('update', Organisation::class);
         $organisation->users()->detach($user->id);
 
         return redirect()->route('admin.organisations.show', $organisation->slug);
