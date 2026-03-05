@@ -4,7 +4,7 @@ import Pagination from '@/components/Pagination/Pagination.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import { Paginator, Reservation, ReservationFilters } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
