@@ -3,7 +3,6 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { execSync } from 'child_process';
 import laravel from 'laravel-vite-plugin';
-import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 
 const gitVersion = execSync('git describe --tags --always').toString().trim();
@@ -27,7 +26,6 @@ export default defineConfig({
                 },
             },
         }),
-        visualizer({ open: true, filename: 'bundle-stats.html' }),
     ],
     define: {
         'import.meta.env.VITE_APP_VERSION': JSON.stringify(gitVersion),
@@ -39,7 +37,7 @@ export default defineConfig({
                     if (id.includes('node_modules')) {
                         if (id.includes('@vueform')) return 'vendor-vueform';
                         if (id.includes('lodash-es')) return 'vendor-lodash';
-                            if (id.includes('quill')) return 'vendor-quill';
+                        if (id.includes('quill')) return 'vendor-quill';
                         return 'vendor';
                     }
                 },
