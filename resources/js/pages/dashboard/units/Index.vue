@@ -5,7 +5,7 @@ import UnitCard from '@/components/Units/UnitCard.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import { UnitFilters, Paginator, Unit } from '@/types';
 import { router } from '@inertiajs/vue3';
-import { debounce } from 'lodash-es';
+import { debounce } from 'lodash';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{

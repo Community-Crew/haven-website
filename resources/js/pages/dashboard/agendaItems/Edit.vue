@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import ContentCard from '@/components/ContentCard.vue';
+import TextEditor from '@/components/TextEditor.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import type { Agenda, AgendaItem, Organisation } from '@/types';
 import { useForm } from '@inertiajs/vue3';
-import { defineAsyncComponent, ref } from 'vue';
+import { ref } from 'vue';
 
-const TextEditor = defineAsyncComponent(
-    () => import('@/components/TextEditor.vue'),
-);
 const props = defineProps<{
     agenda: Agenda;
     agendaItem: AgendaItem;
@@ -38,16 +36,14 @@ const submitForm = async () => {
     isLoading.value = true;
 
     try {
-        form.put(
-            `/admin/agendas/${props.agenda.slug}/items/${props.agendaItem.slug}`,
-            {},
-        );
+        form.put(`/admin/agendas/${props.agenda.slug}/items/${props.agendaItem.slug}`, {});
     } catch (error) {
         console.error('Error submitting data:', error);
     } finally {
         isLoading.value = false;
     }
 };
+
 </script>
 
 <template>

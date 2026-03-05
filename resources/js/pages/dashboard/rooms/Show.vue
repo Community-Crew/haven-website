@@ -12,7 +12,7 @@ import {
     RoomStatus,
 } from '@/types';
 import { Link, router, useForm } from '@inertiajs/vue3';
-import { debounce } from 'lodash-es';
+import { debounce } from 'lodash';
 import { computed, ref, watch } from 'vue';
 
 interface RoomForm {

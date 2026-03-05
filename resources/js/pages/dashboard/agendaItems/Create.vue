@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import ContentCard from '@/components/ContentCard.vue';
+import TextEditor from '@/components/TextEditor.vue';
 import AdminDashboardLayout from '@/layouts/AdminDashboardLayout.vue';
 import type { Agenda, Organisation } from '@/types';
 import { useForm } from '@inertiajs/vue3';
-import { defineAsyncComponent, ref } from 'vue';
-
-const TextEditor = defineAsyncComponent(
-    () => import('@/components/TextEditor.vue'),
-);
+import { ref } from 'vue';
 
 const props = defineProps<{
     agenda: Agenda;
@@ -23,10 +20,10 @@ const form = useForm({
     image: null as File | null,
     start_date: '',
     end_date: '',
-    organisation:
-        props.organisations.length > 0 ? props.organisations[0].id : null,
+    organisation: props.organisations.length > 0 ? props.organisations[0].id : null,
     agenda_id: props.agenda.id,
 });
+
 
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -39,7 +36,7 @@ const submitForm = async () => {
     isLoading.value = true;
 
     try {
-        console.log('Form Data:', form);
+        console.log("Form Data:", form);
         form.post(`/admin/agendas/${props.agenda.slug}/items`, {});
     } catch (error) {
         console.error('Error submitting data:', error);
@@ -130,7 +127,7 @@ const submitForm = async () => {
             </ContentCard>
 
             <ContentCard title="Description" position="end" class="h-full">
-                <div class="grid h-full grid-cols-1 gap-4">
+                <div class="grid grid-cols-1 gap-4 h-full">
                     <TextEditor
                         class="h-full"
                         v-model="form.description"
@@ -153,7 +150,7 @@ const submitForm = async () => {
                         <button
                             type="submit"
                             :disabled="isLoading"
-                            class="h-fit self-end rounded-lg px-6 py-2.5 font-medium text-white transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                            class="rounded-lg px-6 py-2.5 h-fit font-medium text-white transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none self-end"
                             :class="[
                                 isLoading
                                     ? 'cursor-not-allowed bg-blue-300'
