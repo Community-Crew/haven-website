@@ -1,19 +1,37 @@
-name: Lint
+name: Lint and Fix
+
 on:
   - push
+
 jobs:
   lint:
-    name: Lint
+    name: Lint and Auto-fix
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
-          tools: phplint, laravel/pint
-      - name: Check syntax
-        run: phplint .
+          php-version: '8.4'
+          tools: laravel/pint
+
       - name: Check code style
+        id: pint_check
         run: pint --test
+
+      - name: Fix and Commit
+        if: failure() && steps.pint_check.outcome == 'failure'
+        run: pint
+
+      - name: Push fixes
+        if: failure() && steps.pint_check.outcome == 'failure'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-fix linting issues"
