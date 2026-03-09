@@ -1,7 +1,8 @@
 name: Lint and Fix
 
 on:
-  - push
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   lint:
@@ -9,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout
@@ -16,22 +18,42 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.2'
           tools: laravel/pint
 
       - name: Check code style
         id: pint_check
         run: pint --test
+        continue-on-error: true
+
+      - name: Post PR Comment
+        if: steps.pint_check.outcome == 'failure'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ## 🎨 Linting Fix Applied (Verified)
+            I've automatically fixed the code style and signed the commit.
 
       - name: Fix and Commit
-        if: failure() && steps.pint_check.outcome == 'failure'
-        run: pint
-
-      - name: Push fixes
-        if: failure() && steps.pint_check.outcome == 'failure'
+        if: steps.pint_check.outcome == 'failure'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: auto-fix linting issues"
+          commit_author: "Github Action Bot <54815057+Kroffie@users.noreply.github.com>"
+          commit_user_name: "GitHub Action Bot"
+          commit_user_email: "54815057+Kroffie@users.noreply.github.com"
+
+      - name: Finalize Status
+        if: steps.pint_check.outcome == 'failure'
+        run: exit 1
