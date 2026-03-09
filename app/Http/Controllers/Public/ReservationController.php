@@ -235,8 +235,11 @@ class ReservationController extends Controller
             }
         }
 
-        if (! $isWithinPolicy) {
+        if (!$isWithinPolicy)
+        {
             $supportId = strtoupper('OOP-'.Str::random(3).'-'.rand(100, 999));
+
+
             Log::warning('Out-of-policy reservation attempt', [
                 'support_id' => $supportId,
                 'user_id' => auth()->id(),
