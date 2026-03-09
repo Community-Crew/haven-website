@@ -10,6 +10,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ReservationController extends Controller
@@ -205,30 +207,47 @@ class ReservationController extends Controller
         }
     }
 
+    /**
+     * @throws ValidationException
+     */
     private function ensureWithinPolicy(Room $room, Carbon $reqStart, Carbon $reqEnd)
     {
         $service = new ReservationPolicyService;
         $allowedSlots = $service->getMergedTimeSlots($reqStart, $room);
-        $dateString = $reqStart->format('Y-m-d');
         $isWithinPolicy = false;
 
+        $reqStartLocal = $reqStart->copy()->setTimezone($this->timezone);
+        $reqEndLocal = $reqEnd->copy()->setTimezone($this->timezone);
+        $dateString = $reqStartLocal->toDateString();
+
         foreach ($allowedSlots as $slot) {
-            $policyStart = Carbon::createFromFormat('Y-m-d H:i', $dateString.' '.$slot['start'], $this->timezone);
-            $policyEnd = Carbon::createFromFormat('Y-m-d H:i', $dateString.' '.$slot['end'], $this->timezone);
+            $policyStart = Carbon::parse("$dateString {$slot['start']}", $this->timezone);
 
             if ($slot['end'] === '24:00') {
-                $policyEnd->addDay()->startOfDay();
+                $policyEnd = Carbon::parse($dateString, $this->timezone)->addDay()->startOfDay();
+            } else {
+                $policyEnd = Carbon::parse("$dateString {$slot['end']}", $this->timezone);
             }
 
-            if ($reqStart->gte($policyStart) && $reqEnd->lte($policyEnd)) {
+            if ($reqStartLocal->gte($policyStart) && $reqEndLocal->lte($policyEnd)) {
                 $isWithinPolicy = true;
                 break;
             }
         }
 
         if (! $isWithinPolicy) {
+            $supportId = strtoupper('OOP-'.Str::random(3).'-'.rand(100, 999));
+
+            Log::warning('Out-of-policy reservation attempt', [
+                'support_id' => $supportId,
+                'user_id' => auth()->id(),
+                'room_id' => $room->id,
+                'requested_range' => $reqStart->toDateTimeString().' - '.$reqEnd->toDateTimeString(),
+                'policy_applied' => $allowedSlots,
+            ]);
+
             throw ValidationException::withMessages([
-                'start_time' => 'The selected time is outside your allowed reservation hours.',
+                'start_time' => "The selected time is outside your allowed reservation hours. (Support ID: $supportId)",
             ]);
         }
     }
