@@ -10,6 +10,7 @@ use App\Models\AgendaItem;
 use App\Models\Organisation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -48,11 +49,11 @@ class AgendaItemController extends Controller
             return redirect()->back()->withErrors(['membership' => 'You do not have permission to add items to this agenda.']);
         }
 
-        if ($request->hasFile('image')) {
-            $validatedData['image'] = $request->file('image')->store('images', 'public');
-        }
+        $path = '';
 
-        $path = $request->file('image')->store('rooms', 'hetzner');
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('agenda', 'hetzner');
+        }
 
         $agendaItem = AgendaItem::create([
             'title' => $validatedData['title'],
@@ -86,9 +87,16 @@ class AgendaItemController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Agenda $agenda, AgendaItem $agendaItem)
+    public function edit(Request $request, Agenda $agenda, AgendaItem $agendaItem)
     {
         Gate::authorize('update', $agendaItem);
+        $agendaItem->load('organisation');
+
+        return Inertia::render('dashboard/agendaItems/Edit', [
+            'agenda' => $agenda,
+            'agendaItem' => $agendaItem,
+            'organisations' => $request->user()->organisations()->get(),
+        ]);
     }
 
     /**
@@ -97,6 +105,30 @@ class AgendaItemController extends Controller
     public function update(Agenda $agenda, UpdateAgendaItemRequest $request, AgendaItem $agendaItem)
     {
         Gate::authorize('update', $agendaItem);
+
+        $validatedData = $request->validated();
+
+        if ($request->hasFile('image')) {
+            if ($agendaItem->image_path && Storage::disk('hetzner')->exists($agendaItem->image_path)) {
+                Storage::disk('hetzner')->delete($agendaItem->image_path);
+            }
+
+            $path = $request->file('image')->store('agenda', 'hetzner');
+            $agendaItem->image_path = $path;
+        }
+
+        $agendaItem->update([
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'short_description' => $validatedData['shortDescription'],
+            'start_date' => $validatedData['start_date'],
+            'end_date' => $validatedData['end_date'],
+            'user_id' => $request->user()->id,
+        ]);
+
+        return redirect()
+            ->to(route('admin.agendas.items.show', ['agenda' => $agenda, 'agendaItem' => $agendaItem]))
+            ->with('success', 'Agenda item updated successfully!');
     }
 
     /**
