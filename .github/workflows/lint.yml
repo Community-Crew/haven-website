@@ -14,7 +14,6 @@ jobs:
 
     steps:
       - name: Get Bot Token
-        # You'll need to create a GitHub App and store its ID/Private Key
         uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -33,30 +32,13 @@ jobs:
           php-version: '8.2'
           tools: laravel/pint
 
-      - name: Check code style
-        id: pint_check
-        run: pint --test
-        continue-on-error: true
-
-      - name: Post PR Comment
-        if: steps.pint_check.outcome == 'failure'
-        uses: mshick/add-pr-comment@v2
-        with:
-          repo-token: ${{ steps.app-token.outputs.token }}
-          message: |
-            ## 🎨 Linting Fix Applied
-            I've automatically fixed the code style issues.
+      - name: Run Pint (Fix)
+        run: pint
 
       - name: Fix and Commit
-        if: steps.pint_check.outcome == 'failure'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: auto-fix linting issues"
-          # Use the Bot's token-based identity
           commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Finalize Status
-        if: steps.pint_check.outcome == 'failure'
-        run: exit 1
