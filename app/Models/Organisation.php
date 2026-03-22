@@ -21,7 +21,7 @@ class Organisation extends Model
 
     protected $appends = ['image_url'];
 
-    public function users(): belongsToMany
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
     }
