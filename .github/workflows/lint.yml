@@ -13,18 +13,18 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Get Bot Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private_key: ${{ secrets.BOT_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.head_ref }}
-
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -32,28 +32,13 @@ jobs:
           php-version: '8.2'
           tools: laravel/pint
 
-      - name: Check code style
-        id: pint_check
-        run: pint --test
-        continue-on-error: true
-
-      - name: Post PR Comment
-        if: steps.pint_check.outcome == 'failure'
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            ## 🎨 Linting Fix Applied (Verified)
-            I've automatically fixed the code style and signed the commit.
+      - name: Run Pint (Fix)
+        run: pint
 
       - name: Fix and Commit
-        if: steps.pint_check.outcome == 'failure'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: auto-fix linting issues"
-          commit_author: "Github Action Bot <54815057+Kroffie@users.noreply.github.com>"
-          commit_user_name: "GitHub Action Bot"
-          commit_user_email: "54815057+Kroffie@users.noreply.github.com"
-
-      - name: Finalize Status
-        if: steps.pint_check.outcome == 'failure'
-        run: exit 1
+          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"

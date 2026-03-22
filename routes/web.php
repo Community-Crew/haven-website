@@ -34,11 +34,11 @@ Route::get('privacy-policy', function () {
     return Inertia::render('PrivacyPolicy');
 })->name('privacy-policy');
 
-route::get('wip', function () {
+Route::get('wip', function () {
     return Inertia::render('WIP', []);
 })->name('wip');
 
-route::Resource('reservations', ReservationController::class)->only(['store', 'destroy', 'update']);
+Route::Resource('reservations', ReservationController::class)->only(['store', 'destroy', 'update']);
 Route::Resource('agendas.items', AgendaItemController::class)->parameters([
     'items' => 'agendaItem:slug',
 ]);
