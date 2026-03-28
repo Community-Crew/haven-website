@@ -13,6 +13,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Sentry\Severity;
+use Sentry\State\Scope;
+use function Sentry\configureScope;
+use function Sentry\captureMessage;
 
 class ReservationController extends Controller
 {
@@ -63,7 +67,7 @@ class ReservationController extends Controller
             abort(403, 'You can only edit future reservations.');
         }
 
-        if (! ($reservation->status == ReservationStatus::APPROVED || $reservation->status == ReservationStatus::PENDING)) {
+        if (!($reservation->status == ReservationStatus::APPROVED || $reservation->status == ReservationStatus::PENDING)) {
             abort(403, 'You can only edit approved or pending reservations.');
         }
 
@@ -118,7 +122,7 @@ class ReservationController extends Controller
                 'required', 'string',
                 function ($attribute, $value, $fail) {
                     $date = $this->parseDateTime($value);
-                    if (! $date) {
+                    if (!$date) {
                         return $fail('Invalid date.');
                     }
                     if ($date->isPast()) {
@@ -138,7 +142,7 @@ class ReservationController extends Controller
                     $start = $this->parseDateTime($request->input('start_time'));
                     $end = $this->parseDateTime($value);
 
-                    if (! $end) {
+                    if (!$end) {
                         return $fail('Invalid date.');
                     }
 
@@ -154,7 +158,7 @@ class ReservationController extends Controller
                         $isSameDay = $start->isSameDay($end);
                         $isMidnightNextDay = $end->format('H:i') === '00:00' && $end->isSameDay($start->copy()->addDay());
 
-                        if (! $isSameDay && ! $isMidnightNextDay) {
+                        if (!$isSameDay && !$isMidnightNextDay) {
                             $fail('The start and end time must be on the same day.');
                         }
                     }
@@ -166,7 +170,7 @@ class ReservationController extends Controller
                 'nullable',
                 'exists:organisations,id',
                 function ($attribute, $value, $fail) use ($user) {
-                    if ($value !== null && ! $user->organisations->contains($value)) {
+                    if ($value !== null && !$user->organisations->contains($value)) {
                         return $fail('You can only use organisations you are a member of.');
                     }
 
@@ -181,7 +185,7 @@ class ReservationController extends Controller
      */
     private function parseDateTime(?string $timeString): ?Carbon
     {
-        if (! $timeString) {
+        if (!$timeString) {
             return null;
         }
 
@@ -231,19 +235,32 @@ class ReservationController extends Controller
             }
         }
 
-        if (! $isWithinPolicy) {
-            $supportId = strtoupper('OOP-'.Str::random(3).'-'.rand(100, 999));
+        if (!$isWithinPolicy) {
+            $supportId = app()->bound('support_id') ? app('support_id') : 'OOP-' . strtoupper(Str::random(6));
+            $daysInFuture = now()->diffInDays($reqStart, false);
 
-            Log::warning('Out-of-policy reservation attempt', [
-                'support_id' => $supportId,
-                'user_id' => auth()->id(),
-                'room_id' => $room->id,
-                'requested_range' => $reqStart->toDateTimeString().' - '.$reqEnd->toDateTimeString(),
-                'policy_applied' => $allowedSlots,
-            ]);
+            $isShortTerm = $daysInFuture <= 14;
+            $severity = $isShortTerm ? Severity::error() : Severity::info();
+            $typeLabel = $isShortTerm ? 'Policy Error (Short-term)' : 'Policy Audit (Long-term)';
+
+            configureScope(function (Scope $scope) use ($supportId, $daysInFuture, $room, $allowedSlots, $reqStartLocal, $reqEndLocal, $severity) {
+                $scope->setTag('support_id', $supportId);
+                $scope->setTag('room', $room->name);
+                $scope->setTag('policy_window', $daysInFuture <= 14 ? 'within_14_days' : 'beyond_14_days');
+                $scope->setLevel($severity);
+
+                $scope->setContext('reservation_details', [
+                    'days_forward' => $daysInFuture,
+                    'requested_range' => "{$reqStartLocal->toDateTimeString()} to {$reqEndLocal->toDateTimeString()}",
+                    'applied_policy_slots' => $allowedSlots,
+                    'user_id' => auth()->id(),
+                ]);
+            });
+
+            captureMessage("Out-of-Policy: $typeLabel");
 
             throw ValidationException::withMessages([
-                'start_time' => "The selected time is outside your allowed reservation hours. (Support ID: $supportId)",
+                'start_time' => "The selected time is outside your allowed hours. (Ref: $supportId)",
             ]);
         }
     }
