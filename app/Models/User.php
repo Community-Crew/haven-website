@@ -26,6 +26,8 @@ class User extends Authenticatable
         'email',
         'keycloak_id',
         'unit_id',
+        'keycloak_token',
+        'keycloak_refresh_token',
     ];
 
     /**
@@ -35,6 +37,8 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'remember_token',
+        'keycloak_token',
+        'keycloak_refresh_token',
     ];
 
     /**
@@ -46,6 +50,27 @@ class User extends Authenticatable
     {
         return [
         ];
+    }
+
+    public function getRolesAttribute(): array
+    {
+        if (session()->has('roles')) {
+            return session('roles');
+        }
+
+        $token = session('keycloak_token') ?? $this->keycloak_token;
+
+        if ($token) {
+            $payload = json_decode(base64_decode(explode('.', $token)[1]), true);
+            $clientName = config('services.keycloak.client_id');
+            $roles = $payload['resource_access'][$clientName]['roles'] ?? [];
+
+            session(['roles' => $roles]);
+
+            return $roles;
+        }
+
+        return [];
     }
 
     public function unit(): BelongsTo

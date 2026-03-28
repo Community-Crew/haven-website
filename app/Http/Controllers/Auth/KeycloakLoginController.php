@@ -28,12 +28,15 @@ class KeycloakLoginController extends Controller
             [
                 'name' => $keycloak_user->getName(),
                 'email' => $keycloak_user->getEmail(),
+                'keycloak_token' => $keycloak_user->token,
+                'keycloak_refresh_token' => $keycloak_user->refreshToken,
             ]
         );
         $user_is_validated = $keycloak_user->user['validated'] ?? 'no';
 
-        $access_token = $keycloak_user->token;
-        [$header, $payload, $signature] = explode('.', $access_token);
+        $request->session()->put('keycloak_token', $keycloak_user->token);
+
+        [, $payload] = explode('.', $keycloak_user->token);
         $claims = json_decode(base64_decode($payload), true);
 
         $clientName = config('services.keycloak.client_id');
@@ -46,7 +49,7 @@ class KeycloakLoginController extends Controller
         $this->updateUserOrganizationRoles($user, $roles);
 
         if ($user_is_validated == 'yes') {
-            Auth::login($user);
+            Auth::login($user, true);
 
             return redirect()->to('/');
         } else {

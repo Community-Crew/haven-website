@@ -112,10 +112,12 @@ class ReservationPolicyService
             return [];
         }
 
-        // Sort by start time
-        usort($rawRanges, function ($a, $b) {
-            return strcmp($a['start'], $b['start']);
-        });
+        foreach ($rawRanges as &$r) {
+            $r['start'] = str_pad($r['start'], 5, '0', STR_PAD_LEFT);
+            $r['end'] = str_pad($r['end'], 5, '0', STR_PAD_LEFT);
+        }
+
+        usort($rawRanges, fn ($a, $b) => strcmp($a['start'], $b['start']));
 
         $merged = [];
         $current = $rawRanges[0];
