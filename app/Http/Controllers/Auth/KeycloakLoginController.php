@@ -28,12 +28,15 @@ class KeycloakLoginController extends Controller
             [
                 'name' => $keycloak_user->getName(),
                 'email' => $keycloak_user->getEmail(),
+                'keycloak_token' => $keycloak_user->token,
+                'keycloak_refresh_token' => $keycloak_user->refreshToken,
             ]
         );
         $user_is_validated = $keycloak_user->user['validated'] ?? 'no';
 
-        $access_token = $keycloak_user->token;
-        [$header, $payload, $signature] = explode('.', $access_token);
+        $request->session()->put('keycloak_token', $keycloak_user->token);
+
+        [, $payload,] = explode('.', $keycloak_user->token);
         $claims = json_decode(base64_decode($payload), true);
 
         $clientName = config('services.keycloak.client_id');
@@ -46,7 +49,7 @@ class KeycloakLoginController extends Controller
         $this->updateUserOrganizationRoles($user, $roles);
 
         if ($user_is_validated == 'yes') {
-            Auth::login($user);
+            Auth::login($user, true);
 
             return redirect()->to('/');
         } else {
@@ -63,7 +66,7 @@ class KeycloakLoginController extends Controller
 
     public function register(Request $request): RedirectResponse
     {
-        return redirect(config('services.keycloak.base_url').config('services.keycloak.realm').'account');
+        return redirect(config('services.keycloak.base_url') . config('services.keycloak.realm') . 'account');
     }
 
     protected function syncUserGroups(User $user, array $groupsFromToken)
@@ -91,7 +94,7 @@ class KeycloakLoginController extends Controller
 
                 $organisation = Organisation::find($organisationId);
                 if ($organisation) {
-                    if (! $organisation->users()->where('users.id', $user->id)->exists()) {
+                    if (!$organisation->users()->where('users.id', $user->id)->exists()) {
                         $organisation->users()->attach($user->id);
                     }
                 }
@@ -101,7 +104,7 @@ class KeycloakLoginController extends Controller
         // Remove user from organizations where they no longer have the role
         $organisations = Organisation::all();
         foreach ($organisations as $organisation) {
-            if (! in_array($organisation->id, $organisationRoles)) {
+            if (!in_array($organisation->id, $organisationRoles)) {
                 $organisation->users()->detach($user->id);
             }
         }
