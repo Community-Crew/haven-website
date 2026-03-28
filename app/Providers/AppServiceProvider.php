@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('support_id', function () {
-            return 'RES-' . strtoupper(Str::random(8));
+            return 'RES-'.strtoupper(Str::random(8));
         });
     }
 

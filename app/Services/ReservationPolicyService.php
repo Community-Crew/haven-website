@@ -29,7 +29,7 @@ class ReservationPolicyService
 
         $rawRanges = [];
         foreach ($policies as $policy) {
-            if (isset($policy->max_days_in_advance) && (int)$daysInFuture > (int)$policy->max_days_in_advance) {
+            if (isset($policy->max_days_in_advance) && (int) $daysInFuture > (int) $policy->max_days_in_advance) {
                 continue;
             }
 
@@ -108,14 +108,16 @@ class ReservationPolicyService
      */
     private function mergeRanges(array $rawRanges): array
     {
-        if (empty($rawRanges)) return [];
+        if (empty($rawRanges)) {
+            return [];
+        }
 
         foreach ($rawRanges as &$r) {
             $r['start'] = str_pad($r['start'], 5, '0', STR_PAD_LEFT);
             $r['end'] = str_pad($r['end'], 5, '0', STR_PAD_LEFT);
         }
 
-        usort($rawRanges, fn($a, $b) => strcmp($a['start'], $b['start']));
+        usort($rawRanges, fn ($a, $b) => strcmp($a['start'], $b['start']));
 
         $merged = [];
         $current = $rawRanges[0];
@@ -132,6 +134,7 @@ class ReservationPolicyService
         }
 
         $merged[] = $current;
+
         return $merged;
     }
 }

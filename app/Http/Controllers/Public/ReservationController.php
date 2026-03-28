@@ -10,13 +10,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Sentry\Severity;
 use Sentry\State\Scope;
-use function Sentry\configureScope;
+
 use function Sentry\captureMessage;
+use function Sentry\configureScope;
 
 class ReservationController extends Controller
 {
@@ -33,7 +33,7 @@ class ReservationController extends Controller
         $this->ensureWithinPolicy($room, $this->parseDateTime($validated['start_time']), $this->parseDateTime($validated['end_time']));
         $this->ensureNoOverlap($room->id, $this->parseDateTime($validated['start_time']), $this->parseDateTime($validated['end_time']));
 
-        $reservation = new Reservation();
+        $reservation = new Reservation;
         $this->saveReservation($reservation, $validated, $request->user()->id);
 
         return redirect()->route('rooms.show', $room->id)->with('success', 'Created!');
@@ -67,7 +67,7 @@ class ReservationController extends Controller
             abort(403, 'You can only edit future reservations.');
         }
 
-        if (!($reservation->status == ReservationStatus::APPROVED || $reservation->status == ReservationStatus::PENDING)) {
+        if (! ($reservation->status == ReservationStatus::APPROVED || $reservation->status == ReservationStatus::PENDING)) {
             abort(403, 'You can only edit approved or pending reservations.');
         }
 
@@ -122,7 +122,7 @@ class ReservationController extends Controller
                 'required', 'string',
                 function ($attribute, $value, $fail) {
                     $date = $this->parseDateTime($value);
-                    if (!$date) {
+                    if (! $date) {
                         return $fail('Invalid date.');
                     }
                     if ($date->isPast()) {
@@ -142,7 +142,7 @@ class ReservationController extends Controller
                     $start = $this->parseDateTime($request->input('start_time'));
                     $end = $this->parseDateTime($value);
 
-                    if (!$end) {
+                    if (! $end) {
                         return $fail('Invalid date.');
                     }
 
@@ -158,7 +158,7 @@ class ReservationController extends Controller
                         $isSameDay = $start->isSameDay($end);
                         $isMidnightNextDay = $end->format('H:i') === '00:00' && $end->isSameDay($start->copy()->addDay());
 
-                        if (!$isSameDay && !$isMidnightNextDay) {
+                        if (! $isSameDay && ! $isMidnightNextDay) {
                             $fail('The start and end time must be on the same day.');
                         }
                     }
@@ -170,7 +170,7 @@ class ReservationController extends Controller
                 'nullable',
                 'exists:organisations,id',
                 function ($attribute, $value, $fail) use ($user) {
-                    if ($value !== null && !$user->organisations->contains($value)) {
+                    if ($value !== null && ! $user->organisations->contains($value)) {
                         return $fail('You can only use organisations you are a member of.');
                     }
 
@@ -185,7 +185,7 @@ class ReservationController extends Controller
      */
     private function parseDateTime(?string $timeString): ?Carbon
     {
-        if (!$timeString) {
+        if (! $timeString) {
             return null;
         }
 
@@ -235,8 +235,8 @@ class ReservationController extends Controller
             }
         }
 
-        if (!$isWithinPolicy) {
-            $supportId = app()->bound('support_id') ? app('support_id') : 'OOP-' . strtoupper(Str::random(6));
+        if (! $isWithinPolicy) {
+            $supportId = app()->bound('support_id') ? app('support_id') : 'OOP-'.strtoupper(Str::random(6));
             $daysInFuture = now()->diffInDays($reqStart, false);
 
             $isShortTerm = $daysInFuture <= 14;

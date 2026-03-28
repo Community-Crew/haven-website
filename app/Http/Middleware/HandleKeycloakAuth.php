@@ -11,7 +11,7 @@ class HandleKeycloakAuth
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return $next($request);
         }
 
@@ -19,12 +19,14 @@ class HandleKeycloakAuth
 
         $accessToken = session('keycloak_token') ?? $user->keycloak_token;
 
-        if (!$accessToken) {
+        if (! $accessToken) {
             return $this->forceLogout($request);
         }
 
         $parts = explode('.', $accessToken);
-        if (count($parts) !== 3) return $this->forceLogout($request);
+        if (count($parts) !== 3) {
+            return $this->forceLogout($request);
+        }
 
         $payload = json_decode(base64_decode($parts[1]), true);
         $exp = $payload['exp'] ?? 0;
@@ -39,7 +41,7 @@ class HandleKeycloakAuth
             return $refreshResult;
         }
 
-        if (!session()->has('roles')) {
+        if (! session()->has('roles')) {
             $client = config('services.keycloak.client_id');
             $roles = $payload['resource_access'][$client]['roles'] ?? [];
             session(['roles' => $roles, 'keycloak_token' => $accessToken]);
@@ -50,11 +52,11 @@ class HandleKeycloakAuth
 
     protected function refreshKeycloakToken($request, $user)
     {
-        if (!$user->keycloak_refresh_token) {
+        if (! $user->keycloak_refresh_token) {
             return $this->forceLogout($request);
         }
 
-        $response = Http::asForm()->post(config('services.keycloak.base_url') . "/realms/" . config('services.keycloak.realm') . "/protocol/openid-connect/token", [
+        $response = Http::asForm()->post(config('services.keycloak.base_url').'/realms/'.config('services.keycloak.realm').'/protocol/openid-connect/token', [
             'grant_type' => 'refresh_token',
             'refresh_token' => $user->keycloak_refresh_token,
             'client_id' => config('services.keycloak.client_id'),
@@ -71,7 +73,7 @@ class HandleKeycloakAuth
 
             session([
                 'keycloak_token' => $data['access_token'],
-                'roles' => $this->parseRoles($data['access_token'])
+                'roles' => $this->parseRoles($data['access_token']),
             ]);
 
             Auth::setUser($user);
@@ -87,6 +89,7 @@ class HandleKeycloakAuth
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->to('/auth/login/redirect');
     }
 
@@ -96,7 +99,9 @@ class HandleKeycloakAuth
     private function parseRoles(string $token): array
     {
         $parts = explode('.', $token);
-        if (count($parts) !== 3) return [];
+        if (count($parts) !== 3) {
+            return [];
+        }
 
         $payload = json_decode(base64_decode($parts[1]), true);
         $clientId = config('services.keycloak.client_id');
