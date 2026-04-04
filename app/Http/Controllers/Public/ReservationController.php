@@ -36,7 +36,7 @@ class ReservationController extends Controller
         $reservation = new Reservation;
         $this->saveReservation($reservation, $validated, $request->user()->id);
 
-        return redirect()->route('rooms.show', $room->id)->with('success', 'Created!');
+        return redirect()->route('rooms.show', $room->slug)->with('success', 'Created!');
     }
 
     private function saveReservation(Reservation $reservation, array $data, int $userId): void
