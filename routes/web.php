@@ -44,5 +44,9 @@ Route::Resource('agendas.items', AgendaItemController::class)->parameters([
 ]);
 Route::Resource('agendas', AgendaController::class);
 
+Route::get('discord', function () {
+    return redirect(env('DISCORD_LINK'));
+})->name('discord');
+
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
