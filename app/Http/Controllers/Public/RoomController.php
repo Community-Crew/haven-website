@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Enums\ReservationStatus;
 use App\Models\Room;
 use App\Services\ReservationPolicyService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -23,7 +23,7 @@ class RoomController extends Controller
         return Inertia::render('rooms/Index', ['rooms' => Room::all()]);
     }
 
-    public function show(Request $request, Room $room)
+    public function show(Request $request, Room $room, ReservationPolicyService $reservationPolicyService)
     {
         if ($request->user() != null) {
             $reservations = $room->reservations()
@@ -52,18 +52,11 @@ class RoomController extends Controller
             $formattedReservations = [];
         }
 
-        $service = new ReservationPolicyService;
-        $policy = [];
-        for ($i = 0; $i < 7; $i++) {
-            $policy[$i] = $service->getMergedTimeSlotsOnWeekday($i, $room);
-        }
-
         return Inertia::render('rooms/Show',
             [
                 'room' => $room,
                 'reservations' => $formattedReservations,
-                'policy' => $policy,
-                'maxDaysInAdvance' => $service->getAllDaysInAdvance($room),
+                'weeklyPolicies' => $reservationPolicyService->getWeeklySchedule(7),
                 'userOrganisations' => $request->user()->organisations ?? null,
             ]);
     }

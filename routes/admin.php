@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrganisationController;
 use App\Http\Controllers\Admin\RegistrationCodeController;
 use App\Http\Controllers\Admin\ReservationController;
+use App\Http\Controllers\Admin\ReservationPolicyController;
+use App\Http\Controllers\Admin\ReservationPolicyEntryController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UnitController;
 use Illuminate\Support\Facades\Route;
@@ -23,4 +25,6 @@ Route::prefix('admin')->middleware(['auth', 'role:view-dashboard'])->name('admin
     Route::Resource('agendas.items', AgendaItemController::class)->parameters([
         'items' => 'agendaItem:slug',
     ]);
+    Route::Resource('reservation-policies', ReservationPolicyController::class);
+    Route::Resource('reservation-policies.entries', ReservationPolicyEntryController::class);
 });

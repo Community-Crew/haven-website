@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ReservationStatus;
+use App\Enums\RoomStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Enums\ReservationStatus;
-use App\Http\Enums\RoomStatus;
 use App\Http\Requests\Admin\UpdateRoomRequest;
 use App\Models\Reservation;
 use App\Models\Room;

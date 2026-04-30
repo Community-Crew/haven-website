@@ -34,7 +34,6 @@ const form = useForm({
     organisation: (props.reservation && props.reservation.organisation) ? props.reservation.organisation.id : null,
 });
 
-// Generate 30-minute time slots (08:00 to 24:00)
 const timeSlots = computed(() => {
     const slots = [];
     for (let i = 8; i < 24; i++) {
@@ -76,7 +75,6 @@ const extractTime = (dateStr: string) => {
     return time;
 };
 
-// Helper: extract YYYY-MM-DD
 const extractDate = (dateStr: string) => {
     if (!dateStr) return '';
     return dateStr.split(/[T ]/)[0];
@@ -87,18 +85,15 @@ watch(
     async (isOpen) => {
         if (isOpen) {
             if (props.edit && props.reservation) {
-                // 1. Populate standard fields
                 form.name = props.reservation.name;
                 form.share_name = !!props.reservation.share_user;
                 form.room_id = props.room.id;
 
-                // 2. Parse raw strings directly
                 const rawStart = props.reservation.start_at;
                 const rawEnd = props.reservation.end_at;
 
                 bookingDate.value = extractDate(rawStart);
 
-                // 3. Set times
                 const sTime = extractTime(rawStart);
                 const eTime = extractTime(rawEnd);
 
@@ -211,7 +206,6 @@ const cancelReservation = () => {
 
                     <form @submit.prevent="submit">
                         <div class="space-y-4 px-6 py-6">
-                            <!-- Event Name -->
                             <div>
                                 <label
                                     class="mb-1 block text-sm font-bold text-haven-yellow"
@@ -220,7 +214,7 @@ const cancelReservation = () => {
                                 <input
                                     v-model="form.name"
                                     type="text"
-                                    placeholder="e.g. Team Sync"
+                                    placeholder="Get together"
                                     class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                     :class="{
                                         'border-red-500': form.errors.name,
@@ -234,7 +228,6 @@ const cancelReservation = () => {
                                 </p>
                             </div>
 
-                            <!-- Date Picker -->
                             <div>
                                 <label
                                     class="mb-1 block text-sm font-bold text-haven-yellow"
