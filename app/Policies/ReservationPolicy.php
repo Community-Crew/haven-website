@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\User;
 
@@ -50,7 +51,8 @@ class ReservationPolicy
         $roles = $this->getUserRoles();
 
         return in_array('admin-'.$this->resource.'-update', $roles)
-            || in_array('admin-'.$this->resource.'-update-'.$reservation->id, $roles);
+            || in_array('admin-'.$this->resource.'-update-'.$reservation->id, $roles)
+            || ($user->id === $reservation->user_id && $reservation->status === ReservationStatus::APPROVED);
     }
 
     /**

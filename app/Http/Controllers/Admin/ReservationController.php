@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Enums\ReservationStatus;
 use App\Http\Requests\Admin\StoreReservationRequest;
 use App\Http\Requests\Admin\UpdateReservationRequest;
 use App\Models\Reservation;

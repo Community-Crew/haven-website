@@ -3,138 +3,94 @@
 namespace App\Services;
 
 use App\Models\ReservationPolicy;
-use App\Models\Room;
+use App\Models\ReservationPolicyEntry;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class ReservationPolicyService
 {
-    public function getMergedTimeSlots(Carbon $date, Room $room): array
+    public function getUserPolicies(Carbon $date): Collection
     {
-        $policies = $this->getUserPolicies($room);
-
-        if ($policies->isEmpty()) {
-            return [];
-        }
-
-        $today = Carbon::now()->startOfDay();
-        $targetDate = $date->copy()->startOfDay();
-
-        if ($targetDate->lt($today)) {
-            return [];
-        }
-
-        $daysInFuture = $today->diffInDays($targetDate);
+        $days = (int)$date->copy()->diffInDays(Carbon::now()->startOfDay(), true);
         $dayOfWeek = $date->dayOfWeek;
 
-        $rawRanges = [];
-        foreach ($policies as $policy) {
-            if (isset($policy->max_days_in_advance) && (int) $daysInFuture > (int) $policy->max_days_in_advance) {
-                continue;
-            }
+        $roles = collect(Session::get('roles', []));
 
-            $schedule = $policy->weekly_schedule[$dayOfWeek] ?? null;
+        $policyNames = $roles->filter(fn($role) => Str::startsWith($role, 'reservation_policy-'))
+            ->map(fn($role) => Str::after($role, 'reservation_policy-'));
 
-            if ($schedule) {
-                $rawRanges[] = [
-                    'start' => $schedule['start'],
-                    'end' => $schedule['end'],
-                ];
-            }
-        }
+        $reservationPolicies = ReservationPolicy::whereIn('role_name', $policyNames)
+            ->where('max_days_in_advance', '>=', $days)
+            ->get(['id', 'max_days_in_advance']);
 
-        return $this->mergeRanges($rawRanges);
+        $entries = ReservationPolicyEntry::whereIn('reservation_policy_id', $reservationPolicies->pluck('id'))
+            ->where(function ($query) use ($dayOfWeek) {
+                $query->where('day_of_week', $dayOfWeek)
+                    ->orWhere('day_of_week', 8);
+            })
+            ->orderBy('start_time')
+            ->get()
+            ->map(function ($entry) use ($reservationPolicies) {
+                $policy = $reservationPolicies->firstWhere('id', $entry->reservation_policy_id);
+                $entry->max_days_in_advance = $policy ? $policy->max_days_in_advance : 0;
+                return $entry;
+            });
+
+        return $this->mergeEntries($entries);
     }
 
-    /**
-     * Get slots for a generic day of the week (0=Sun, 6=Sat).
-     * Ignores 'days_in_advance' (used for showing general policy).
-     */
-    public function getMergedTimeSlotsOnWeekday(int $dayOfWeek, Room $room)
+    protected function mergeEntries(Collection $entries): Collection
     {
-        $policies = $this->getUserPolicies($room);
-
-        if ($policies->isEmpty()) {
-            return [];
+        if ($entries->isEmpty()) {
+            return collect();
         }
 
-        $rawRanges = [];
+        $merged = collect();
+        $current = clone $entries->first();
 
-        foreach ($policies as $policy) {
-            $schedule = $policy->weekly_schedule[$dayOfWeek] ?? null;
-
-            if ($schedule) {
-                $rawRanges[] = [
-                    'start' => $schedule['start'],
-                    'end' => $schedule['end'],
-                ];
-            }
-        }
-
-        return $this->mergeRanges($rawRanges);
-    }
-
-    public function getAllDaysInAdvance(Room $room): array
-    {
-        $policies = $this->getUserPolicies($room);
-
-        if ($policies->isEmpty()) {
-            return [];
-        }
-
-        return $policies->pluck('max_days_in_advance')
-            ->unique()
-            ->sort()
-            ->values()
-            ->all();
-    }
-
-    /**
-     * Helper to fetch policies based on session roles.
-     */
-    private function getUserPolicies(Room $room): Collection
-    {
-        $roles = session('roles');
-
-        if (empty($roles)) {
-            return collect([]);
-        }
-
-        return ReservationPolicy::whereIn('role_name', $roles)->where('room_id', $room['id'])->get();
-    }
-
-    /**
-     * Helper to sort and merge overlapping time ranges.
-     */
-    private function mergeRanges(array $rawRanges): array
-    {
-        if (empty($rawRanges)) {
-            return [];
-        }
-
-        foreach ($rawRanges as &$r) {
-            $r['start'] = str_pad($r['start'], 5, '0', STR_PAD_LEFT);
-            $r['end'] = str_pad($r['end'], 5, '0', STR_PAD_LEFT);
-        }
-
-        usort($rawRanges, fn ($a, $b) => strcmp($a['start'], $b['start']));
-
-        $merged = [];
-        $current = $rawRanges[0];
-
-        foreach ($rawRanges as $range) {
-            if ($range['start'] <= $current['end']) {
-                if ($range['end'] > $current['end']) {
-                    $current['end'] = $range['end'];
-                }
+        foreach ($entries->skip(1) as $next) {
+            if ($next->start_time <= $current->end_time) {
+                $current->end_time = max($current->end_time, $next->end_time);
+                $current->max_days_in_advance = max($current->max_days_in_advance, $next->max_days_in_advance);
             } else {
-                $merged[] = $current;
-                $current = $range;
+                $merged->push($current);
+                $current = clone $next;
             }
         }
 
-        $merged[] = $current;
+        $merged->push($current);
 
         return $merged;
+    }
+
+    public function getWeeklySchedule(int $daysOut = 7): array
+    {
+        $timeConverter = new TimeConverterService();
+        $schedule = [];
+
+        $startDate = Carbon::now()->startOfWeek();
+
+        for ($i = 0; $i < $daysOut; $i++) {
+            $date = $startDate->copy()->addDays($i);
+
+            $mergedEntries = $this->getUserPolicies($date);
+
+            $schedule[] = [
+                'date' => $date->toDateString(),
+                'day_name' => $date->format('l'),
+                'is_today' => $date->isToday(),
+                'is_past' => $date->isPast() && !$date->isToday(),
+                'entries' => $mergedEntries->map(fn($entry) => [
+                    'start' => $entry->start_time,
+                    'end' => $entry->end_time,
+                    'max_days' => $entry->max_days_in_advance,
+                    'label' => ($entry->start_time . ' - ' . $entry->end_time)
+                ])
+            ];
+        }
+
+        return $schedule;
     }
 }

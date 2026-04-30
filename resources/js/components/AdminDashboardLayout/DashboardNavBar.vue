@@ -42,6 +42,7 @@ const closeMenu = (): void => {
                     <DropdownMenu title="Booking" id="booking-dropdown">
                         <DropdownMenuElement title="Rooms" :route="route('admin.rooms.index')"/>
                         <DropdownMenuElement title="Reservations" :route="route('admin.reservations.index')"/>
+                        <DropdownMenuElement title="Reservation Policies" :route="route('admin.reservation-policies.index')"/>
                     </DropdownMenu>
                     <DropdownMenu title="Admin" id="admin-dropdown">
                         <DropdownMenuElement title="Units" :route="route('admin.units.index')"/>

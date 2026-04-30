@@ -164,4 +164,21 @@ export interface AgendaItem {
 
 }
 
+export interface ReservationPolicyEntry {
+    id: number;
+    day_of_week: number;
+    start_at: string;
+    end_at: string;
+}
+
+export interface ReservationPolicy {
+    id: number;
+    role_name: string;
+    max_days_in_advance: number;
+    entries: ReservationPolicyEntry[];
+    rooms: Room[];
+
+
+}
+
 export type BreadcrumbItemType = BreadcrumbItem;
