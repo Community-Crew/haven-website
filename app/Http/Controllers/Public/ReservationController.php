@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class ReservationController extends Controller
 {
-   use AuthorizesRequests;
+    use AuthorizesRequests;
 
     /**
      * @throws ValidationException
@@ -27,8 +27,7 @@ class ReservationController extends Controller
         return redirect()->route('rooms.show', $reservation->room->slug)->with('success', 'Created!');
     }
 
-    public
-    function update(StoreReservationRequest $request, Reservation $reservation, ReservationService $service): RedirectResponse
+    public function update(StoreReservationRequest $request, Reservation $reservation, ReservationService $service): RedirectResponse
     {
         $this->authorize('update', $reservation);
         $service->updateReservation($reservation, $request->validated());
@@ -36,8 +35,7 @@ class ReservationController extends Controller
         return redirect()->route('profile')->with('success', 'Reservation updated successfully.');
     }
 
-    public
-    function destroy(Request $request, Reservation $reservation): RedirectResponse
+    public function destroy(Request $request, Reservation $reservation): RedirectResponse
     {
         if ($reservation->user_id !== $request->user()->id) {
             abort(403, 'You can only cancel your own reservations.');

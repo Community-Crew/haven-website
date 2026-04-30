@@ -13,13 +13,13 @@ class ReservationPolicyService
 {
     public function getUserPolicies(Carbon $date): Collection
     {
-        $days = (int)$date->copy()->diffInDays(Carbon::now()->startOfDay(), true);
+        $days = (int) $date->copy()->diffInDays(Carbon::now()->startOfDay(), true);
         $dayOfWeek = $date->dayOfWeek;
 
         $roles = collect(Session::get('roles', []));
 
-        $policyNames = $roles->filter(fn($role) => Str::startsWith($role, 'reservation_policy-'))
-            ->map(fn($role) => Str::after($role, 'reservation_policy-'));
+        $policyNames = $roles->filter(fn ($role) => Str::startsWith($role, 'reservation_policy-'))
+            ->map(fn ($role) => Str::after($role, 'reservation_policy-'));
 
         $reservationPolicies = ReservationPolicy::whereIn('role_name', $policyNames)
             ->where('max_days_in_advance', '>=', $days)
@@ -35,6 +35,7 @@ class ReservationPolicyService
             ->map(function ($entry) use ($reservationPolicies) {
                 $policy = $reservationPolicies->firstWhere('id', $entry->reservation_policy_id);
                 $entry->max_days_in_advance = $policy ? $policy->max_days_in_advance : 0;
+
                 return $entry;
             });
 
@@ -67,7 +68,7 @@ class ReservationPolicyService
 
     public function getWeeklySchedule(int $daysOut = 7): array
     {
-        $timeConverter = new TimeConverterService();
+        $timeConverter = new TimeConverterService;
         $schedule = [];
 
         $startDate = Carbon::now()->startOfWeek();
@@ -81,13 +82,13 @@ class ReservationPolicyService
                 'date' => $date->toDateString(),
                 'day_name' => $date->format('l'),
                 'is_today' => $date->isToday(),
-                'is_past' => $date->isPast() && !$date->isToday(),
-                'entries' => $mergedEntries->map(fn($entry) => [
+                'is_past' => $date->isPast() && ! $date->isToday(),
+                'entries' => $mergedEntries->map(fn ($entry) => [
                     'start' => $entry->start_time,
                     'end' => $entry->end_time,
                     'max_days' => $entry->max_days_in_advance,
-                    'label' => ($entry->start_time . ' - ' . $entry->end_time)
-                ])
+                    'label' => ($entry->start_time.' - '.$entry->end_time),
+                ]),
             ];
         }
 
