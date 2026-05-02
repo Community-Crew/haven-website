@@ -17,9 +17,6 @@ class ReservationController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws ValidationException
-     */
     public function store(StoreReservationRequest $request, ReservationService $reservationService): RedirectResponse
     {
         $reservation = $reservationService->createReservation($request->validated());
