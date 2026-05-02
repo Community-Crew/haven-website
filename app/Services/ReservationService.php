@@ -13,9 +13,7 @@ class ReservationService
 {
     public function __construct(
         protected ReservationPolicyService $policyService
-    )
-    {
-    }
+    ) {}
 
     public function createReservation(array $data)
     {
@@ -81,13 +79,13 @@ class ReservationService
             $endMin = 1440;
         }
         $isAllowed = $policies->contains(function ($policy) use ($startMin, $endMin) {
-            $pStart = (int)$policy->getAttributes()['start_time'];
-            $pEnd = (int)$policy->getAttributes()['end_time'];
+            $pStart = (int) $policy->getAttributes()['start_time'];
+            $pEnd = (int) $policy->getAttributes()['end_time'];
 
             return $startMin >= $pStart && $endMin <= $pEnd;
         });
 
-        if (!$isAllowed) {
+        if (! $isAllowed) {
             throw ValidationException::withMessages([
                 'start_time' => 'The selected time range is not permitted by your user policy.',
             ]);
