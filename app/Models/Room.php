@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\RoomStatus;
 use App\Traits\HasS3Image;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Spatie\Sluggable\HasSlug;
@@ -41,28 +42,14 @@ class Room extends Model
         return 'slug';
     }
 
-    protected static function boot(): void
-    {
-        parent::boot();
-
-        // Automatically generate slug when creating a Room
-        static::creating(function ($room) {
-            if (empty($room->slug)) {
-                $room->slug = Str::slug($room->name);
-            }
-        });
-
-        // Optional: Update slug if the name changes
-        static::updating(function ($room) {
-            if ($room->isDirty('name') && empty($room->getDirty()['slug'] ?? null)) {
-                $room->slug = Str::slug($room->name);
-            }
-        });
-    }
-
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    public function reservationPolicies(): BelongsToMany
+    {
+        return $this->belongsToMany(ReservationPolicy::class);
     }
 
     public function toArray()

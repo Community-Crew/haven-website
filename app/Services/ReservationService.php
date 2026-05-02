@@ -13,7 +13,9 @@ class ReservationService
 {
     public function __construct(
         protected ReservationPolicyService $policyService
-    ) {}
+    )
+    {
+    }
 
     public function createReservation(array $data)
     {
@@ -22,9 +24,10 @@ class ReservationService
             $end = Carbon::parse($data['end_time']);
             $roomId = $data['room_id'];
 
-            Room::where('id', $roomId)->lockForUpdate()->first();
+            $room = Room::findOrFail($roomId);
+            $room->lockForUpdate();
 
-            $this->verifyPolicyAllows($start, $end);
+            $this->verifyPolicyAllows($start, $end, $room);
 
             $this->ensureNoOverlap($roomId, $start, $end);
 
@@ -48,9 +51,10 @@ class ReservationService
             $end = Carbon::parse($data['end_time']);
             $roomId = $data['room_id'];
 
-            Room::where('id', $roomId)->lockForUpdate()->first();
+            $room = Room::findOrFail($roomId);
+            $room->lockForUpdate();
 
-            $this->verifyPolicyAllows($start, $end);
+            $this->verifyPolicyAllows($start, $end, $room);
 
             $this->ensureNoOverlap($roomId, $start, $end, $reservation->id);
 
@@ -67,9 +71,9 @@ class ReservationService
         });
     }
 
-    protected function verifyPolicyAllows(Carbon $start, Carbon $end): void
+    protected function verifyPolicyAllows(Carbon $start, Carbon $end, Room $room): void
     {
-        $policies = $this->policyService->getUserPolicies($start);
+        $policies = $this->policyService->getUserPolicies($start, $room);
 
         $startMin = ($start->hour * 60) + $start->minute;
         $endMin = ($end->hour * 60) + $end->minute;
@@ -77,13 +81,13 @@ class ReservationService
             $endMin = 1440;
         }
         $isAllowed = $policies->contains(function ($policy) use ($startMin, $endMin) {
-            $pStart = (int) $policy->getAttributes()['start_time'];
-            $pEnd = (int) $policy->getAttributes()['end_time'];
+            $pStart = (int)$policy->getAttributes()['start_time'];
+            $pEnd = (int)$policy->getAttributes()['end_time'];
 
             return $startMin >= $pStart && $endMin <= $pEnd;
         });
 
-        if (! $isAllowed) {
+        if (!$isAllowed) {
             throw ValidationException::withMessages([
                 'start_time' => 'The selected time range is not permitted by your user policy.',
             ]);
