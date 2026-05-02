@@ -76,7 +76,6 @@ class ReservationPolicyService
 
     public function getWeeklySchedule(Room $room, int $daysOut = 7): array
     {
-        $timeConverter = new TimeConverterService;
         $schedule = [];
 
         $startDate = Carbon::now()->startOfWeek();

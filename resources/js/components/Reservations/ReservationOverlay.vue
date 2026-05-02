@@ -128,6 +128,8 @@ const submit = () => {
     if (props.edit && props.reservation) {
         form.put(route('reservations.update', props.reservation.id), {
             preserveScroll: true,
+            preserveState: true, // Keep the modal data if it fails
+            errorBag: 'updateReservation', // Groups errors
             onSuccess: () => {
                 form.reset();
                 emit('close');
@@ -136,10 +138,15 @@ const submit = () => {
     } else {
         form.post(route('reservations.store'), {
             preserveScroll: true,
+            preserveState: true,
+            errorBag: 'storeReservation',
             onSuccess: () => {
                 form.reset();
                 emit('close');
             },
+            onError: (errors) => {
+                console.log("Validation Failed", errors);
+            }
         });
     }
 };
