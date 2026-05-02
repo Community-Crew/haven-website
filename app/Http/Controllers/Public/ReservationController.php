@@ -11,15 +11,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
-use Illuminate\Validation\ValidationException;
 
 class ReservationController extends Controller
 {
     use AuthorizesRequests;
 
-    /**
-     * @throws ValidationException
-     */
     public function store(StoreReservationRequest $request, ReservationService $reservationService): RedirectResponse
     {
         $reservation = $reservationService->createReservation($request->validated());
