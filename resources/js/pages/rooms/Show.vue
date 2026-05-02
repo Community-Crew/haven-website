@@ -205,7 +205,7 @@ const formatDate = (dateStr: string) => {
                                                 class="flex items-center gap-2"
                                             >
                                                 <span
-                                                    class="max-w-[80px] truncate text-right font-medium"
+                                                    class="max-w-[80px] truncate text-right font-medium text-haven-black"
                                                     >{{
                                                         reservation.organisation
                                                             .name
