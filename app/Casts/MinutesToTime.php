@@ -25,7 +25,10 @@ class MinutesToTime implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        if (is_int($value)) return $value;
+        if (is_int($value)) {
+            return $value;
+        }
 
-        return TimeConverterService::toMinutes($value);    }
+        return TimeConverterService::toMinutes($value);
+    }
 }

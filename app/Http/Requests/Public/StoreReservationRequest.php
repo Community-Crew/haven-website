@@ -31,10 +31,10 @@ class StoreReservationRequest extends FormRequest
                 'required', 'date', 'after:now',
                 function ($attribute, $value, $fail) {
                     $date = Carbon::parse($value);
-                    if (!in_array($date->minute, [0, 30])) {
+                    if (! in_array($date->minute, [0, 30])) {
                         $fail('Start time must be on the hour or half-hour.');
                     }
-                }
+                },
             ],
 
             'end_time' => [
@@ -43,17 +43,17 @@ class StoreReservationRequest extends FormRequest
                     $start = Carbon::parse($this->input('start_time'));
                     $end = Carbon::parse($value);
 
-                    if (!$start->isSameDay($end) && !($end->isNextDay($start) && $end->format('H:i') === '00:00')) {
+                    if (! $start->isSameDay($end) && ! ($end->isNextDay($start) && $end->format('H:i') === '00:00')) {
                         $fail('Reservations must start and end on the same day.');
                     }
-                }
+                },
             ],
 
             'organisation' => [
                 'nullable',
                 'exists:organisations,id',
                 function ($attribute, $value, $fail) use ($user) {
-                    if ($value && !$user->organisations->contains($value)) {
+                    if ($value && ! $user->organisations->contains($value)) {
                         $fail('You can only use organisations you are a member of.');
                     }
                 },

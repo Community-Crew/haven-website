@@ -35,6 +35,7 @@ class ReservationPolicyEntryController extends Controller
     {
         $validated = $request->validated();
         $reservationPolicy->reservationPolicyEntries()->create($validated);
+
         return redirect()->route('admin.reservation-policies.edit', $reservationPolicy->id)
             ->with('success', 'Rule created successfully.');
     }
@@ -69,6 +70,7 @@ class ReservationPolicyEntryController extends Controller
     public function destroy(ReservationPolicy $reservation_policy, ReservationPolicyEntry $entry)
     {
         $entry->delete();
+
         return redirect()->route('admin.reservation-policies.edit', $reservation_policy->id)->with('success', 'Reservation Policy Entry has been deleted successfully.');
     }
 }

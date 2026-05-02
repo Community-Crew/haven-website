@@ -13,7 +13,7 @@ class ReservationPolicyController extends Controller
 {
     public function index()
     {
-        $reservationPolicies = ReservationPolicy::query()->paginate(20)->withQueryString()->through(fn($policy) => [
+        $reservationPolicies = ReservationPolicy::query()->paginate(20)->withQueryString()->through(fn ($policy) => [
             'id' => $policy->id,
             'role_name' => $policy->role_name,
             'max_days_in_advance' => $policy->max_days_in_advance,
@@ -21,7 +21,7 @@ class ReservationPolicyController extends Controller
         ]);
 
         return Inertia::render('dashboard/reservationPolicy/Index', [
-            'policies' => $reservationPolicies
+            'policies' => $reservationPolicies,
         ]);
     }
 
@@ -39,7 +39,6 @@ class ReservationPolicyController extends Controller
         ]);
     }
 
-
     public function create()
     {
         return Inertia::render('dashboard/reservationPolicy/Create', ['rooms' => Room::all()]);
@@ -51,7 +50,7 @@ class ReservationPolicyController extends Controller
 
         $ReservationPolicy = ReservationPolicy::create([
             'role_name' => $validated['role_name'],
-            'max_days_in_advance' => $validated['max_days_in_advance']
+            'max_days_in_advance' => $validated['max_days_in_advance'],
         ]);
 
         $ReservationPolicy->rooms()->sync($validated['room_ids']);
@@ -64,7 +63,7 @@ class ReservationPolicyController extends Controller
         $validated = $request->validated();
         $reservationPolicy->update([
             'role_name' => $validated['role_name'],
-            'max_days_in_advance' => $validated['max_days_in_advance']
+            'max_days_in_advance' => $validated['max_days_in_advance'],
         ]);
 
         $reservationPolicy->rooms()->sync($validated['room_ids']);
@@ -75,6 +74,7 @@ class ReservationPolicyController extends Controller
     public function destroy(ReservationPolicy $reservationPolicy)
     {
         $reservationPolicy->delete();
+
         return redirect()->route('admin.reservation-policies.index')->with('success', 'Reservation Policy has been deleted successfully.');
     }
 }

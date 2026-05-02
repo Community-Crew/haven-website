@@ -9,7 +9,7 @@ class StoreReservationPolicyEntryRequest extends FormRequest
 {
     public function authorize()
     {
-//        return Gate::allows('admin.reservation-policy.create');
+        //        return Gate::allows('admin.reservation-policy.create');
         return true;
     }
 
@@ -19,7 +19,7 @@ class StoreReservationPolicyEntryRequest extends FormRequest
             'day_of_week' => ['required', 'integer', 'regex:/^([0-6]|8)$/'],
             'start_time' => [
                 'required',
-                'regex:/^([01][0-9]|2[0-3]):[0-5][0-9]$/'
+                'regex:/^([01][0-9]|2[0-3]):[0-5][0-9]$/',
             ],
 
             'end_time' => [
