@@ -55,7 +55,7 @@ class ReservationPolicyController extends Controller
 
         $ReservationPolicy->rooms()->sync($validated['room_ids']);
 
-        return redirect()->route('admin.reservation-policies.index')->with('success', 'Policy created');
+        return redirect()->route('admin.reservation-policies.edit')->with('success', 'Policy created');
     }
 
     public function update(UpdateReservationPolicyRequest $request, ReservationPolicy $reservationPolicy)
