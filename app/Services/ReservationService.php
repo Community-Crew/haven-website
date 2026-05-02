@@ -22,9 +22,10 @@ class ReservationService
             $end = Carbon::parse($data['end_time']);
             $roomId = $data['room_id'];
 
-            Room::where('id', $roomId)->lockForUpdate()->first();
+            $room = Room::findOrFail($roomId);
+            $room->lockForUpdate();
 
-            $this->verifyPolicyAllows($start, $end);
+            $this->verifyPolicyAllows($start, $end, $room);
 
             $this->ensureNoOverlap($roomId, $start, $end);
 
@@ -48,9 +49,10 @@ class ReservationService
             $end = Carbon::parse($data['end_time']);
             $roomId = $data['room_id'];
 
-            Room::where('id', $roomId)->lockForUpdate()->first();
+            $room = Room::findOrFail($roomId);
+            $room->lockForUpdate();
 
-            $this->verifyPolicyAllows($start, $end);
+            $this->verifyPolicyAllows($start, $end, $room);
 
             $this->ensureNoOverlap($roomId, $start, $end, $reservation->id);
 
@@ -67,9 +69,9 @@ class ReservationService
         });
     }
 
-    protected function verifyPolicyAllows(Carbon $start, Carbon $end): void
+    protected function verifyPolicyAllows(Carbon $start, Carbon $end, Room $room): void
     {
-        $policies = $this->policyService->getUserPolicies($start);
+        $policies = $this->policyService->getUserPolicies($start, $room);
 
         $startMin = ($start->hour * 60) + $start->minute;
         $endMin = ($end->hour * 60) + $end->minute;

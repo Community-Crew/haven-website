@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ReservationPolicy;
 use App\Models\ReservationPolicyEntry;
+use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 
 class ReservationPolicyService
 {
-    public function getUserPolicies(Carbon $date): Collection
+    public function getUserPolicies(Carbon $date, Room $room): Collection
     {
         $days = (int) $date->copy()->diffInDays(Carbon::now()->startOfDay(), true);
         $dayOfWeek = $date->dayOfWeek;
@@ -23,7 +24,14 @@ class ReservationPolicyService
 
         $reservationPolicies = ReservationPolicy::whereIn('role_name', $policyNames)
             ->where('max_days_in_advance', '>=', $days)
+            ->whereHas('rooms', function ($query) use ($room) {
+                $query->where('rooms.id', $room->id);
+            })
             ->get(['id', 'max_days_in_advance']);
+
+        if ($reservationPolicies->isEmpty()) {
+            return collect();
+        }
 
         $entries = ReservationPolicyEntry::whereIn('reservation_policy_id', $reservationPolicies->pluck('id'))
             ->where(function ($query) use ($dayOfWeek) {
@@ -66,7 +74,7 @@ class ReservationPolicyService
         return $merged;
     }
 
-    public function getWeeklySchedule(int $daysOut = 7): array
+    public function getWeeklySchedule(Room $room, int $daysOut = 7): array
     {
         $timeConverter = new TimeConverterService;
         $schedule = [];
@@ -76,7 +84,7 @@ class ReservationPolicyService
         for ($i = 0; $i < $daysOut; $i++) {
             $date = $startDate->copy()->addDays($i);
 
-            $mergedEntries = $this->getUserPolicies($date);
+            $mergedEntries = $this->getUserPolicies($date, $room);
 
             $schedule[] = [
                 'date' => $date->toDateString(),

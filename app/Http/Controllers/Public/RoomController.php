@@ -56,7 +56,7 @@ class RoomController extends Controller
             [
                 'room' => $room,
                 'reservations' => $formattedReservations,
-                'weeklyPolicies' => $reservationPolicyService->getWeeklySchedule(7),
+                'weeklyPolicies' => $reservationPolicyService->getWeeklySchedule($room),
                 'userOrganisations' => $request->user()->organisations ?? null,
             ]);
     }
