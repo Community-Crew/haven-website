@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreReservationPolicyEntryRequest;
 use App\Models\ReservationPolicy;
 use App\Models\ReservationPolicyEntry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ReservationPolicyEntryController extends Controller
@@ -24,6 +25,7 @@ class ReservationPolicyEntryController extends Controller
      */
     public function create(ReservationPolicy $reservationPolicy)
     {
+        Gate::authorize('create', ReservationPolicy::class);
         return Inertia::render('dashboard/reservationPolicy/entries/Create',
             ['reservationPolicy' => $reservationPolicy]);
     }
@@ -33,6 +35,7 @@ class ReservationPolicyEntryController extends Controller
      */
     public function store(StoreReservationPolicyEntryRequest $request, ReservationPolicy $reservationPolicy)
     {
+        Gate::authorize('create', ReservationPolicy::class);
         $validated = $request->validated();
         $reservationPolicy->reservationPolicyEntries()->create($validated);
 
@@ -69,6 +72,7 @@ class ReservationPolicyEntryController extends Controller
      */
     public function destroy(ReservationPolicy $reservation_policy, ReservationPolicyEntry $entry)
     {
+        Gate::authorize('delete', ReservationPolicy::class);
         $entry->delete();
 
         return redirect()->route('admin.reservation-policies.edit', $reservation_policy->id)->with('success', 'Reservation Policy Entry has been deleted successfully.');
