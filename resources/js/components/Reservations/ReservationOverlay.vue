@@ -286,8 +286,9 @@ const activeDayPolicies = computed(() => {
                                 <p class="mt-2 text-sm text-haven-yellow/90">
                                     {{ form.errors.policy }}
                                 </p>
-                                <p class="mt-6" v-if="form.errors.policy">
-                                    Your allowed reservations for {{ activeDayPolicies.day_name }}:
+                                <p class="mt-6">
+                                    Your allowed reservations for
+                                    {{ activeDayPolicies.day_name }}:
                                 </p>
                                 <div
                                     class="mt-2 flex flex-wrap justify-center gap-2"
@@ -307,6 +308,19 @@ const activeDayPolicies = computed(() => {
                                             class="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-haven-blue"
                                         >
                                             {{ slot.max_days }}d
+                                        </span>
+                                    </div>
+                                    <div
+                                        v-if="
+                                            activeDayPolicies.entries.length ===
+                                            0
+                                        "
+                                        class="flex items-center rounded-lg border border-haven-red/25 bg-white px-3 py-1.5 shadow-sm ring-[20px] ring-haven-red/25 transition-transform ring-inset hover:scale-105"
+                                    >
+                                        <span
+                                            class="text-sm font-semibold text-haven-blue"
+                                        >
+                                            Not allowed
                                         </span>
                                     </div>
                                 </div>
