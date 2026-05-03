@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Organisation, Reservation, Room } from '@/types';
+import { Organisation, Reservation, ReservationPolicy, Room } from '@/types';
 import { router, useForm } from '@inertiajs/vue3';
 import { computed, getCurrentInstance, nextTick, ref, watch } from 'vue';
 
@@ -13,6 +13,7 @@ const props = withDefaults(
         edit?: boolean;
         reservation?: Reservation;
         organisations?: Organisation[];
+        weeklyPolicies: ReservationPolicy[];
     }>(),
     {
         edit: false,
@@ -31,7 +32,10 @@ const form = useForm({
     end_time: '',
     share_name: true,
     room_id: props.room.id,
-    organisation: (props.reservation && props.reservation.organisation) ? props.reservation.organisation.id : null,
+    organisation:
+        props.reservation && props.reservation.organisation
+            ? props.reservation.organisation.id
+            : null,
 });
 
 const timeSlots = computed(() => {
@@ -145,8 +149,8 @@ const submit = () => {
                 emit('close');
             },
             onError: (errors) => {
-                console.log("Validation Failed", errors);
-            }
+                console.log('Validation Failed', errors);
+            },
         });
     }
 };
@@ -158,6 +162,39 @@ const cancelReservation = () => {
         onSuccess: () => emit('close'),
     });
 };
+
+const countdown = ref(0);
+const totalTime = 500;
+
+const clearBlockingError = () => {
+    if (countdown.value > 0) return;
+    form.clearErrors();
+};
+
+watch(
+    () => form.errors.policy,
+    (newError) => {
+        if (newError) {
+            countdown.value = 500;
+            const interval = setInterval(() => {
+                countdown.value--;
+                if (countdown.value <= 0) clearInterval(interval);
+            }, 10);
+        }
+    },
+);
+
+const progressWidth = computed(() => {
+    return ((totalTime - countdown.value) / totalTime) * 100;
+});
+
+const activeDayPolicies = computed(() => {
+    if (!form.start_time) return [];
+
+    const dayIndex = new Date(form.start_time).getDay();
+
+    return props.weeklyPolicies[dayIndex] || [];
+});
 </script>
 
 <template>
@@ -183,6 +220,7 @@ const cancelReservation = () => {
 
                 <div
                     class="z-50 mb-6 w-full max-w-lg transform overflow-hidden rounded-xl bg-haven-blue shadow-2xl transition-all sm:mx-auto"
+                    :class="{ 'animate-shake': form.errors.policy }"
                 >
                     <div
                         class="flex items-center justify-between border-b bg-haven-blue px-6 py-4"
@@ -211,7 +249,99 @@ const cancelReservation = () => {
                         </button>
                     </div>
 
-                    <form @submit.prevent="submit">
+                    <form @submit.prevent="submit" class="relative">
+                        <Transition
+                            enter-active-class="transition duration-300 ease-out"
+                            enter-from-class="opacity-0 scale-95"
+                            enter-to-class="opacity-100 scale-100"
+                            leave-active-class="transition duration-200 ease-in"
+                            leave-from-class="opacity-100 scale-100"
+                            leave-to-class="opacity-0 scale-95"
+                        >
+                            <div
+                                v-if="form.errors.policy"
+                                class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-haven-blue/95 px-8 text-center backdrop-blur-md"
+                            >
+                                <div
+                                    class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/20"
+                                >
+                                    <svg
+                                        class="h-8 w-8 text-red-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 14c-.77 1.333.192 3 1.732 3z"
+                                        />
+                                    </svg>
+                                </div>
+
+                                <h2 class="text-lg font-bold text-white">
+                                    Booking Conflict
+                                </h2>
+                                <p class="mt-2 text-sm text-haven-yellow/90">
+                                    {{ form.errors.policy }}
+                                </p>
+                                <p class="mt-6">
+                                    Your allowed reservations for {{ activeDayPolicies.day_name }}:
+                                </p>
+                                <div
+                                    class="mt-2 flex flex-wrap justify-center gap-2"
+                                >
+                                    <div
+                                        v-for="slot in activeDayPolicies.entries"
+                                        :key="slot.start"
+                                        class="flex items-center rounded-lg border border-white/20 bg-white px-3 py-1.5 shadow-sm transition-transform hover:scale-105"
+                                    >
+                                        <span
+                                            class="text-sm font-semibold text-haven-blue"
+                                        >
+                                            {{ slot.label }}
+                                        </span>
+
+                                        <span
+                                            class="ml-2 rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-haven-blue"
+                                        >
+                                            {{ slot.max_days }}d
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    @click="clearBlockingError"
+                                    :disabled="countdown > 0"
+                                    class="relative mt-8 w-full overflow-hidden rounded-lg py-3 text-sm font-bold shadow-lg transition-all active:scale-95"
+                                    :class="[
+                                        countdown > 0
+                                            ? 'cursor-not-allowed bg-gray-700 text-white/50'
+                                            : 'bg-white text-haven-blue hover:bg-gray-100',
+                                    ]"
+                                >
+                                    <div
+                                        v-if="countdown > 0"
+                                        class="absolute inset-y-0 left-0 bg-haven-yellow/30 transition-all duration-100 ease-linear"
+                                        :style="{ width: progressWidth + '%' }"
+                                    />
+
+                                    <span
+                                        class="relative z-10 tracking-widest uppercase"
+                                    >
+                                        <span v-if="countdown > 0">
+                                            Please read...
+                                            {{ Math.ceil(countdown / 100) }}s
+                                        </span>
+                                        <span v-else>
+                                            I Understand, Let me fix it
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </Transition>
                         <div class="space-y-4 px-6 py-6">
                             <div>
                                 <label
@@ -250,7 +380,6 @@ const cancelReservation = () => {
                                 />
                             </div>
 
-                            <!-- Time Slots -->
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label
@@ -298,7 +427,6 @@ const cancelReservation = () => {
                                 </div>
                             </div>
 
-                            <!-- Backend Error Messages -->
                             <div
                                 v-if="form.errors.start_time"
                                 class="text-sm text-red-500"
@@ -312,7 +440,6 @@ const cancelReservation = () => {
                                 {{ form.errors.end_time }}
                             </div>
 
-                            <!-- Privacy Toggle -->
                             <div
                                 class="flex items-start rounded-md bg-haven-light-blue p-3"
                             >
@@ -336,7 +463,9 @@ const cancelReservation = () => {
                                     </p>
                                 </div>
                             </div>
-                            <div v-if="organisations && organisations.length > 0">
+                            <div
+                                v-if="organisations && organisations.length > 0"
+                            >
                                 <div>
                                     <label
                                         class="mb-1 block text-sm font-bold text-haven-yellow"
@@ -361,11 +490,9 @@ const cancelReservation = () => {
                             </div>
                         </div>
 
-                        <!-- Footer Actions -->
                         <div
                             class="flex items-center justify-between border-t bg-haven-green px-6 py-4"
                         >
-                            <!-- Left: Cancel Button (Only in Edit Mode) -->
                             <div>
                                 <button
                                     v-if="edit"
@@ -401,3 +528,21 @@ const cancelReservation = () => {
         </Transition>
     </Teleport>
 </template>
+
+<style scoped>
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+.animate-shake {
+    animation: shake 0.2s ease-in-out 0s 2;
+}
+</style>

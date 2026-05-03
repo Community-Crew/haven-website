@@ -37,6 +37,7 @@ const formatDate = (dateStr: string) => {
         :show="showReservationModal"
         :room="room"
         :organisations="userOrganisations"
+        :weeklyPolicies="weeklyPolicies"
         @close="showReservationModal = false"
     />
     <PublicAppLayout>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Enums\ReservationStatus;
 use App\Http\Requests\Public\StoreReservationRequest;
 use App\Models\Reservation;
+use App\Models\Room;
 use App\Services\ReservationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -18,9 +19,17 @@ class ReservationController extends Controller
 
     public function store(StoreReservationRequest $request, ReservationService $reservationService): RedirectResponse
     {
-        $reservation = $reservationService->createReservation($request->validated());
+        $room = Room::findOrFail($request->room_id);
 
-        return redirect()->route('rooms.show', $reservation->room->slug)->with('success', 'Created!');
+        try {
+            $reservationService->createReservation($request->validated());
+
+            return redirect()->route('rooms.show', $room->slug)->with('success', 'Created!');
+        } catch (\Exception $exception) {
+            return redirect()->route('rooms.show', $room->slug)
+                ->withErrors(['policy' => $exception->getMessage()])
+                ->withInput();
+        }
     }
 
     public function update(StoreReservationRequest $request, Reservation $reservation, ReservationService $service): RedirectResponse
