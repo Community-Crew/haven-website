@@ -26,6 +26,7 @@ class ReservationPolicyEntryController extends Controller
     public function create(ReservationPolicy $reservationPolicy)
     {
         Gate::authorize('create', ReservationPolicy::class);
+
         return Inertia::render('dashboard/reservationPolicy/entries/Create',
             ['reservationPolicy' => $reservationPolicy]);
     }

@@ -7,9 +7,8 @@ use App\Http\Requests\Admin\StoreReservationPolicyRequest;
 use App\Http\Requests\Admin\UpdateReservationPolicyRequest;
 use App\Models\ReservationPolicy;
 use App\Models\Room;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Gate;
-
+use Inertia\Inertia;
 
 class ReservationPolicyController extends Controller
 {
@@ -31,6 +30,7 @@ class ReservationPolicyController extends Controller
     public function edit(ReservationPolicy $reservationPolicy)
     {
         Gate::authorize('edit', ReservationPolicy::class);
+
         return Inertia::render('dashboard/reservationPolicy/Edit', [
             'reservationPolicy' => [
                 'id' => $reservationPolicy->id,
@@ -46,6 +46,7 @@ class ReservationPolicyController extends Controller
     public function create()
     {
         Gate::authorize('create', ReservationPolicy::class);
+
         return Inertia::render('dashboard/reservationPolicy/Create', ['rooms' => Room::all()]);
     }
 
