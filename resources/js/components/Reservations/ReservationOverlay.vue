@@ -286,7 +286,7 @@ const activeDayPolicies = computed(() => {
                                 <p class="mt-2 text-sm text-haven-yellow/90">
                                     {{ form.errors.policy }}
                                 </p>
-                                <p class="mt-6" v-if="activeDayPolicies.entries.length > 0">
+                                <p class="mt-6" v-if="form.errors.policy">
                                     Your allowed reservations for {{ activeDayPolicies.day_name }}:
                                 </p>
                                 <div
