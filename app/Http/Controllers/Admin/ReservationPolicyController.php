@@ -7,12 +7,14 @@ use App\Http\Requests\Admin\StoreReservationPolicyRequest;
 use App\Http\Requests\Admin\UpdateReservationPolicyRequest;
 use App\Models\ReservationPolicy;
 use App\Models\Room;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ReservationPolicyController extends Controller
 {
     public function index()
     {
+        Gate::authorize('viewAny', ReservationPolicy::class);
         $reservationPolicies = ReservationPolicy::query()->paginate(20)->withQueryString()->through(fn ($policy) => [
             'id' => $policy->id,
             'role_name' => $policy->role_name,
@@ -27,6 +29,8 @@ class ReservationPolicyController extends Controller
 
     public function edit(ReservationPolicy $reservationPolicy)
     {
+        Gate::authorize('edit', ReservationPolicy::class);
+
         return Inertia::render('dashboard/reservationPolicy/Edit', [
             'reservationPolicy' => [
                 'id' => $reservationPolicy->id,
@@ -41,11 +45,14 @@ class ReservationPolicyController extends Controller
 
     public function create()
     {
+        Gate::authorize('create', ReservationPolicy::class);
+
         return Inertia::render('dashboard/reservationPolicy/Create', ['rooms' => Room::all()]);
     }
 
     public function store(StoreReservationPolicyRequest $request)
     {
+        Gate::authorize('create', ReservationPolicy::class);
         $validated = $request->validated();
 
         $ReservationPolicy = ReservationPolicy::create([
@@ -60,6 +67,7 @@ class ReservationPolicyController extends Controller
 
     public function update(UpdateReservationPolicyRequest $request, ReservationPolicy $reservationPolicy)
     {
+        Gate::authorize('edit', ReservationPolicy::class);
         $validated = $request->validated();
         $reservationPolicy->update([
             'role_name' => $validated['role_name'],
@@ -73,6 +81,7 @@ class ReservationPolicyController extends Controller
 
     public function destroy(ReservationPolicy $reservationPolicy)
     {
+        Gate::authorize('delete', ReservationPolicy::class);
         $reservationPolicy->delete();
 
         return redirect()->route('admin.reservation-policies.index')->with('success', 'Reservation Policy has been deleted successfully.');
