@@ -11,7 +11,6 @@ class RoomPolicy
 
     private function getUserRoles(): array
     {
-        // Get roles from session and ensure it's an array, default to empty array if null.
         return (array) session('roles', []);
     }
 
@@ -31,7 +30,7 @@ class RoomPolicy
         $roles = $this->getUserRoles();
 
         return in_array('admin-'.$this->resource.'-view-'.$room->id, $roles)
-            || $this->viewAny($user); // You can re-use viewAny for the general permission
+            || $this->viewAny($user);
     }
 
     /**

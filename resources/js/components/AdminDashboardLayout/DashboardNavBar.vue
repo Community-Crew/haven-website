@@ -47,6 +47,7 @@ const closeMenu = (): void => {
                     <DropdownMenu title="Admin" id="admin-dropdown">
                         <DropdownMenuElement title="Units" :route="route('admin.units.index')"/>
                         <DropdownMenuElement title="Organisations" :route="route('admin.organisations.index')"/>
+                        <DropdownMenuElement title="Users" :route="route('admin.users.index')"/>
                     </DropdownMenu>
                     <div></div>
                     <NavBarProfile/>

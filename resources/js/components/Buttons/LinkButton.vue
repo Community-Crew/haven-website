@@ -1,9 +1,14 @@
 <script setup lang="ts">
-
-defineProps<{
-    link: string
-    name: string
-}>();
+withDefaults(
+    defineProps<{
+        link: string;
+        name?: string;
+        advanced?: boolean;
+    }>(),
+    {
+        advanced: false,
+    },
+);
 </script>
 
 <template>
@@ -11,7 +16,8 @@ defineProps<{
         :href="link"
         class="flex h-12 w-full cursor-pointer items-center justify-center rounded-2xl bg-haven-blue shadow-2xl transition-transform hover:scale-105"
     >
-        <span class="font-semibold text-white">{{name}}</span>
+        <slot v-if="advanced" />
+        <span v-else class="font-semibold text-white">{{ name }}</span>
     </a>
 </template>
 
