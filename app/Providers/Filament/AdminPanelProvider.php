@@ -2,26 +2,22 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Auth\KeycloakLogin;
-use App\Filament\Widgets\UsersWidget;
+use App\Filament\Widgets\OverRegistrationOverview;
+use App\Http\Controllers\Auth\KeycloakAdminController;
 use App\Http\Middleware\AuthenticateAdminWithKeycloak;
-use Filament\Actions\Action;
-use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\MenuItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -43,7 +39,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                UsersWidget::class,
+                OverRegistrationOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -57,10 +53,16 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
-                Authenticate::class,
                 AuthenticateAdminWithKeycloak::class,
             ])
             ->strictAuthorization()
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources');
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->routes(function () {
+                Route::get('/oauth/keycloak/redirect', [KeycloakAdminController::class, 'redirect'])
+                    ->name('oauth.keycloak.redirect');
+
+                Route::get('/oauth/keycloak/callback', [KeycloakAdminController::class, 'callback'])
+                    ->name('oauth.keycloak.callback');
+            });
     }
 }

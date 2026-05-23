@@ -43,6 +43,3 @@ Route::Resource('agendas.items', AgendaItemController::class)->parameters([
     'items' => 'agendaItem:slug',
 ]);
 Route::Resource('agendas', AgendaController::class);
-
-require __DIR__.'/auth.php';
-require __DIR__.'/admin.php';

@@ -11,7 +11,7 @@ class UserPolicy
 
     private function getUserRoles(): array
     {
-        return (array) session('roles', []);
+        return (array)session('roles', []);
     }
 
     /**
@@ -19,7 +19,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return in_array('admin-'.$this->resource.'-view', $this->getUserRoles());
+        return in_array('admin-' . $this->resource . '-view', $this->getUserRoles());
     }
 
     /**
@@ -29,7 +29,7 @@ class UserPolicy
     {
         $roles = $this->getUserRoles();
 
-        return in_array('admin-'.$this->resource.'-view-'.$userToView->id, $roles)
+        return in_array('admin-' . $this->resource . '-view-' . $userToView->id, $roles)
             || $this->viewAny($user);
     }
 
@@ -38,7 +38,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return in_array('admin-'.$this->resource.'-create', $this->getUserRoles());
+        return in_array('admin-' . $this->resource . '-create', $this->getUserRoles());
     }
 
     /**
@@ -48,8 +48,8 @@ class UserPolicy
     {
         $roles = $this->getUserRoles();
 
-        return in_array('admin-'.$this->resource.'-update', $roles)
-            || in_array('admin-'.$this->resource.'-update-'.$userToView->id, $roles);
+        return in_array('admin-' . $this->resource . '-update', $roles)
+            || in_array('admin-' . $this->resource . '-update-' . $userToView->id, $roles);
     }
 
     /**
@@ -59,8 +59,8 @@ class UserPolicy
     {
         $roles = $this->getUserRoles();
 
-        return in_array('admin-'.$this->resource.'-delete', $roles)
-            || in_array('admin-'.$this->resource.'-delete-'.$userToView->id, $roles);
+        return in_array('admin-' . $this->resource . '-delete', $roles)
+            || in_array('admin-' . $this->resource . '-delete-' . $userToView->id, $roles);
     }
 
     /**
@@ -70,8 +70,8 @@ class UserPolicy
     {
         $roles = $this->getUserRoles();
 
-        return in_array('admin-'.$this->resource.'-restore', $roles)
-            || in_array('admin-'.$this->resource.'-restore-'.$userToView->id, $roles);
+        return in_array('admin-' . $this->resource . '-restore', $roles)
+            || in_array('admin-' . $this->resource . '-restore-' . $userToView->id, $roles);
     }
 
     /**
@@ -81,7 +81,14 @@ class UserPolicy
     {
         $roles = $this->getUserRoles();
 
-        return in_array('admin-'.$this->resource.'-force_delete', $roles)
-            || in_array('admin-'.$this->resource.'-force_delete-'.$userToView->id, $roles);
+        return in_array('admin-' . $this->resource . '-force_delete', $roles)
+            || in_array('admin-' . $this->resource . '-force_delete-' . $userToView->id, $roles);
+    }
+
+    public function deleteAny(User $user): bool
+    {
+        $roles = $this->getUserRoles();
+
+        return in_array('admin-' . $this->resource . '-delete', $roles);
     }
 }

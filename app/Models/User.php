@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Traits\Timestamp;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -15,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Timestamp;
 
     /**
      * The attributes that are mass assignable.
@@ -27,8 +28,7 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'keycloak_id',
         'unit_id',
-        'keycloak_token',
-        'keycloak_refresh_token',
+
     ];
 
     /**
@@ -38,78 +38,9 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $hidden = [
         'remember_token',
-        'keycloak_token',
-        'keycloak_refresh_token',
     ];
 
     protected array $runtimeGroups = [];
-
-
-    /**
-     * Get the user's keycloak groups dynamically.
-     */
-    public function getKeycloakGroupsAttribute(): array
-    {
-        // Check if API user is authenticated through keycloak-guard, pull straight from the token payload
-        if (function_exists('auth') && auth('api')->check()) {
-            return auth('api')->token()['groups'] ?? [];
-        }
-
-        // If it's a stateless API request but cached manually in runtime.
-        if (!empty($this->runtimeGroups)) {
-            return $this->runtimeGroups;
-        }
-
-        // Fallback for stateful Filament session.
-        if (session()->has('keycloak_groups')) {
-            return session('keycloak_groups');
-        }
-
-        // Fallback decoding from database tokens if available
-        $token = session('keycloak_token') ?? $this->keycloak_token;
-        if ($token && str_contains($token, '.')) {
-            $payload = json_decode(base64_decode(explode('.', $token)[1]), true);
-            $groups = $payload['groups'] ?? [];
-
-            if (request()->hasSession()) {
-                session(['keycloak_groups' => $groups]);
-            }
-            return $groups;
-        }
-        return [];
-    }
-
-    public function setKeycloakGroups(array $groups): self
-    {
-        $this->runtimeGroups = $groups;
-        return $this;
-    }
-
-    public function hasKeycloakGroup(string $groupPattern): bool
-    {
-        return in_array($groupPattern, $this->keycloak_groups);
-    }
-
-    public function getRolesAttribute(): array
-    {
-        if (session()->has('roles')) {
-            return session('roles');
-        }
-
-        $token = session('keycloak_token') ?? $this->keycloak_token;
-
-        if ($token) {
-            $payload = json_decode(base64_decode(explode('.', $token)[1]), true);
-            $clientName = config('services.keycloak.client_id');
-            $roles = $payload['resource_access'][$clientName]['roles'] ?? [];
-
-            session(['roles' => $roles]);
-
-            return $roles;
-        }
-
-        return [];
-    }
 
     public function unit(): BelongsTo
     {

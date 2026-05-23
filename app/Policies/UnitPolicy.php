@@ -84,4 +84,10 @@ class UnitPolicy
         return in_array('admin-'.$this->resource.'-force_delete', $roles)
             || in_array('admin-'.$this->resource.'-force_delete-'.$unit->id, $roles);
     }
+
+    public function deleteAny(User $user): bool
+    {
+        $roles = $this->getUserRoles();
+        return in_array('admin-'.$this->resource.'-delete', $roles);
+    }
 }

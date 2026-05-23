@@ -2,69 +2,40 @@
 
 namespace App\Providers\auth;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
-use Laravel\Socialite\Two\AbstractProvider;
-use Laravel\Socialite\Two\ProviderInterface;
-use Laravel\Socialite\Two\User;
+use GuzzleHttp\RequestOptions;
+use Illuminate\Support\Arr;
+use SocialiteProviders\Manager\Exception\InvalidArgumentException;
+use SocialiteProviders\Manager\OAuth2\AbstractProvider;
+use SocialiteProviders\Manager\OAuth2\User;
 
-class KeycloakProvider extends AbstractProvider implements ProviderInterface
+class KeycloakProvider extends AbstractProvider
 {
-    /**
-     * The scopes being requested.
-     *
-     * @var array
-     */
-    protected $scopes = ['openid', 'profile', 'email'];
+    public const IDENTIFIER = 'KEYCLOAK';
 
-    /**
-     * The separating character for the requested scopes.
-     *
-     * @var string
-     */
+    protected $usesPKCE = true;
+
     protected $scopeSeparator = ' ';
 
-    /**
-     * {@inheritdoc}
-     */
+    protected $scopes = ['openid'];
+
+    public static function additionalConfigKeys(): array
+    {
+        return ['base_url', 'realms'];
+    }
+
+    protected function getBaseUrl()
+    {
+        return rtrim(rtrim($this->getConfig('base_url'), '/') . '/realms/' . $this->getConfig('realms', 'master'), '/');
+    }
+
     protected function getAuthUrl($state): string
     {
-        $this->request->session()->put('code_verifier', $verifier = Str::random(128));
-
-        $challenge = strtr(rtrim(base64_encode(hash('sha256', $verifier, true)),
-            '='
-        ), '+/', '-_');
-
-        $baseUrl = rtrim(config('services.keycloak.base_url'), '/');
-        $realm = config('services.keycloak.realm');
-        $authUrl = "{$baseUrl}/realms/{$realm}/protocol/openid-connect/auth";
-
-        return $this->buildAuthUrlFromBase($authUrl, $state)
-            .'&code_challenge='.$challenge
-            .'&code_challenge_method=S256';
+        return $this->buildAuthUrlFromBase($this->getBaseUrl() . '/protocol/openid-connect/auth', $state);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTokenUrl(): int|string
+    protected function getTokenUrl(): string
     {
-        $baseUrl = rtrim(config('services.keycloak.base_url'), '/');
-        $realm = config('services.keycloak.realm');
-
-        return "{$baseUrl}/realms/{$realm}/protocol/openid-connect/token";
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTokenFields($code): array
-    {
-        $fields = parent::getTokenFields($code);
-
-        $fields['code_verifier'] = $this->request->session()->pull('code_verifier');
-
-        return $fields;
+        return $this->getBaseUrl() . '/protocol/openid-connect/token';
     }
 
     /**
@@ -72,13 +43,13 @@ class KeycloakProvider extends AbstractProvider implements ProviderInterface
      */
     protected function getUserByToken($token)
     {
-        $baseUrl = rtrim(config('services.keycloak.base_url'), '/');
-        $realm = config('services.keycloak.realm');
-        $userinfoUrl = "{$baseUrl}/realms/{$realm}/protocol/openid-connect/userinfo";
+        $response = $this->getHttpClient()->get($this->getBaseUrl() . '/protocol/openid-connect/userinfo', [
+            RequestOptions::HEADERS => [
+                'Authorization' => 'Bearer ' . $token,
+            ],
+        ]);
 
-        $response = Http::withToken($token)->get($userinfoUrl);
-
-        return $response->json();
+        return json_decode((string)$response->getBody(), true);
     }
 
     /**
@@ -87,10 +58,55 @@ class KeycloakProvider extends AbstractProvider implements ProviderInterface
     protected function mapUserToObject(array $user)
     {
         return (new User)->setRaw($user)->map([
-            'id' => $user['sub'],
-            'is_validated' => $user['validated'] ?? 'no',
-            'name' => $user['name'],
-            'email' => $user['email'],
+            'id' => Arr::get($user, 'sub'),
+            'nickname' => Arr::get($user, 'preferred_username'),
+            'name' => Arr::get($user, 'name'),
+            'email' => Arr::get($user, 'email'),
         ]);
+    }
+
+    /**
+     * Return logout endpoint with redirect_uri, clientId, idTokenHint
+     * and optional parameters by a key value array.
+     *
+     * @param string|null $redirectUri
+     * @param string|null $clientId
+     * @param string|null $idTokenHint
+     * @param array $additionalParameters
+     * @return string
+     *
+     * @throws InvalidArgumentException
+     */
+    public function getLogoutUrl(?string $redirectUri = null, ?string $clientId = null, ?string $idTokenHint = null, ...$additionalParameters): string
+    {
+        $logoutUrl = $this->getBaseUrl() . '/protocol/openid-connect/logout';
+
+        $logoutUrl .= '?post_logout_redirect_uri=' . urlencode($redirectUri);
+
+        if ($clientId !== null) {
+            $logoutUrl .= '&client_id=' . urlencode($clientId);
+        }
+
+        if ($idTokenHint !== null) {
+            $logoutUrl .= '&id_token_hint=' . urlencode($idTokenHint);
+        }
+
+        foreach ($additionalParameters as $parameter) {
+            if (!is_array($parameter) || count($parameter) > 1) {
+                throw new InvalidArgumentException('Invalid argument. Expected an array with a key and a value.');
+            }
+
+            $parameterKey = array_keys($parameter)[0];
+            $parameterValue = array_values($parameter)[0];
+
+            $logoutUrl .= "&{$parameterKey}=" . urlencode($parameterValue);
+        }
+
+        return $logoutUrl;
+    }
+
+    protected function getCodeChallengeMethod()
+    {
+        return 'S256';
     }
 }
