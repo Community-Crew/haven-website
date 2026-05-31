@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\ReservationPolicyEntry;
+use App\Policies\ReservationPolicyPolicy;
 use App\Providers\auth\KeycloakProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 

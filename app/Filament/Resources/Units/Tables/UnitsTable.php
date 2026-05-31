@@ -117,6 +117,29 @@ class UnitsTable
                                 $data['floor'] !== null && $data['floor'] !== '',
                                 fn(Builder $query, $floor) => $query->where('floor', $data['floor'])
                             );
+                    }),
+                SelectFilter::make('occupancy_status')
+                    ->label('Occupancy Status')
+                    ->options([
+                        'vacant' => 'Vacant (Not Used)',
+                        'under' => 'Under Capacity',
+                        'full' => 'At Capacity',
+                        'over' => 'Overoccupied',
+                    ])
+                    ->multiple()
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when($data['value'], function ($query, $value) {
+                            switch ($value) {
+                                case 'vacant':
+                                    return $query->whereDoesntHave('users');
+                                case 'under':
+                                    return $query->whereIn('id', fn($q) => $q->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) < MAX(units.max_residents)'));
+                                case 'full':
+                                    return $query->whereIn('id', fn($q) => $q->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) = MAX(units.max_residents)'));
+                                case 'over':
+                                    return $query->whereIn('id', fn($q) => $q->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) > MAX(units.max_residents)'));
+                            }
+                        });
                     })
             ])
             ->recordActions([

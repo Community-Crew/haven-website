@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use JsonSerializable;
+use Filament\Support\Colors\Color;
 
 enum RoomStatus: string implements JsonSerializable
 {
@@ -12,7 +13,12 @@ enum RoomStatus: string implements JsonSerializable
     case MAINTENANCE = 'maintenance';
     case CLEANING = 'cleaning';
 
-    public function label(): string
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+
+    public function getLabel(): string
     {
         return match ($this) {
             self::AVAILABLE => 'Available',
@@ -23,21 +29,14 @@ enum RoomStatus: string implements JsonSerializable
         };
     }
 
-    public function text_color(): string
+    public function getColor(): array
     {
         return match ($this) {
-            self::AVAILABLE, self::OCCUPIED, self::RESERVED, self::MAINTENANCE, self::CLEANING => 'text-haven-white',
-        };
-    }
-
-    public function background_color(): string
-    {
-        return match ($this) {
-            self::AVAILABLE => 'bg-green-600',
-            self::OCCUPIED => 'bg-blue-600',
-            self::RESERVED => 'bg-cyan-600',
-            self::MAINTENANCE => 'bg-red-600',
-            self::CLEANING => 'bg-orange-600',
+            self::AVAILABLE => Color::Green,
+            self::OCCUPIED => Color::Blue,
+            self::RESERVED => Color::Cyan,
+            self::MAINTENANCE => Color::Red,
+            self::CLEANING => Color::Orange,
         };
     }
 
@@ -46,9 +45,8 @@ enum RoomStatus: string implements JsonSerializable
         return [
             'name' => $this->name,
             'value' => $this->value,
-            'label' => $this->label(),
-            'text_color' => $this->text_color(),
-            'background_color' => $this->background_color(),
+            'label' => $this->getLabel(),
+            'background_color' => $this->getColor(),
         ];
     }
 }

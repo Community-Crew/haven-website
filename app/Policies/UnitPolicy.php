@@ -1,93 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
+use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Unit;
-use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UnitPolicy
 {
-    protected string $resource = 'units';
-
-    private function getUserRoles(): array
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return (array) session('roles', []);
+        return $authUser->can('ViewAny:Unit');
     }
 
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function view(AuthUser $authUser, Unit $unit): bool
     {
-        return in_array('admin-'.$this->resource.'-view', $this->getUserRoles());
+        return $authUser->can('View:Unit');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Unit $unit): bool
+    public function create(AuthUser $authUser): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-view-'.$unit->id, $roles)
-            || $this->viewAny($user);
+        return $authUser->can('Create:Unit');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function update(AuthUser $authUser, Unit $unit): bool
     {
-        return in_array('admin-'.$this->resource.'-create', $this->getUserRoles());
+        return $authUser->can('Update:Unit');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Unit $unit): bool
+    public function delete(AuthUser $authUser, Unit $unit): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-update', $roles)
-            || in_array('admin-'.$this->resource.'-update-'.$unit->id, $roles);
+        return $authUser->can('Delete:Unit');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Unit $unit): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-delete', $roles)
-            || in_array('admin-'.$this->resource.'-delete-'.$unit->id, $roles);
+        return $authUser->can('DeleteAny:Unit');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Unit $unit): bool
+    public function restore(AuthUser $authUser, Unit $unit): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-restore', $roles)
-            || in_array('admin-'.$this->resource.'-restore-'.$unit->id, $roles);
+        return $authUser->can('Restore:Unit');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Unit $unit): bool
+    public function forceDelete(AuthUser $authUser, Unit $unit): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-force_delete', $roles)
-            || in_array('admin-'.$this->resource.'-force_delete-'.$unit->id, $roles);
+        return $authUser->can('ForceDelete:Unit');
     }
 
-    public function deleteAny(User $user): bool
+    public function forceDeleteAny(AuthUser $authUser): bool
     {
-        $roles = $this->getUserRoles();
-        return in_array('admin-'.$this->resource.'-delete', $roles);
+        return $authUser->can('ForceDeleteAny:Unit');
     }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Unit');
+    }
+
+    public function replicate(AuthUser $authUser, Unit $unit): bool
+    {
+        return $authUser->can('Replicate:Unit');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Unit');
+    }
+
 }

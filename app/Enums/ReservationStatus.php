@@ -3,6 +3,7 @@
 namespace App\Enums;
 
 use JsonSerializable;
+use Filament\Support\Colors\Color;
 
 enum ReservationStatus: string implements JsonSerializable
 {
@@ -11,7 +12,7 @@ enum ReservationStatus: string implements JsonSerializable
     case REJECTED = 'rejected';
     case CANCELLED = 'cancelled';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::PENDING => 'Pending',
@@ -21,6 +22,11 @@ enum ReservationStatus: string implements JsonSerializable
         };
     }
 
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+
     public function text_color(): string
     {
         return match ($this) {
@@ -28,12 +34,13 @@ enum ReservationStatus: string implements JsonSerializable
         };
     }
 
-    public function background_color(): string
+    public function getColor(): array
     {
         return match ($this) {
-            self::PENDING => 'bg-orange-600',
-            self::APPROVED => 'bg-green-600',
-            self::REJECTED, self::CANCELLED => 'bg-red-600',
+            self::PENDING => Color::Amber,
+            self::APPROVED => Color::Green,
+            self::REJECTED => Color::Red,
+            self::CANCELLED => Color::Slate,
         };
     }
 
@@ -42,9 +49,9 @@ enum ReservationStatus: string implements JsonSerializable
         return [
             'name' => $this->name,
             'value' => $this->value,
-            'label' => $this->label(),
+            'label' => $this->getLabel(),
             'text_color' => $this->text_color(),
-            'background_color' => $this->background_color(),
+            'background_color' => $this->getColor(),
         ];
     }
 }

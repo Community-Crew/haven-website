@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Widgets\OverRegistrationOverview;
 use App\Http\Controllers\Auth\KeycloakAdminController;
 use App\Http\Middleware\AuthenticateAdminWithKeycloak;
@@ -63,6 +65,15 @@ class AdminPanelProvider extends PanelProvider
 
                 Route::get('/oauth/keycloak/callback', [KeycloakAdminController::class, 'callback'])
                     ->name('oauth.keycloak.callback');
-            });
+            })
+            ->plugins([
+                FilamentShieldPlugin::make(),
+            ])
+            ->navigationGroups([
+                'Reservations',
+                __('filament-shield::filament-shield.nav.group'),
+                'Setup',
+
+            ]);
     }
 }
