@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
+
 trait HasS3Image
 {
     protected function imageUrl(): Attribute
