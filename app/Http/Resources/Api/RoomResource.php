@@ -49,7 +49,7 @@ class RoomResource extends JsonResource
              * The status of the room.
              * @example "available"
              */
-            'status' => $this->status,
+            'status' => $this->status->value,
 
             /**
              * The temporary image url of the S3 bucket.
