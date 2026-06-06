@@ -1,0 +1,53 @@
+### 1. Get OAuth Bearer Token from Keycloak
+POST http://auth.havencommunity.nl/realms/haven-test-tim/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = password &
+client_id = frontend &
+username = test2@hc.test &
+password = test2
+
+> {%
+    client.global.set("auth_token", response.body.access_token);
+%}
+
+###
+
+### 2. View My Profile (Expect empty unit initially)
+GET http://localhost/api/v1/user
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+###
+
+### 3. Claim a Registration Code
+POST http://localhost/api/register/claim-code
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "code": "WELCOME2026"
+}
+
+###
+
+### 4. Create a Reservation for Room 1
+POST http://localhost/api/rooms/1/reservations
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Community Board Game Night",
+    "start_at": "2026-07-10 18:00:00",
+    "end_at": "2026-07-10 21:00:00",
+    "share_user": true
+}
+
+###
+
+### 5. View Room Reservations (Verify 30-Cap & Privacy Masking)
+GET http://localhost/api/rooms/1/reservations
+Authorization: Bearer {{auth_token}}
+Accept: application/json
