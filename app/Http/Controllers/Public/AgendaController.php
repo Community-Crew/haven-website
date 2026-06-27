@@ -25,7 +25,7 @@ class AgendaController extends Controller
         if (! ($request->user() || $agenda->public)) {
             abort(404);
         }
-        $agendaItems = $agenda->agendaItems()
+        $agendaItems = $agenda->items()
             ->with(['agenda', 'organisation'])
             ->paginate(10)
             ->withQueryString();

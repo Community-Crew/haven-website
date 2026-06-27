@@ -17,7 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, Timestamp, HasRoles;
+    use HasFactory, HasRoles, Notifiable, Timestamp;
 
     /**
      * The attributes that are mass assignable.
@@ -66,6 +66,6 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         // TODO: Implement canAccessPanel() method.
-        return True;
+        return true;
     }
 }

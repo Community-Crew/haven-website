@@ -5,10 +5,10 @@ namespace App\Services;
 use App\Models\ReservationPolicy;
 use App\Models\ReservationPolicyEntry;
 use App\Models\Room;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationPolicyService
 {
@@ -17,12 +17,19 @@ class ReservationPolicyService
         $days = (int) $date->copy()->diffInDays(Carbon::now()->startOfDay(), true);
         $dayOfWeek = $date->dayOfWeek;
 
-        $roles = collect(Session::get('roles', []));
+        $user = Auth::user();
 
-        $policyNames = $roles->filter(fn ($role) => Str::startsWith($role, 'reservation_policy-'))
-            ->map(fn ($role) => Str::after($role, 'reservation_policy-'));
+        if (! $user) {
+            return collect();
+        }
 
-        $reservationPolicies = ReservationPolicy::whereIn('role_name', $policyNames)
+        $userRoleIds = $user->roles()->pluck('id');
+
+        if ($userRoleIds->isEmpty()) {
+            return collect();
+        }
+
+        $reservationPolicies = ReservationPolicy::whereIn('shield_role_id', $userRoleIds)
             ->where('max_days_in_advance', '>=', $days)
             ->whereHas('rooms', function ($query) use ($room) {
                 $query->where('rooms.id', $room->id);

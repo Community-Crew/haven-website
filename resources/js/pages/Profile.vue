@@ -380,7 +380,7 @@ onUnmounted(() => stopRotation());
                     </ContentCard>
                 </div>
 
-                <!-- BOTTOM: Reservations (Unchanged) -->
+                <!-- BOTTOM: Reservation (Unchanged) -->
                 <ContentCard
                     title="Upcoming reservations"
                     position="full"

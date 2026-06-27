@@ -89,7 +89,7 @@ const reset = () => {
                     </div>
                 </div>
 
-                <!-- Reservations -->
+                <!-- Reservation -->
                 <div
                     class="pt-4"
                 >

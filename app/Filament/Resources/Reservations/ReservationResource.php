@@ -22,7 +22,7 @@ class ReservationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Reservations';
+    protected static string|null|\UnitEnum $navigationGroup = 'Reservation';
 
     protected static ?string $recordTitleAttribute = 'name';
 

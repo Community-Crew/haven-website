@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ReservationResource extends JsonResource
+class OrganisationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,13 +17,11 @@ class ReservationResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'start_at' => $this->start_at,
-            'end_at' => $this->end_at,
-            'user' => $this->when($this->share_user, function () {
-                return [
-                    'name' => $this->user->name,
-                ];
-            }),
+            'about' => $this->about,
+            'image_url' => $this->image_url,
+
+            'users' => $this->users->pluck('name')->toArray(),
+
         ];
     }
 }
