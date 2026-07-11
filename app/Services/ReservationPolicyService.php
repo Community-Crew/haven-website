@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\ReservationPolicy;
 use App\Models\ReservationPolicyEntry;
 use App\Models\Room;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
