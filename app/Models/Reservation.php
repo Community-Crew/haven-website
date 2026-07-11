@@ -66,10 +66,10 @@ class Reservation extends Model
         $end = $endDate ? now()->parse($endDate)->endOfDay() : null;
 
         return $query->where(function ($q) use ($start, $end) {
-            $q->where('start_date', '>=', $start);
+            $q->where('start_at', '>=', $start);
 
             if ($end) {
-                $q->where('end_date', '<=', $end);
+                $q->where('end_at', '<=', $end);
             }
         });
     }

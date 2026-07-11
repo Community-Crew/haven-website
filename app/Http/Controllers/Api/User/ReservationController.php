@@ -26,7 +26,7 @@ class ReservationController extends Controller
         $reservations = $request->user()
             ->reservations()
             ->withStatus($request->query('status'))
-            ->inDateRange($request->query('start_date'), $request->query('end_date'))
+            ->inDateRange($request->query('start_at'), $request->query('end_at'))
             ->forRoomSlug($request->query('room_slug'))
             ->with(['room'])
             ->latest()

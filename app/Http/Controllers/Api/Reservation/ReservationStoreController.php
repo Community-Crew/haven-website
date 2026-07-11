@@ -26,6 +26,6 @@ class ReservationStoreController extends Controller
             'success' => true,
             'message' => 'Reservation recorded successfully.',
             'data' => $reservation,
-        ], 210);
+        ], 201);
     }
 }

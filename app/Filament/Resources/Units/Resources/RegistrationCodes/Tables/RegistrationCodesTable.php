@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources\Units\Resources\RegistrationCodes\Tables;
 
-use App\Models\RegistrationCode;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\ViewAction;
+use Filament\Resources\RelationManagers\RelationManager; // 👈 Import the core RelationManager class
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,7 +28,7 @@ class RegistrationCodesTable
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success') // Green for used
+                    ->trueColor('success')
                     ->falseColor('gray'),
                 TextColumn::make('created_at')
                     ->label('Generated At')
@@ -42,7 +41,7 @@ class RegistrationCodesTable
             ->recordActions([
                 DeleteAction::make()
                     ->label('Revoke')
-                    ->authorize(fn() => auth()->user()->hasPermissionTo('DeleteAny:RegistrationCode')),
+                    ->authorize(fn () => auth()->user()->hasPermissionTo('DeleteAny:RegistrationCode')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -54,8 +53,8 @@ class RegistrationCodesTable
                     ->label('Generate Code')
                     ->icon('heroicon-o-key')
                     ->color('primary')
-                    ->action(function () {
-                        static::getOwnerRecord()->registrationCodes()->create([]);
+                    ->action(function (RelationManager $livewire) {
+                        $livewire->getOwnerRecord()->registrationCodes()->create([]);
                     })
                     ->successNotificationTitle('Registration code generated!'),
             ]);

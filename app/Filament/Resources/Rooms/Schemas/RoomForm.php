@@ -24,14 +24,14 @@ class RoomForm
                 ToggleButtons::make('status')
                     ->options(function () {
                         return collect(RoomStatus::cases())
-                            ->mapWithKeys(fn($status) => [$status->getValue() => $status->getLabel()])
+                            ->mapWithKeys(fn ($status) => [$status->getValue() => $status->getLabel()])
                             ->all();
                     })
                     ->default(RoomStatus::AVAILABLE->getValue())
                     ->inline()
                     ->colors(
                         collect(RoomStatus::cases())
-                            ->mapWithKeys(fn($status) => [$status->value => $status->getColor()])
+                            ->mapWithKeys(fn ($status) => [$status->value => $status->getColor()])
                             ->all()
                     )
                     ->required(),
@@ -47,7 +47,7 @@ class RoomForm
                             ->automaticallyCropImagesToAspectRatio()
                             ->automaticallyResizeImagesToWidth('1200')
                             ->required(),
-                    ])
+                    ]),
             ]);
     }
 }

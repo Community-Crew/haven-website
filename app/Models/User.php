@@ -6,6 +6,7 @@ use Carbon\Traits\Timestamp;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -29,7 +30,12 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'keycloak_id',
         'unit_id',
+        'activated_at',
 
+    ];
+
+    protected $casts = [
+        'activated_at' => 'datetime',
     ];
 
     /**

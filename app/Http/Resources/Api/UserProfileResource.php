@@ -33,6 +33,8 @@ class UserProfileResource extends JsonResource
              * @example jan.klaas@voorbeeld.nl
              */
             'email' => $this->email,
+            'is_activated' => ! is_null($this->activated_at),
+            'activated_at' => $this->activated_at ? $this->activated_at->toIso8601String() : null,
             /**
              * The unit of the current user.
              */

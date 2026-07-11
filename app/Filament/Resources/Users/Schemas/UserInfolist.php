@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -25,6 +26,29 @@ class UserInfolist
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
+                TextEntry::make('activation_status')
+                    ->label('Account Status')
+                    ->state(fn ($record) => $record?->activated_at ? 'Activated' : 'Not Activated yet')
+                    ->badge()
+                    ->color(fn ($record) => $record?->activated_at ? 'success' : 'danger')
+                    ->hintAction(
+                        fn ($record) => $record?->activated_at === null
+                            ? Action::make('activate')
+                                ->label('Activate Now')
+                                ->icon('heroicon-m-check-circle')
+                                ->color('success')
+                                ->action(function ($record) {
+                                    $record->update(['activated_at' => now()]);
+                                })
+                            : Action::make('deactivate')
+                                ->label('Deactivate')
+                                ->icon('heroicon-m-x-circle')
+                                ->color('danger')
+                                ->requiresConfirmation()
+                                ->action(function ($record) {
+                                    $record->update(['activated_at' => null]);
+                                })
+                    ),
             ]);
     }
 }

@@ -39,6 +39,9 @@ class AgendaIndexController extends Controller
             })
             ->simplePaginate(10);
 
-        return AgendaResource::collection($agendas);
+        $resourceCollection = AgendaResource::collection($agendas);
+        $resourceCollection->toResponse($request);
+
+        return $resourceCollection;
     }
 }

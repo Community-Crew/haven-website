@@ -3,9 +3,6 @@
 namespace App\Filament\Resources\Units\Tables;
 
 use App\Models\Unit;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
@@ -40,10 +37,9 @@ class UnitsTable
                     })
                     ->weight('bold')
                     ->color(function (string $state, Unit $record): string {
-                        if ((int)$state > $record->max_residents) {
+                        if ((int) $state > $record->max_residents) {
                             return 'danger';
                         }
-
                         return 'gray';
                     }),
                 TextColumn::make('created_at')
@@ -66,15 +62,15 @@ class UnitsTable
                                 'Terra' => 'Terra',
                             ])
                             ->reactive()
-                            ->afterStateUpdated(fn(callable $set) => $set('floor', null)),
+                            ->afterStateUpdated(fn (callable $set) => $set('floor', null)),
 
                         Select::make('floor')
-                            ->placeholder(fn(callable $get) => $get('building') ? 'Select floor...' : 'Choose a building first')
-                            ->disabled(fn(callable $get) => !$get('building'))
+                            ->placeholder(fn (callable $get) => $get('building') ? 'Select floor...' : 'Choose a building first')
+                            ->disabled(fn (callable $get) => ! $get('building'))
                             ->options(function (callable $get) {
                                 $building = $get('building');
 
-                                if (!$building) {
+                                if (! $building) {
                                     return [];
                                 }
 
@@ -111,11 +107,11 @@ class UnitsTable
                         return $query
                             ->when(
                                 $data['building'],
-                                fn(Builder $query, $building) => $query->where('building', $building)
+                                fn (Builder $query, $building) => $query->where('building', $building)
                             )
                             ->when(
                                 $data['floor'] !== null && $data['floor'] !== '',
-                                fn(Builder $query, $floor) => $query->where('floor', $data['floor'])
+                                fn (Builder $query, $floor) => $query->where('floor', $data['floor'])
                             );
                     }),
                 SelectFilter::make('occupancy_status')
@@ -128,24 +124,37 @@ class UnitsTable
                     ])
                     ->multiple()
                     ->query(function (Builder $query, array $data) {
-                        return $query->when($data['value'], function ($query, $value) {
-                            switch ($value) {
-                                case 'vacant':
-                                    return $query->whereDoesntHave('users');
-                                case 'under':
-                                    return $query->whereIn('id', fn($q) => $q->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) < MAX(units.max_residents)'));
-                                case 'full':
-                                    return $query->whereIn('id', fn($q) => $q->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) = MAX(units.max_residents)'));
-                                case 'over':
-                                    return $query->whereIn('id', fn($q) => $q->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) > MAX(units.max_residents)'));
+                        $statuses = $data['values'] ?? [];
+
+                        if (empty($statuses)) {
+                            return $query;
+                        }
+
+                        return $query->where(function (Builder $outerQuery) use ($statuses) {
+                            foreach ($statuses as $status) {
+                                $outerQuery->orWhere(function (Builder $q) use ($status) {
+                                    switch ($status) {
+                                        case 'vacant':
+                                            $q->whereDoesntHave('users');
+                                            break;
+                                        case 'under':
+                                            $q->whereIn('id', fn ($sub) => $sub->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) < MAX(units.max_residents)'));
+                                            break;
+                                        case 'full':
+                                            $q->whereIn('id', fn ($sub) => $sub->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) = MAX(units.max_residents)'));
+                                            break;
+                                        case 'over':
+                                            $q->whereIn('id', fn ($sub) => $sub->select('unit_id')->from('users')->groupBy('unit_id')->join('units', 'units.id', '=', 'users.unit_id')->havingRaw('COUNT(users.id) > MAX(units.max_residents)'));
+                                            break;
+                                    }
+                                });
                             }
                         });
-                    })
+                    }),
             ])
             ->recordActions([
                 ViewAction::make(),
             ]);
-
 
     }
 }
