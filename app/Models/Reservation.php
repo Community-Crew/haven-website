@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Enums\ReservationStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Reservation extends Model
 {
@@ -44,18 +44,45 @@ class Reservation extends Model
         return $this->belongsTo(Organisation::class);
     }
 
-    public function clashes(): HasMany
+    /**
+     * Scope: Filter by status (e.g., pending, confirmed, cancelled)
+     */
+    public function scopeWithStatus(Builder $query, ?string $status): Builder
     {
-        if (is_null($this->start_at) || is_null($this->end_at)) {
-            return $this->hasMany(Reservation::class, 'room_id', 'room_id')->whereRaw('1 = 0');
-        }
+        return $query->when($status, function ($q) use ($status) {
+            $q->where('status', $status);
+        });
+    }
 
-        return $this->hasMany(Reservation::class, 'room_id', 'room_id')
-            ->where('id', '!=', $this->id)
-            ->where(function ($query) {
-                $query->where('start_at', '<', $this->end_at)
-                    ->where('end_at', '>', $this->start_at);
+    /**
+     * Scope: Filter reservations within a date window.
+     * Default: From today onward if parameters are missing.
+     */
+    public function scopeInDateRange(Builder $query, ?string $startDate, ?string $endDate): Builder
+    {
+        $start = $startDate ? now()->parse($startDate) : now()->startOfDay();
+
+        $end = $endDate ? now()->parse($endDate)->endOfDay() : null;
+
+        return $query->where(function ($q) use ($start, $end) {
+            $q->where('start_at', '>=', $start);
+
+            if ($end) {
+                $q->where('end_at', '<=', $end);
+            }
+        });
+    }
+
+    /**
+     * Scope: Filter reservations by a specific room slug.
+     */
+    public function scopeForRoomSlug(Builder $query, ?string $slug): Builder
+    {
+        return $query->when($slug, function ($q) use ($slug) {
+            $q->whereHas('room', function ($innerQuery) use ($slug) {
+                $innerQuery->where('slug', $slug);
             });
+        });
     }
 
     public function toArray()

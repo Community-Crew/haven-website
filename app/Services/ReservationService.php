@@ -18,8 +18,8 @@ class ReservationService
     public function createReservation(array $data)
     {
         return DB::transaction(function () use ($data) {
-            $start = Carbon::parse($data['start_time']);
-            $end = Carbon::parse($data['end_time']);
+            $start = Carbon::parse($data['start_at']);
+            $end = Carbon::parse($data['end_at']);
             $roomId = $data['room_id'];
 
             $room = Room::findOrFail($roomId);

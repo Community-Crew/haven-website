@@ -15,6 +15,7 @@ class RegistrationCode extends Model
     protected $fillable = [
         'unit_id',
         'is_used',
+        'code',
     ];
 
     protected $casts = [

@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Permission\Models\Role;
 
 class ReservationPolicy extends Model
 {
@@ -13,7 +15,7 @@ class ReservationPolicy extends Model
         'max_days_in_advance',
     ];
 
-    public function reservationPolicyEntries(): HasMany
+    public function entries(): HasMany
     {
         return $this->hasMany(ReservationPolicyEntry::class);
     }
@@ -21,5 +23,10 @@ class ReservationPolicy extends Model
     public function rooms(): BelongsToMany
     {
         return $this->belongsToMany(Room::class);
+    }
+
+    public function shieldRole(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'shield_role_id');
     }
 }

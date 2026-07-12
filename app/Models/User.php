@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Traits\Timestamp;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable, Timestamp;
 
     /**
      * The attributes that are mass assignable.
@@ -26,8 +29,12 @@ class User extends Authenticatable
         'email',
         'keycloak_id',
         'unit_id',
-        'keycloak_token',
-        'keycloak_refresh_token',
+        'activated_at',
+
+    ];
+
+    protected $casts = [
+        'activated_at' => 'datetime',
     ];
 
     /**
@@ -37,41 +44,9 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'remember_token',
-        'keycloak_token',
-        'keycloak_refresh_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-        ];
-    }
-
-    public function getRolesAttribute(): array
-    {
-        if (session()->has('roles')) {
-            return session('roles');
-        }
-
-        $token = session('keycloak_token') ?? $this->keycloak_token;
-
-        if ($token) {
-            $payload = json_decode(base64_decode(explode('.', $token)[1]), true);
-            $clientName = config('services.keycloak.client_id');
-            $roles = $payload['resource_access'][$clientName]['roles'] ?? [];
-
-            session(['roles' => $roles]);
-
-            return $roles;
-        }
-
-        return [];
-    }
+    protected array $runtimeGroups = [];
 
     public function unit(): BelongsTo
     {
@@ -91,5 +66,11 @@ class User extends Authenticatable
     public function organisations(): BelongsToMany
     {
         return $this->belongsToMany(Organisation::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // TODO: Implement canAccessPanel() method.
+        return true;
     }
 }

@@ -30,8 +30,8 @@ class Agenda extends Model
         return 'slug';
     }
 
-    public function agendaItems(): HasMany
+    public function items(): HasMany
     {
-        return $this->hasMany(AgendaItem::class);
+        return $this->hasMany(AgendaItem::class)->orderBy('start_date');
     }
 }

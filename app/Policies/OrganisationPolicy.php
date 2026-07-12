@@ -1,70 +1,74 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\Organisation;
-use App\Models\User;
-use App\Policies\Traits\RoleBasedPermissions;
+use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class OrganisationPolicy
 {
-    use RoleBasedPermissions;
+    use HandlesAuthorization;
 
-    protected string $resource = 'organisations';
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $this->hasRole($user, 'view');
+        return $authUser->can('ViewAny:Organisation');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Organisation $organisation): bool
+    public function view(AuthUser $authUser, Organisation $organisation): bool
     {
-        return $this->hasRole($user, 'view', $organisation->id) || $this->viewAny($user);
+        return $authUser->can('View:Organisation');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $this->hasRole($user, 'create');
+        return $authUser->can('Create:Organisation');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Organisation $organisation): bool
+    public function update(AuthUser $authUser, Organisation $organisation): bool
     {
-        return $this->hasRole($user, 'update', $organisation->id);
+        return $authUser->can('Update:Organisation');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Organisation $organisation): bool
+    public function delete(AuthUser $authUser, Organisation $organisation): bool
     {
-        return $this->hasRole($user, 'delete', $organisation->id);
+        return $authUser->can('Delete:Organisation');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Organisation $organisation): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        return $this->hasRole($user, 'restore', $organisation->id);
+        return $authUser->can('DeleteAny:Organisation');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Organisation $organisation): bool
+    public function restore(AuthUser $authUser, Organisation $organisation): bool
     {
-        return $this->hasRole($user, 'force_delete', $organisation->id);
+        return $authUser->can('Restore:Organisation');
+    }
+
+    public function forceDelete(AuthUser $authUser, Organisation $organisation): bool
+    {
+        return $authUser->can('ForceDelete:Organisation');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:Organisation');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Organisation');
+    }
+
+    public function replicate(AuthUser $authUser, Organisation $organisation): bool
+    {
+        return $authUser->can('Replicate:Organisation');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Organisation');
     }
 }

@@ -44,7 +44,7 @@ class StoreReservationRequest extends FormRequest
                     $end = Carbon::parse($value);
 
                     if (! $start->isSameDay($end) && ! ($end->isNextDay($start) && $end->format('H:i') === '00:00')) {
-                        $fail('Reservations must start and end on the same day.');
+                        $fail('Reservation must start and end on the same day.');
                     }
                 },
             ],

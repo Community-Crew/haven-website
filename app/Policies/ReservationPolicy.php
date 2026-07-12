@@ -1,90 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
-use App\Enums\ReservationStatus;
 use App\Models\Reservation;
-use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class ReservationPolicy
 {
-    protected string $resource = 'reservations';
+    use HandlesAuthorization;
 
-    private function getUserRoles(): array
+    public function viewAny(AuthUser $authUser): bool
     {
-        // Get roles from session and ensure it's an array, default to empty array if null.
-        return (array) session('roles', []);
+        return $authUser->can('ViewAny:Reservation');
     }
 
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function view(AuthUser $authUser, Reservation $reservation): bool
     {
-        return in_array('admin-'.$this->resource.'-view', $this->getUserRoles());
+        return $authUser->can('View:Reservation');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user, Reservation $reservation): bool
+    public function create(AuthUser $authUser): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-view-'.$reservation->id, $roles)
-            || $this->viewAny($user); // You can re-use viewAny for the general permission
+        return $authUser->can('Create:Reservation');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(): bool
+    public function update(AuthUser $authUser, Reservation $reservation): bool
     {
-        return in_array('admin-'.$this->resource.'-create', $this->getUserRoles());
+        if ($authUser->can('Update:Reservation')) {
+            return true;
+        }
+
+        return (int) $authUser->getAuthIdentifier() === (int) $reservation->user_id;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Reservation $reservation): bool
+    public function delete(AuthUser $authUser, Reservation $reservation): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-update', $roles)
-            || in_array('admin-'.$this->resource.'-update-'.$reservation->id, $roles)
-            || ($user->id === $reservation->user_id && $reservation->status === ReservationStatus::APPROVED);
+        return $authUser->can('Delete:Reservation');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Reservation $reservation): bool
+    public function deleteAny(AuthUser $authUser): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-delete', $roles)
-            || in_array('admin-'.$this->resource.'-delete-'.$reservation->id, $roles);
+        return $authUser->can('DeleteAny:Reservation');
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Reservation $reservation): bool
+    public function restore(AuthUser $authUser, Reservation $reservation): bool
     {
-        $roles = $this->getUserRoles();
-
-        return in_array('admin-'.$this->resource.'-restore', $roles)
-            || in_array('admin-'.$this->resource.'-restore-'.$reservation->id, $roles);
+        return $authUser->can('Restore:Reservation');
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Reservation $reservation): bool
+    public function forceDelete(AuthUser $authUser, Reservation $reservation): bool
     {
-        $roles = $this->getUserRoles();
+        return $authUser->can('ForceDelete:Reservation');
+    }
 
-        return in_array('admin-'.$this->resource.'-force_delete', $roles)
-            || in_array('admin-'.$this->resource.'-force_delete-'.$reservation->id, $roles);
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:Reservation');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Reservation');
+    }
+
+    public function replicate(AuthUser $authUser, Reservation $reservation): bool
+    {
+        return $authUser->can('Replicate:Reservation');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Reservation');
     }
 }
