@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Reservations\Schemas;
 
 use App\Enums\ReservationStatus;
-use App\Models\Unit;
 use App\Models\User;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -25,7 +24,7 @@ class ReservationForm
                     ->required(),
                 Select::make('user_id')
                     ->relationship('user', 'name')
-                    ->getOptionLabelFromRecordUsing(fn(User $record) => "{$record->name} ({$record->email})")
+                    ->getOptionLabelFromRecordUsing(fn (User $record) => "{$record->name} ({$record->email})")
                     ->searchable()
                     ->required(),
                 DateTimePicker::make('start_at')
@@ -38,14 +37,14 @@ class ReservationForm
                 ToggleButtons::make('status')
                     ->options(function () {
                         return collect(ReservationStatus::cases())
-                            ->mapWithKeys(fn($status) => [$status->getValue() => $status->getLabel()])
+                            ->mapWithKeys(fn ($status) => [$status->getValue() => $status->getLabel()])
                             ->all();
                     })
                     ->default(ReservationStatus::PENDING->getValue())
                     ->inline()
                     ->colors(
                         collect(ReservationStatus::cases())
-                            ->mapWithKeys(fn($status) => [$status->value => $status->getColor()])
+                            ->mapWithKeys(fn ($status) => [$status->value => $status->getColor()])
                             ->all()
                     )
                     ->required(),

@@ -27,7 +27,7 @@ class RoomReservationIndexController extends Controller
             ->limit(15)
             ->get();
 
-        $formattedReservations = $reservations->map(function ($reservation) use ($user) {
+        $formattedReservations = $reservations->map(function ($reservation) {
             $data = [
                 'id' => $reservation->id,
                 'start_at' => $reservation->start_at,
@@ -38,9 +38,9 @@ class RoomReservationIndexController extends Controller
             ];
 
             if ($reservation->share_user) {
-//            if ($reservation->share_user || ($user && $reservation->user_id === $user->id)) {
+                //            if ($reservation->share_user || ($user && $reservation->user_id === $user->id)) {
 
-                    $data['user_name'] = $reservation->user->name;
+                $data['user_name'] = $reservation->user->name;
             }
 
             return $data;

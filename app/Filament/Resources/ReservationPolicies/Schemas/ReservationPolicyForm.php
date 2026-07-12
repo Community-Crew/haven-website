@@ -10,7 +10,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Spatie\Permission\Models\Role;
 
 class ReservationPolicyForm
 {
@@ -65,13 +64,13 @@ class ReservationPolicyForm
                         Repeater::make('entries')
                             ->relationship(
                                 name: 'entries',
-                                modifyQueryUsing: fn($query) => $query->orderBy('day_of_week')->orderBy('start_time')
+                                modifyQueryUsing: fn ($query) => $query->orderBy('day_of_week')->orderBy('start_time')
                             )
                             ->hiddenLabel()
                             ->collapsible()
                             ->collapsed()
                             ->defaultItems(0)
-                            ->itemLabel(fn(array $state): ?string => isset($state['day_of_week']) ? match ((int)$state['day_of_week']) {
+                            ->itemLabel(fn (array $state): ?string => isset($state['day_of_week']) ? match ((int) $state['day_of_week']) {
                                 0 => 'Monday Slot',
                                 1 => 'Tuesday Slot',
                                 2 => 'Wednesday Slot',
@@ -104,10 +103,14 @@ class ReservationPolicyForm
                                     ->required()
                                     ->searchable()
                                     ->formatStateUsing(function ($state) {
-                                        if (is_null($state)) return null;
-                                        if (is_int($state)) return $state;
+                                        if (is_null($state)) {
+                                            return null;
+                                        }
+                                        if (is_int($state)) {
+                                            return $state;
+                                        }
 
-                                        return TimeConverterService::toMinutes((string)$state);
+                                        return TimeConverterService::toMinutes((string) $state);
                                     }),
 
                                 Select::make('end_time')
@@ -116,12 +119,17 @@ class ReservationPolicyForm
                                     ->required()
                                     ->searchable()
                                     ->formatStateUsing(function ($state) {
-                                        if (is_null($state)) return null;
-                                        if (is_int($state)) return $state;
-                                        return TimeConverterService::toMinutes((string)$state);
+                                        if (is_null($state)) {
+                                            return null;
+                                        }
+                                        if (is_int($state)) {
+                                            return $state;
+                                        }
+
+                                        return TimeConverterService::toMinutes((string) $state);
                                     })
                                     ->rules([
-                                        fn(Get $get): array => [
+                                        fn (Get $get): array => [
                                             function (string $attribute, $value, \Closure $fail) use ($get) {
                                                 $startTime = $get('start_time');
 
@@ -137,8 +145,8 @@ class ReservationPolicyForm
                                     ]),
 
                             ])
-                            ->columns(3)
-                    ])
+                            ->columns(3),
+                    ]),
             ]);
     }
 }

@@ -39,13 +39,13 @@ class ValidateKeycloakToken
                 $response = Http::withHeaders(['Accept' => 'application/json'])->get($jwksUrl);
 
                 if ($response->failed()) {
-                    throw new \Exception('Could not connect to Keycloak to retrieve JWKS.');
+                    throw new Exception('Could not connect to Keycloak to retrieve JWKS.');
                 }
 
                 $data = $response->json();
 
                 if (! is_array($data) || ! isset($data['keys'])) {
-                    throw new \Exception('Keycloak returned an invalid JWK Set payload.');
+                    throw new Exception('Keycloak returned an invalid JWK Set payload.');
                 }
 
                 return $data;

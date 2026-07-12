@@ -2,11 +2,10 @@
 
 namespace App\Providers\Filament;
 
-use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
-use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Widgets\OverRegistrationOverview;
 use App\Http\Controllers\Auth\KeycloakAdminController;
 use App\Http\Middleware\AuthenticateAdminWithKeycloak;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;

@@ -43,7 +43,7 @@ class ReservationPolicyInfolist
                             ->schema([
                                 TextEntry::make('day_of_week')
                                     ->hiddenLabel()
-                                    ->formatStateUsing(fn($state) => match ((int)$state) {
+                                    ->formatStateUsing(fn ($state) => match ((int) $state) {
                                         0 => 'Monday',
                                         1 => 'Tuesday',
                                         2 => 'Wednesday',
@@ -56,14 +56,12 @@ class ReservationPolicyInfolist
                                     }),
 
                                 TextEntry::make('start_time')
-                                    ->hiddenLabel()
-                                ,
+                                    ->hiddenLabel(),
 
                                 TextEntry::make('end_time')
-                                    ->hiddenLabel()
-                                ,
-                            ])
-                    ])
+                                    ->hiddenLabel(),
+                            ]),
+                    ]),
             ]);
     }
 }

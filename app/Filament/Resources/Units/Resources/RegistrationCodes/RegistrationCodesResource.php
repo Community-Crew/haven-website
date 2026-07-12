@@ -2,17 +2,11 @@
 
 namespace App\Filament\Resources\Units\Resources\RegistrationCodes;
 
-use App\Filament\Resources\Units\Resources\RegistrationCodes\Pages\CreateRegistrationCode;
-use App\Filament\Resources\Units\Resources\RegistrationCodes\Pages\EditRegistrationCode;
-use App\Filament\Resources\Units\Resources\RegistrationCodes\Pages\ViewRegistrationCode;
-use App\Filament\Resources\Units\Resources\RegistrationCodes\Schemas\RegistrationCodeForm;
-use App\Filament\Resources\Units\Resources\RegistrationCodes\Schemas\RegistrationCodeInfolist;
 use App\Filament\Resources\Units\Resources\RegistrationCodes\Tables\RegistrationCodesTable;
 use App\Filament\Resources\Units\UnitResource;
 use App\Models\RegistrationCode;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 

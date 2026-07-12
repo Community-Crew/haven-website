@@ -9,7 +9,6 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class OverRegistrationOverview extends StatsOverviewWidget
 {
-
     protected function getStats(): array
     {
         $totalUsers = User::count();

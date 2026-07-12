@@ -10,6 +10,7 @@ use Dedoc\Scramble\Attributes\Group;
  * View a room
  *
  * Retrieve the detailed profile of a specific room via its slug.
+ *
  * @param  Room  $room
  * @return RoomResource
  */

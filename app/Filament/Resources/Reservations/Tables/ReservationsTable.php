@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Reservations\Tables;
 
-use App\Enums\ReservationStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;

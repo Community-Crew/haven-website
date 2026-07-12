@@ -36,7 +36,7 @@ class ScrambleServiceProvider extends ServiceProvider
             ->withDocumentTransformers(function (OpenApi $openApi) {
                 $openApi->secure(
                     SecurityScheme::http('bearer', 'JWT')
-                    ->setDescription('Paste your active Keycloak Access Token here to authorize API playground requests.')
+                        ->setDescription('Paste your active Keycloak Access Token here to authorize API playground requests.')
                 );
             });
     }

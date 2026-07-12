@@ -13,8 +13,6 @@ class UserController extends Controller
      * View current user
      *
      * Get the current authenticated user's profile, including their unit and assigned roles.
-     * @param  Request  $request
-     * @return UserProfileResource
      */
     #[Group('Users')]
     public function __invoke(Request $request): UserProfileResource

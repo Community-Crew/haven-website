@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use Illuminate\Foundation\Auth\User as AuthUser;
 use App\Models\Reservation;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Foundation\Auth\User as AuthUser;
 
 class ReservationPolicy
 {
@@ -75,5 +75,4 @@ class ReservationPolicy
     {
         return $authUser->can('Reorder:Reservation');
     }
-
 }

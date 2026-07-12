@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Permission\Models\Role;
 
 class ReservationPolicy extends Model
 {
@@ -26,6 +27,6 @@ class ReservationPolicy extends Model
 
     public function shieldRole(): BelongsTo
     {
-        return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'shield_role_id');
+        return $this->belongsTo(Role::class, 'shield_role_id');
     }
 }

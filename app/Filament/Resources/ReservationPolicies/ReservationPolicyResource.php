@@ -6,8 +6,6 @@ use App\Filament\Resources\ReservationPolicies\Pages\CreateReservationPolicy;
 use App\Filament\Resources\ReservationPolicies\Pages\EditReservationPolicy;
 use App\Filament\Resources\ReservationPolicies\Pages\ListReservationPolicies;
 use App\Filament\Resources\ReservationPolicies\Pages\ViewReservationPolicy;
-use App\Filament\Resources\ReservationPolicies\RelationManagers\EntriesRelationManager;
-use App\Filament\Resources\ReservationPolicies\RelationManagers\RoomsRelationManager;
 use App\Filament\Resources\ReservationPolicies\Schemas\ReservationPolicyForm;
 use App\Filament\Resources\ReservationPolicies\Schemas\ReservationPolicyInfolist;
 use App\Filament\Resources\ReservationPolicies\Tables\ReservationPoliciesTable;

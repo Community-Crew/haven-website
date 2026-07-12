@@ -40,6 +40,7 @@ class UnitsTable
                         if ((int) $state > $record->max_residents) {
                             return 'danger';
                         }
+
                         return 'gray';
                     }),
                 TextColumn::make('created_at')

@@ -8,7 +8,6 @@ use App\Filament\Resources\Units\Schemas\UnitInfolist;
 use App\Filament\Resources\Units\Tables\UnitsTable;
 use App\Models\Unit;
 use BackedEnum;
-use Filament\GlobalSearch\GlobalSearchResult;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -16,14 +15,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Traits\EnumeratesValues;
 
 class UnitResource extends Resource
 {
     protected static ?string $model = Unit::class;
 
     protected static ?string $recordTitleAttribute = 'building';
-
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHome;
 
@@ -61,7 +58,6 @@ class UnitResource extends Resource
             'Building' => $record->building,
         ];
     }
-
 
     public static function infolist(Schema $schema): Schema
     {

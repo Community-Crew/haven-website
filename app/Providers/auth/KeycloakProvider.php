@@ -25,17 +25,17 @@ class KeycloakProvider extends AbstractProvider
 
     protected function getBaseUrl()
     {
-        return rtrim(rtrim($this->getConfig('base_url'), '/') . '/realms/' . $this->getConfig('realms', 'master'), '/');
+        return rtrim(rtrim($this->getConfig('base_url'), '/').'/realms/'.$this->getConfig('realms', 'master'), '/');
     }
 
     protected function getAuthUrl($state): string
     {
-        return $this->buildAuthUrlFromBase($this->getBaseUrl() . '/protocol/openid-connect/auth', $state);
+        return $this->buildAuthUrlFromBase($this->getBaseUrl().'/protocol/openid-connect/auth', $state);
     }
 
     protected function getTokenUrl(): string
     {
-        return $this->getBaseUrl() . '/protocol/openid-connect/token';
+        return $this->getBaseUrl().'/protocol/openid-connect/token';
     }
 
     /**
@@ -43,13 +43,13 @@ class KeycloakProvider extends AbstractProvider
      */
     protected function getUserByToken($token)
     {
-        $response = $this->getHttpClient()->get($this->getBaseUrl() . '/protocol/openid-connect/userinfo', [
+        $response = $this->getHttpClient()->get($this->getBaseUrl().'/protocol/openid-connect/userinfo', [
             RequestOptions::HEADERS => [
-                'Authorization' => 'Bearer ' . $token,
+                'Authorization' => 'Bearer '.$token,
             ],
         ]);
 
-        return json_decode((string)$response->getBody(), true);
+        return json_decode((string) $response->getBody(), true);
     }
 
     /**
@@ -69,37 +69,33 @@ class KeycloakProvider extends AbstractProvider
      * Return logout endpoint with redirect_uri, clientId, idTokenHint
      * and optional parameters by a key value array.
      *
-     * @param string|null $redirectUri
-     * @param string|null $clientId
-     * @param string|null $idTokenHint
-     * @param array $additionalParameters
-     * @return string
+     * @param  array  $additionalParameters
      *
      * @throws InvalidArgumentException
      */
     public function getLogoutUrl(?string $redirectUri = null, ?string $clientId = null, ?string $idTokenHint = null, ...$additionalParameters): string
     {
-        $logoutUrl = $this->getBaseUrl() . '/protocol/openid-connect/logout';
+        $logoutUrl = $this->getBaseUrl().'/protocol/openid-connect/logout';
 
-        $logoutUrl .= '?post_logout_redirect_uri=' . urlencode($redirectUri);
+        $logoutUrl .= '?post_logout_redirect_uri='.urlencode($redirectUri);
 
         if ($clientId !== null) {
-            $logoutUrl .= '&client_id=' . urlencode($clientId);
+            $logoutUrl .= '&client_id='.urlencode($clientId);
         }
 
         if ($idTokenHint !== null) {
-            $logoutUrl .= '&id_token_hint=' . urlencode($idTokenHint);
+            $logoutUrl .= '&id_token_hint='.urlencode($idTokenHint);
         }
 
         foreach ($additionalParameters as $parameter) {
-            if (!is_array($parameter) || count($parameter) > 1) {
+            if (! is_array($parameter) || count($parameter) > 1) {
                 throw new InvalidArgumentException('Invalid argument. Expected an array with a key and a value.');
             }
 
             $parameterKey = array_keys($parameter)[0];
             $parameterValue = array_values($parameter)[0];
 
-            $logoutUrl .= "&{$parameterKey}=" . urlencode($parameterValue);
+            $logoutUrl .= "&{$parameterKey}=".urlencode($parameterValue);
         }
 
         return $logoutUrl;

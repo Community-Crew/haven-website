@@ -13,8 +13,6 @@ class RoomIndexController
      * List All Rooms
      *
      * Fetch a paginated list of all rooms.
-     *
-     * @return AnonymousResourceCollection
      */
     #[Group('Rooms')]
     public function __invoke(): AnonymousResourceCollection

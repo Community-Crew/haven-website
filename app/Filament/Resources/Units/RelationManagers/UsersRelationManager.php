@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Units\RelationManagers;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\User;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -30,13 +29,13 @@ class UsersRelationManager extends RelationManager
                         Select::make('user_id')
                             ->label('Select User')
                             ->placeholder('Type to search users...')
-                            ->getSearchResultsUsing(fn(string $search): array => User::where('name', 'ilike', "%{$search}%")
+                            ->getSearchResultsUsing(fn (string $search): array => User::where('name', 'ilike', "%{$search}%")
                                 ->orWhere('email', 'ilike', "%{$search}%")
                                 ->limit(50)
                                 ->pluck('name', 'id')
                                 ->toArray()
                             )
-                            ->getOptionLabelUsing(fn(string $value): ?string => User::find($value)?->name)
+                            ->getOptionLabelUsing(fn (string $value): ?string => User::find($value)?->name)
                             ->searchable()
                             ->required(),
                     ])
@@ -58,7 +57,7 @@ class UsersRelationManager extends RelationManager
                     ->color('danger')
                     ->icon('heroicon-o-x-mark')
                     ->requiresConfirmation()
-                    ->action(fn(User $record) => $record->update(['unit_id' => null])),
+                    ->action(fn (User $record) => $record->update(['unit_id' => null])),
             ])->searchable(false)
             ->columnManager(false)
             ->paginated(false);

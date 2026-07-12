@@ -2,8 +2,8 @@
 
 namespace App\Enums;
 
-use JsonSerializable;
 use Filament\Support\Colors\Color;
+use JsonSerializable;
 
 enum RoomStatus: string implements JsonSerializable
 {
