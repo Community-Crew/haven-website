@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // WEB-01 is only ever reached via PROXY-01, which terminates TLS and
+        // forwards plain HTTP - without this, Laravel doesn't trust
+        // X-Forwarded-Proto and generates http:// asset/URL links.
+        $middleware->trustProxies(at: config('app.trusted_proxies') ?: null);
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
