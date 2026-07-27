@@ -70,7 +70,10 @@ jobs:
           git fetch origin production
           git reset --hard origin/production
           composer install --no-dev --optimize-autoloader --no-interaction
+          php artisan config:clear
           php artisan migrate --force
+          php artisan shield:generate --all --panel=admin --option=permissions
+          php artisan tinker --execute="\$r = \Spatie\Permission\Models\Role::firstOrCreate(['name' => config('filament-shield.super_admin.name'), 'guard_name' => 'web']); \$r->syncPermissions(\Spatie\Permission\Models\Permission::pluck('id'));"
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
