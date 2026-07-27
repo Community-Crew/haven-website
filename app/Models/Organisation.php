@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\HasS3Image;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
+
+class Organisation extends Model
+{
+    use HasS3Image, HasSlug;
+
+    protected $fillable = [
+        'name',
+        'about',
+        'slug',
+        'image_path',
+    ];
+
+    protected $appends = ['image_url'];
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class);
+    }
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug');
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+}

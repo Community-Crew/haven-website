@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Database\Factories\RegistrationCodeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RegistrationCode extends Model
 {
-    /** @use HasFactory<\Database\Factories\RegistrationCodeFactory> */
+    /** @use HasFactory<RegistrationCodeFactory> */
     use HasFactory;
 
-    protected $fillable =[
+    protected $fillable = [
         'unit_id',
         'is_used',
+        'code',
     ];
 
     protected $casts = [

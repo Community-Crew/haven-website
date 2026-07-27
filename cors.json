@@ -1,0 +1,14 @@
+{
+    "CORSRules": [
+        {
+            "AllowedHeaders": ["*"],
+            "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+            "AllowedOrigins": [
+                "http://admin.havencommunity.test",
+                "https://admin.havencommunity.nl"
+            ],
+            "ExposeHeaders": ["ETag", "Content-Length", "Connection"],
+            "MaxAgeSeconds": 3000
+        }
+    ]
+}

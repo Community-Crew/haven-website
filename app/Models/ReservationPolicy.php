@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Permission\Models\Role;
+
+class ReservationPolicy extends Model
+{
+    protected $fillable = [
+        'role_name',
+        'max_days_in_advance',
+    ];
+
+    public function entries(): HasMany
+    {
+        return $this->hasMany(ReservationPolicyEntry::class);
+    }
+
+    public function rooms(): BelongsToMany
+    {
+        return $this->belongsToMany(Room::class);
+    }
+
+    public function shieldRole(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'shield_role_id');
+    }
+}
