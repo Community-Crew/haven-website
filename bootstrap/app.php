@@ -12,10 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // WEB-01 is only ever reached via PROXY-01, which terminates TLS and
-        // forwards plain HTTP - without this, Laravel doesn't trust
-        // X-Forwarded-Proto and generates http:// asset/URL links.
-        $middleware->trustProxies(at: config('app.trusted_proxies') ?: null);
+        // Trusted proxy IPs come from config/trustedproxy.php (TRUSTED_PROXIES
+        // env var), read lazily by Illuminate\Http\Middleware\TrustProxies
+        // itself at request time - it's already in Laravel's default global
+        // middleware stack, so no explicit registration is needed here.
+        // (Deliberately NOT $middleware->trustProxies(at: ...) here: this
+        // closure runs as part of Application::configure()->create(), before
+        // the config repository is bound in the container, so config()/env()
+        // calls fail or silently return null at this point.)
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 

@@ -123,17 +123,4 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Trusted Proxies
-    |--------------------------------------------------------------------------
-    |
-    | Comma-separated list of reverse proxy IPs to trust for X-Forwarded-*
-    | headers (see bootstrap/app.php). Needed so the app knows the original
-    | request was HTTPS when a TLS-terminating proxy forwards plain HTTP.
-    |
-    */
-
-    'trusted_proxies' => array_filter(explode(',', env('TRUSTED_PROXIES', ''))),
-
 ];
