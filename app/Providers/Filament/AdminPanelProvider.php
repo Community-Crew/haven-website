@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->domain(env('ADMIN_DOMAIN', 'admin.havencommunity.test'))
+            ->domain(config('services.admin_domain'))
             ->path('')
             ->colors([
                 'primary' => Color::Blue,

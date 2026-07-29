@@ -12,6 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Trusted proxy IPs come from config/trustedproxy.php (TRUSTED_PROXIES
+        // env var), read lazily by Illuminate\Http\Middleware\TrustProxies
+        // itself at request time - it's already in Laravel's default global
+        // middleware stack, so no explicit registration is needed here.
+        // (Deliberately NOT $middleware->trustProxies(at: ...) here: this
+        // closure runs as part of Application::configure()->create(), before
+        // the config repository is bound in the container, so config()/env()
+        // calls fail or silently return null at this point.)
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [

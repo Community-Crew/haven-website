@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => array_filter(explode(',', env('CORS_ALLOWED_ORIGINS', 'https://havencommunity.nl,https://www.havencommunity.nl'))),
 
     'allowed_origins_patterns' => [],
 
