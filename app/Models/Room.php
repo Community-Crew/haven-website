@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RoomStatus;
-use App\Traits\HasS3Image;
+use App\Traits\HasCoverMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +15,7 @@ use Spatie\Sluggable\SlugOptions;
  */
 class Room extends Model
 {
-    use HasS3Image, HasSlug;
+    use HasCoverMedia, HasSlug;
 
     protected $fillable = [
         'name',
@@ -29,6 +29,12 @@ class Room extends Model
     protected $casts = [
         'status' => RoomStatus::class,
     ];
+
+    /**
+     * Media collection name for this model's cover image - see HasCoverMedia
+     * and MediaCoverPicker.
+     */
+    protected string $coverMediaCollection = 'rooms-cover';
 
     protected $appends = ['image_url'];
 
