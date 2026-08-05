@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Agenda\AgendaIndexController;
+use App\Http\Controllers\Api\Media\MediaShowController;
 use App\Http\Controllers\Api\Reservation\ReservationCancelController;
 use App\Http\Controllers\Api\Reservation\ReservationStoreController;
 use App\Http\Controllers\Api\Reservation\ReservationUpdateController;
@@ -26,6 +27,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // Agendas
     Route::get('/agendas', AgendaIndexController::class)->name('agendas.index');
+
+    // Media
+    Route::get('/media/{media:uuid}', MediaShowController::class)->name('media.show');
 });
 
 Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])->group(function () {
