@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\HasS3Image;
+use App\Traits\HasCoverMedia;
+use App\Traits\HasMediaAttachments;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class AgendaItem extends Model
 {
-    use HasS3Image, HasSlug, softDeletes;
+    use HasCoverMedia, HasMediaAttachments, HasSlug, softDeletes;
 
     public $timestamps = true;
 
@@ -27,6 +28,18 @@ class AgendaItem extends Model
         'organisation_id',
         'agenda_id',
     ];
+
+    /**
+     * Rich-text columns scanned by HasMediaAttachments to keep Media.mediable_*
+     * pointed at whichever record actually embeds each file.
+     */
+    protected array $mediaAttachmentColumns = ['description'];
+
+    /**
+     * Media collection name for this model's cover image - see HasCoverMedia
+     * and MediaCoverPicker.
+     */
+    protected string $coverMediaCollection = 'agenda-items-cover';
 
     protected $appends = ['image_url'];
 
