@@ -70,6 +70,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 'Reservation',
+                'Agenda',
                 __('filament-shield::filament-shield.nav.group'),
                 'Setup',
 

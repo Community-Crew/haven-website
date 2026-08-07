@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Filament\Resources\Rooms\Pages;
+namespace App\Filament\Resources\AgendaItems\Pages;
 
-use App\Filament\Resources\Rooms\RoomResource;
-use App\Filament\Resources\Rooms\Schemas\RoomForm;
+use App\Filament\Resources\AgendaItems\AgendaItemResource;
+use App\Filament\Resources\AgendaItems\Schemas\AgendaItemForm;
 use App\Filament\Support\MediaCoverPicker;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditRoom extends EditRecord
+class EditAgendaItem extends EditRecord
 {
-    protected static string $resource = RoomResource::class;
+    protected static string $resource = AgendaItemResource::class;
 
     protected ?array $pendingCoverImageData = null;
 
@@ -20,6 +22,8 @@ class EditRoom extends EditRecord
         return [
             ViewAction::make(),
             DeleteAction::make(),
+            ForceDeleteAction::make(),
+            RestoreAction::make(),
         ];
     }
 
@@ -27,7 +31,7 @@ class EditRoom extends EditRecord
     {
         return [
             ...$data,
-            ...MediaCoverPicker::hydrate($this->record, RoomForm::COVER_STATE_KEY, RoomForm::COVER_COLLECTION),
+            ...MediaCoverPicker::hydrate($this->record, AgendaItemForm::COVER_STATE_KEY, AgendaItemForm::COVER_COLLECTION),
         ];
     }
 
@@ -42,8 +46,8 @@ class EditRoom extends EditRecord
     {
         MediaCoverPicker::sync(
             $this->record,
-            RoomForm::COVER_STATE_KEY,
-            RoomForm::COVER_COLLECTION,
+            AgendaItemForm::COVER_STATE_KEY,
+            AgendaItemForm::COVER_COLLECTION,
             $this->pendingCoverImageData ?? [],
         );
     }

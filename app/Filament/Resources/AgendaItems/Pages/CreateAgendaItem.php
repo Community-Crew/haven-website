@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Rooms\Pages;
+namespace App\Filament\Resources\AgendaItems\Pages;
 
-use App\Filament\Resources\Rooms\RoomResource;
-use App\Filament\Resources\Rooms\Schemas\RoomForm;
+use App\Filament\Resources\AgendaItems\AgendaItemResource;
+use App\Filament\Resources\AgendaItems\Schemas\AgendaItemForm;
 use App\Filament\Support\MediaCoverPicker;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateRoom extends CreateRecord
+class CreateAgendaItem extends CreateRecord
 {
-    protected static string $resource = RoomResource::class;
+    protected static string $resource = AgendaItemResource::class;
 
     protected ?array $pendingCoverImageData = null;
 
@@ -24,8 +24,8 @@ class CreateRoom extends CreateRecord
     {
         MediaCoverPicker::sync(
             $this->record,
-            RoomForm::COVER_STATE_KEY,
-            RoomForm::COVER_COLLECTION,
+            AgendaItemForm::COVER_STATE_KEY,
+            AgendaItemForm::COVER_COLLECTION,
             $this->pendingCoverImageData ?? [],
         );
     }
