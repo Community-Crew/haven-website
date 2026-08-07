@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Casts\MinutesToTime;
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ReservationPolicyEntry extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'reservation_policy_id',
         'day_of_week',

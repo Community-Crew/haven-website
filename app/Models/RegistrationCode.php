@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Database\Factories\RegistrationCodeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class RegistrationCode extends Model
 {
     /** @use HasFactory<RegistrationCodeFactory> */
-    use HasFactory;
+    use Auditable, HasFactory;
 
     protected $fillable = [
         'unit_id',

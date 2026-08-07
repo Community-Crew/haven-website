@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Policies\ActivityPolicy;
 use App\Providers\auth\KeycloakProvider;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use SocialiteProviders\Manager\SocialiteWasCalled;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,5 +25,13 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(function (SocialiteWasCalled $event) {
             $event->extendSocialite('keycloak', KeycloakProvider::class);
         });
+
+        // Login/Logout logging lives in App\Listeners\LogAuthenticationEvents -
+        // Laravel auto-discovers it from the typed event parameter, no explicit
+        // Event::listen() needed (and would double-fire it if added here).
+
+        // Activity lives in Spatie's own namespace, so Laravel's convention-based
+        // policy discovery (App\Models\X -> App\Policies\XPolicy) can't find it.
+        Gate::policy(Activity::class, ActivityPolicy::class);
     }
 }

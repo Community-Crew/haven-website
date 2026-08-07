@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
@@ -9,7 +10,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Agenda extends Model
 {
-    use HasSlug;
+    use Auditable, HasSlug;
 
     public $fillable = [
         'name',

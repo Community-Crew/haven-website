@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use App\Traits\HasCoverMedia;
 use App\Traits\HasMediaAttachments;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class AgendaItem extends Model
 {
-    use HasCoverMedia, HasMediaAttachments, HasSlug, softDeletes;
+    use Auditable, HasCoverMedia, HasMediaAttachments, HasSlug, softDeletes;
 
     public $timestamps = true;
 

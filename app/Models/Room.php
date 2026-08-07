@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RoomStatus;
+use App\Traits\Auditable;
 use App\Traits\HasCoverMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,7 +16,7 @@ use Spatie\Sluggable\SlugOptions;
  */
 class Room extends Model
 {
-    use HasCoverMedia, HasSlug;
+    use Auditable, HasCoverMedia, HasSlug;
 
     protected $fillable = [
         'name',

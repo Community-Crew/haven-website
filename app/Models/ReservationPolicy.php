@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,6 +11,8 @@ use Spatie\Permission\Models\Role;
 
 class ReservationPolicy extends Model
 {
+    use Auditable;
+
     protected $fillable = [
         'role_name',
         'max_days_in_advance',
