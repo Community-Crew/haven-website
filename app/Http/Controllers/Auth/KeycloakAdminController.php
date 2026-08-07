@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Exception;
 use Filament\Facades\Filament;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Spatie\Permission\Models\Role;
 
@@ -35,13 +34,13 @@ class KeycloakAdminController extends Controller
 
         $keycloakRoles = $keycloakUser->getRaw()['groups'] ?? [];
 
-        if (!(empty($keycloakRoles))) {
+        if (! (empty($keycloakRoles))) {
             $cleanedRoles = [];
             foreach ($keycloakRoles as $groupPath) {
                 $roleName = trim(str_replace('/', '-', $groupPath), '-');
                 Role::firstOrCreate([
                     'name' => $roleName,
-                    'guard_name' => 'web'
+                    'guard_name' => 'web',
                 ]);
 
                 $cleanedRoles[] = $roleName;
@@ -50,7 +49,6 @@ class KeycloakAdminController extends Controller
         } else {
             $user->syncRoles([]);
         }
-
 
         Filament::auth()->login($user);
 
