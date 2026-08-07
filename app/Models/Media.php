@@ -9,7 +9,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Encoders\AutoEncoder;
+use Intervention\Image\Encoders\GifEncoder;
+use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Laravel\Facades\Image;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
@@ -71,9 +72,16 @@ class Media extends Model
         ?int $maxDimension = null,
         ?int $quality = null,
     ): self {
-        $encoded = Image::read($file->get())
-            ->scaleDown(width: $maxDimension ?? self::MAX_DIMENSION, height: $maxDimension ?? self::MAX_DIMENSION)
-            ->encode(new AutoEncoder(quality: $quality ?? self::QUALITY));
+        $image = Image::read($file->get())
+            ->scaleDown(width: $maxDimension ?? self::MAX_DIMENSION, height: $maxDimension ?? self::MAX_DIMENSION);
+
+        // Normalize everything to WebP so stored files are consistent and
+        // small. The one exception is animated GIFs: converting those to
+        // WebP would keep only the first frame, so they're re-encoded as
+        // GIF instead to preserve the animation.
+        $encoded = $image->isAnimated()
+            ? $image->encode(new GifEncoder)
+            : $image->encode(new WebpEncoder(quality: $quality ?? self::QUALITY));
 
         $path = "media/{$collection}/".Str::uuid().'.'.self::extensionForMediaType($encoded->mediaType());
 
@@ -92,13 +100,8 @@ class Media extends Model
     protected static function extensionForMediaType(string $mediaType): string
     {
         return match ($mediaType) {
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
             'image/gif' => 'gif',
             'image/webp' => 'webp',
-            'image/avif' => 'avif',
-            'image/bmp' => 'bmp',
-            'image/tiff' => 'tiff',
             default => 'bin',
         };
     }
