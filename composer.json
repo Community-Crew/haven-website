@@ -22,6 +22,7 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "sentry/sentry-laravel": "^4.20",
         "socialiteproviders/keycloak": "^5.3",
+        "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-permission": "^7.4",
         "spatie/laravel-sluggable": "^3.7",
         "tightenco/ziggy": "^2.6"

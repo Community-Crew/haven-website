@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -17,6 +18,8 @@ use Throwable;
 
 class Media extends Model
 {
+    use Auditable;
+
     /**
      * Images are capped to this on their longest edge and re-encoded at
      * reduced quality on upload - no reason to store (and ship on every

@@ -21,6 +21,11 @@ class KeycloakAdminController extends Controller
         try {
             $keycloakUser = Socialite::driver('keycloak')->user();
         } catch (Exception $e) {
+            activity('auth')
+                ->event('login_failed')
+                ->withProperties(['ip' => request()->ip()])
+                ->log('Keycloak authentication failed');
+
             return redirect()->route('filament.admin.auth.login')->with('error', 'Keycloak authentication failed.');
         }
 

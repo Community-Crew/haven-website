@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use App\Traits\HasS3Image;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -10,7 +11,7 @@ use Spatie\Sluggable\SlugOptions;
 
 class Organisation extends Model
 {
-    use HasS3Image, HasSlug;
+    use Auditable, HasS3Image, HasSlug;
 
     protected $fillable = [
         'name',
