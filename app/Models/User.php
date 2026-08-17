@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MembershipStatus;
 use App\Traits\Auditable;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -66,6 +68,22 @@ class User extends Authenticatable implements FilamentUser
     public function organisations(): BelongsToMany
     {
         return $this->belongsToMany(Organisation::class);
+    }
+
+    public function memberships(): HasMany
+    {
+        return $this->hasMany(Membership::class);
+    }
+
+    /**
+     * The membership that's still open (pending/active/suspended), if any -
+     * there's at most one at a time, see MembershipForm.
+     */
+    public function currentMembership(): HasOne
+    {
+        return $this->hasOne(Membership::class)
+            ->whereIn('status', array_map(fn (MembershipStatus $status) => $status->value, MembershipStatus::open()))
+            ->latestOfMany();
     }
 
     public function canAccessPanel(Panel $panel): bool
