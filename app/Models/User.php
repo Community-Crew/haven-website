@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
-use Carbon\Traits\Timestamp;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -18,7 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use Auditable, HasFactory, HasRoles, Notifiable, Timestamp;
+    use Auditable, HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -78,9 +77,14 @@ class User extends Authenticatable implements FilamentUser
     /**
      * Keep Keycloak tokens and the remember token out of the audit trail -
      * they're secrets, not the kind of change history an audit log is for.
+     *
+     * Note: can't call parent::auditExcept() here - Auditable is a trait,
+     * not a parent class, so `parent::` falls through to Eloquent's magic
+     * __call() and throws a BadMethodCallException. Repeat 'updated_at'
+     * (the trait's own default) explicitly instead.
      */
     protected function auditExcept(): array
     {
-        return [...parent::auditExcept(), 'remember_token', 'keycloak_token', 'keycloak_refresh_token'];
+        return ['updated_at', 'remember_token', 'keycloak_token', 'keycloak_refresh_token'];
     }
 }
