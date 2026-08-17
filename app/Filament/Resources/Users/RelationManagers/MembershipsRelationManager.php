@@ -11,7 +11,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -55,8 +54,6 @@ class MembershipsRelationManager extends RelationManager
                     ->default(true),
                 TextInput::make('board_role')
                     ->helperText('E.g. Chair, Secretary, Treasurer - leave blank for a regular member.'),
-                DateTimePicker::make('statutes_accepted_at')
-                    ->label('Statutes accepted at'),
                 Textarea::make('notes')
                     ->columnSpanFull(),
             ]);

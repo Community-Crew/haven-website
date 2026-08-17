@@ -8,7 +8,6 @@ use App\Models\MemberType;
 use App\Models\User;
 use Closure;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -51,8 +50,6 @@ class MembershipForm
                     ->default(true),
                 TextInput::make('board_role')
                     ->helperText('E.g. Chair, Secretary, Treasurer - leave blank for a regular member.'),
-                DateTimePicker::make('statutes_accepted_at')
-                    ->label('Statutes accepted at'),
                 Textarea::make('notes')
                     ->columnSpanFull(),
             ]);

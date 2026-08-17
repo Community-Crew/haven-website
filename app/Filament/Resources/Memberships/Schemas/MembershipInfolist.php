@@ -30,9 +30,6 @@ class MembershipInfolist
                     ->boolean(),
                 TextEntry::make('board_role')
                     ->placeholder('-'),
-                TextEntry::make('statutes_accepted_at')
-                    ->dateTime()
-                    ->placeholder('-'),
                 TextEntry::make('notes')
                     ->placeholder('-')
                     ->columnSpanFull(),

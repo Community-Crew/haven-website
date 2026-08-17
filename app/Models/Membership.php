@@ -26,7 +26,6 @@ class Membership extends Model
         'ended_at',
         'has_voting_rights',
         'board_role',
-        'statutes_accepted_at',
         'notes',
     ];
 
@@ -35,7 +34,6 @@ class Membership extends Model
         'joined_at' => 'date',
         'ended_at' => 'date',
         'has_voting_rights' => 'boolean',
-        'statutes_accepted_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

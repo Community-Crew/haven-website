@@ -30,7 +30,6 @@ return new class extends Migration
             $table->date('ended_at')->nullable();
             $table->boolean('has_voting_rights')->default(true);
             $table->string('board_role')->nullable();
-            $table->timestamp('statutes_accepted_at')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });
