@@ -1,0 +1,38 @@
+name: Promote Tag to Production
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout production
+        uses: actions/checkout@v4
+        with:
+          ref: production
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge tag into production
+        run: |
+          tag="${GITHUB_REF_NAME}"
+
+          if git merge --ff-only "$tag"; then
+            echo "Fast-forwarded production to $tag"
+          else
+            git merge --no-ff "$tag" -m "Promote $tag to production"
+          fi
+
+      - name: Push production
+        run: git push origin HEAD:production
