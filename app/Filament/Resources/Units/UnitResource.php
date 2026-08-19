@@ -24,10 +24,7 @@ class UnitResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHome;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('filament-shield::filament-shield.nav.group');
-    }
+    protected static string|null|\UnitEnum $navigationGroup = 'Members';
 
     public static function getGloballySearchableAttributes(): array
     {

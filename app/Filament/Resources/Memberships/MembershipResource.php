@@ -20,7 +20,7 @@ class MembershipResource extends Resource
 {
     protected static ?string $model = Membership::class;
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Membership';
+    protected static string|null|\UnitEnum $navigationGroup = 'Members';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 

@@ -69,11 +69,13 @@ class AdminPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make(),
             ])
             ->navigationGroups([
-                'Reservation',
+                'Members',
+                'Bookings',
                 'Agenda',
+                'Content',
+                'Communication',
+                'System',
                 __('filament-shield::filament-shield.nav.group'),
-                'Setup',
-
             ]);
     }
 }

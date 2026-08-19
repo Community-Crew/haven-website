@@ -25,7 +25,7 @@ class ActivityLogResource extends Resource
 
     protected static ?string $navigationLabel = 'Activity Log';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Setup';
+    protected static string|null|\UnitEnum $navigationGroup = 'System';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ClipboardDocumentList;
 

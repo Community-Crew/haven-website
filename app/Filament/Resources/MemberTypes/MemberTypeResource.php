@@ -22,7 +22,7 @@ class MemberTypeResource extends Resource
 
     protected static ?string $navigationLabel = 'Member Types';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Setup';
+    protected static string|null|\UnitEnum $navigationGroup = 'Members';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Tag;
 
