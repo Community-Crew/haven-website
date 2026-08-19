@@ -25,7 +25,8 @@
         "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-permission": "^7.4",
         "spatie/laravel-sluggable": "^3.7",
-        "tightenco/ziggy": "^2.6"
+        "tightenco/ziggy": "^2.6",
+        "tijsverkoyen/css-to-inline-styles": "^2.4"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.2",

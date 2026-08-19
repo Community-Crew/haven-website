@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AccountActivatedMail;
 use App\Models\RegistrationCode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response;
 
 class ActivateAccountController extends Controller
@@ -45,6 +47,8 @@ class ActivateAccountController extends Controller
         $registrationCode->update([
             'is_used' => true,
         ]);
+
+        Mail::to($user)->send(new AccountActivatedMail($user));
 
         return response()->json([
             'message' => 'Account successfully activated and linked to your unit!',

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\Reservation;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ReservationCancelledMail;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class ReservationCancelController extends Controller
@@ -28,6 +30,8 @@ class ReservationCancelController extends Controller
         $reservation->update([
             'status' => 'cancelled',
         ]);
+
+        Mail::to($reservation->user)->send(new ReservationCancelledMail($reservation));
 
         return response()->json([
             'message' => 'Reservation cancelled successfully.',
