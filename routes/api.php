@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Agenda\AgendaIndexController;
+use App\Http\Controllers\Api\Health\HealthShowController;
 use App\Http\Controllers\Api\Media\MediaShowController;
 use App\Http\Controllers\Api\Reservation\ReservationCancelController;
 use App\Http\Controllers\Api\Reservation\ReservationStoreController;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/ping', function () {
     return response()->json(['message' => 'pong']);
 });
+
+Route::get('/health', HealthShowController::class)->name('api.health');
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
     // Rooms
