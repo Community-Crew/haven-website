@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\Reservation;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Reservation\StoreReservationRequest; // 🎯 Updated Namespace
+use App\Mail\ReservationConfirmedMail;
 use App\Services\ReservationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
 
 class ReservationStoreController extends Controller
 {
@@ -21,6 +23,8 @@ class ReservationStoreController extends Controller
         $data = $request->validated();
 
         $reservation = $this->reservationService->createReservation($data);
+
+        Mail::to($reservation->user)->send(new ReservationConfirmedMail($reservation));
 
         return response()->json([
             'success' => true,

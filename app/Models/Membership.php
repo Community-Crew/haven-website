@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Enums\MembershipStatus;
+use App\Observers\MembershipObserver;
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * only one non-ended (pending/active/suspended) at once - enforced in the
  * Filament form, see MembershipForm.
  */
+#[ObservedBy(MembershipObserver::class)]
 class Membership extends Model
 {
     use Auditable, HasFactory;

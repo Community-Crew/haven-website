@@ -7,6 +7,7 @@ use App\Traits\Auditable;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,7 +17,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasLocalePreference
 {
     /** @use HasFactory<UserFactory> */
     use Auditable, HasFactory, HasRoles, Notifiable;
@@ -32,6 +33,7 @@ class User extends Authenticatable implements FilamentUser
         'keycloak_id',
         'unit_id',
         'activated_at',
+        'locale',
 
     ];
 
@@ -49,6 +51,16 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     protected array $runtimeGroups = [];
+
+    /**
+     * Used by Mail::to($user)->send(...) to pick the mail's language - see
+     * the 'locale' migration for why it's a stored column rather than
+     * derived from Keycloak/Accept-Language on every send.
+     */
+    public function preferredLocale(): string
+    {
+        return $this->locale;
+    }
 
     public function unit(): BelongsTo
     {

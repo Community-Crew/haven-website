@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogSentEmail;
 use App\Policies\ActivityPolicy;
 use App\Providers\auth\KeycloakProvider;
+use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -33,5 +35,8 @@ class AppServiceProvider extends ServiceProvider
         // Activity lives in Spatie's own namespace, so Laravel's convention-based
         // policy discovery (App\Models\X -> App\Policies\XPolicy) can't find it.
         Gate::policy(Activity::class, ActivityPolicy::class);
+
+        // Logs every outbound mail to sent_emails - see LogSentEmail.
+        Event::listen(MessageSent::class, LogSentEmail::class);
     }
 }
