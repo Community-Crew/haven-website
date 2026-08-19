@@ -2,7 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\MembershipsOverview;
 use App\Filament\Widgets\OverRegistrationOverview;
+use App\Filament\Widgets\SentMailOverview;
+use App\Filament\Widgets\UpcomingReservations;
 use App\Http\Controllers\Auth\KeycloakAdminController;
 use App\Http\Middleware\AuthenticateAdminWithKeycloak;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
@@ -41,6 +44,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 OverRegistrationOverview::class,
+                MembershipsOverview::class,
+                SentMailOverview::class,
+                UpcomingReservations::class,
             ])
             ->middleware([
                 EncryptCookies::class,

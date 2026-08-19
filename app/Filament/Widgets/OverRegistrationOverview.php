@@ -4,11 +4,20 @@ namespace App\Filament\Widgets;
 
 use App\Models\Unit;
 use App\Models\User;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class OverRegistrationOverview extends StatsOverviewWidget
 {
+    use HasWidgetShield;
+
+    protected ?string $heading = 'Registration';
+
+    protected int|string|array $columnSpan = 'full';
+
+    protected int|array|null $columns = 3;
+
     protected function getStats(): array
     {
         $totalUsers = User::count();
@@ -23,7 +32,6 @@ class OverRegistrationOverview extends StatsOverviewWidget
 
         return [
             Stat::make('Total Units', $totalUnits)
-                ->description('')
                 ->icon('heroicon-o-home'),
 
             Stat::make('Active Users', $totalUsers)
