@@ -20,6 +20,8 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    protected static string|null|\UnitEnum $navigationGroup = 'Members';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     protected static ?string $recordTitleAttribute = 'name';

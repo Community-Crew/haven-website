@@ -19,7 +19,7 @@ class MediaResource extends Resource
 
     protected static ?string $navigationLabel = 'Media Library';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Setup';
+    protected static string|null|\UnitEnum $navigationGroup = 'Content';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Photo;
 

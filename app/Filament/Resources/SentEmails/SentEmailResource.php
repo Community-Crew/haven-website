@@ -24,7 +24,7 @@ class SentEmailResource extends Resource
 
     protected static ?string $navigationLabel = 'Sent Emails';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Setup';
+    protected static string|null|\UnitEnum $navigationGroup = 'Communication';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Envelope;
 
