@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Agenda\AgendaIndexController;
+use App\Http\Controllers\Api\Agenda\AgendaShowController;
 use App\Http\Controllers\Api\Health\HealthShowController;
 use App\Http\Controllers\Api\Media\MediaShowController;
 use App\Http\Controllers\Api\Reservation\ReservationCancelController;
@@ -30,6 +31,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // Agendas
     Route::get('/agendas', AgendaIndexController::class)->name('agendas.index');
+    Route::get('/agendas/{agenda}', AgendaShowController::class)->name('agendas.show');
 
     // Media
     Route::get('/media/{media:uuid}', MediaShowController::class)->name('media.show');

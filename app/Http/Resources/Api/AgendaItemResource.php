@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources\Api;
 
+use App\Filament\Support\MediaFileAttachmentProvider;
+use Filament\Forms\Components\RichEditor\RichContentRenderer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,7 +18,9 @@ class AgendaItemResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'slug' => $this->slug,
-            'description' => $this->description,
+            'description' => RichContentRenderer::make($this->description)
+                ->fileAttachmentProvider(new MediaFileAttachmentProvider)
+                ->toHtml(),
             'short_description' => $this->short_description,
             'image_url' => $this->image_url,
             'start_date' => $this->start_date,
