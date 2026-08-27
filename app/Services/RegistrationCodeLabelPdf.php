@@ -4,9 +4,6 @@ namespace App\Services;
 
 use App\Models\RegistrationCode;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Collection;
 
 /**
@@ -17,6 +14,8 @@ use Illuminate\Support\Collection;
  */
 class RegistrationCodeLabelPdf
 {
+    public function __construct(private readonly QrImageBuilder $qrImageBuilder) {}
+
     /**
      * @return Collection<int, RegistrationCode>
      */
@@ -62,23 +61,12 @@ class RegistrationCodeLabelPdf
             return [
                 'unit_name' => $code->unit?->name ?? 'Unknown unit',
                 'code' => $code->code,
-                'qr' => $this->buildQrDataUri($url),
+                'qr' => $this->qrImageBuilder->dataUri($url),
                 'host' => parse_url($baseUrl, PHP_URL_HOST),
             ];
         });
 
         return Pdf::loadView('pdf.registration-code-labels', ['labels' => $labels])
             ->output();
-    }
-
-    private function buildQrDataUri(string $url): string
-    {
-        return (new Builder(
-            writer: new PngWriter,
-            data: $url,
-            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
-            size: 220,
-            margin: 4,
-        ))->build()->getDataUri();
     }
 }

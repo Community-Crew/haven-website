@@ -5,6 +5,11 @@ return [
 
     'frontend_url' => env('FRONTEND_URL', 'https://havencommunity.nl'),
 
+    // Bare host for domain-based route matching (Route::domain()) and the
+    // same thing with a scheme for building actual links - see QrCode.
+    'qr_domain' => env('QR_DOMAIN', 'qr.havencommunity.test'),
+    'qr_app_url' => env('QR_APP_URL', 'https://qr.havencommunity.test'),
+
     'keycloak' => [
         'client_id' => env('KEYCLOAK_CLIENT_ID'),
         'client_secret' => env('KEYCLOAK_CLIENT_SECRET'),
