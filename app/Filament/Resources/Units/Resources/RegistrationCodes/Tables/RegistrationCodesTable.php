@@ -30,6 +30,13 @@ class RegistrationCodesTable
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('gray'),
+                IconColumn::make('printed_at')
+                    ->label('Label Printed')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-printer')
+                    ->falseIcon('heroicon-o-printer')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
                 TextColumn::make('created_at')
                     ->label('Generated At')
                     ->dateTime()
@@ -39,6 +46,11 @@ class RegistrationCodesTable
                 //
             ])
             ->recordActions([
+                Action::make('togglePrinted')
+                    ->label(fn ($record) => $record->printed_at ? 'Mark Unprinted' : 'Mark Printed')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->action(fn ($record) => $record->togglePrinted()),
                 DeleteAction::make()
                     ->label('Revoke')
                     ->authorize(fn () => auth()->user()->hasPermissionTo('DeleteAny:RegistrationCode')),

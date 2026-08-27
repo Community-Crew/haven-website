@@ -3,6 +3,8 @@
 return [
     'admin_domain' => env('ADMIN_DOMAIN', 'admin.havencommunity.test'),
 
+    'frontend_url' => env('FRONTEND_URL', 'https://havencommunity.nl'),
+
     'keycloak' => [
         'client_id' => env('KEYCLOAK_CLIENT_ID'),
         'client_secret' => env('KEYCLOAK_CLIENT_SECRET'),
