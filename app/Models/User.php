@@ -34,11 +34,13 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         'unit_id',
         'activated_at',
         'locale',
+        'privacy_policy_accepted_at',
 
     ];
 
     protected $casts = [
         'activated_at' => 'datetime',
+        'privacy_policy_accepted_at' => 'datetime',
     ];
 
     /**
@@ -60,6 +62,21 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
     public function preferredLocale(): string
     {
         return $this->locale;
+    }
+
+    /**
+     * True once the user has accepted a privacy policy no older than the
+     * one currently in force - see EnsureUserAcceptedPrivacyPolicy.
+     */
+    public function hasAcceptedCurrentPrivacyPolicy(): bool
+    {
+        if (! $this->privacy_policy_accepted_at) {
+            return false;
+        }
+
+        return $this->privacy_policy_accepted_at->greaterThanOrEqualTo(
+            PrivacyPolicy::current()->updated_at
+        );
     }
 
     public function unit(): BelongsTo

@@ -35,6 +35,8 @@ class UserProfileResource extends JsonResource
             'email' => $this->email,
             'is_activated' => ! is_null($this->activated_at),
             'activated_at' => $this->activated_at ? $this->activated_at->toIso8601String() : null,
+            'privacy_policy_accepted' => $this->resource->hasAcceptedCurrentPrivacyPolicy(),
+            'privacy_policy_accepted_at' => $this->privacy_policy_accepted_at ? $this->privacy_policy_accepted_at->toIso8601String() : null,
             /**
              * The unit of the current user.
              */
