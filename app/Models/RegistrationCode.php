@@ -17,10 +17,12 @@ class RegistrationCode extends Model
         'unit_id',
         'is_used',
         'code',
+        'printed_at',
     ];
 
     protected $casts = [
         'is_used' => 'boolean',
+        'printed_at' => 'datetime',
     ];
 
     protected static function booted(): void
@@ -33,5 +35,10 @@ class RegistrationCode extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function togglePrinted(): void
+    {
+        $this->update(['printed_at' => $this->printed_at ? null : now()]);
     }
 }
