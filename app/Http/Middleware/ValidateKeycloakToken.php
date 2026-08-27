@@ -75,14 +75,22 @@ class ValidateKeycloakToken
                 ]);
             }
 
-            $tokenIssuedAt = isset($decoded->iat) ? now()->setTimestamp($decoded->iat) : null;
-            if ($user->wasRecentlyCreated || ! $user->updated_at || ($tokenIssuedAt && $tokenIssuedAt->gt($user->updated_at))) {
+            // Keycloak issues a fresh `iat` on every refreshed access token
+            // (the frontend refreshes roughly every minute), so comparing
+            // timestamps here made this expensive resync run on almost every
+            // request for every logged-in user. Comparing the actual role
+            // sets instead means the cheap path (nothing changed) is just
+            // one query, and the sync only runs when Keycloak's groups for
+            // this user genuinely changed.
+            $currentRoleNames = $user->getRoleNames()->sort()->values()->all();
+            $mappedRoleNamesSorted = collect($mappedRoles)->sort()->values()->all();
+
+            if ($user->wasRecentlyCreated || $currentRoleNames !== $mappedRoleNamesSorted) {
                 foreach ($mappedRoles as $roleName) {
                     Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
                 }
 
                 $user->syncRoles($mappedRoles);
-                $user->touch();
             }
 
             Auth::setUser($user);

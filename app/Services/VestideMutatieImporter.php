@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Unit;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Parses Vestide's monthly "mutaties" export (new tenant contracts, one
@@ -65,9 +67,23 @@ class VestideMutatieImporter
                 return $row;
             }
 
-            $unit->users()->update(['unit_id' => null, 'activated_at' => null]);
+            // Wrapped in one transaction per row so a failure issuing the new
+            // code (or anything else) can't leave a unit's outgoing resident
+            // unassigned with no replacement code - it rolls back and the
+            // row is reported as an error instead, retryable on its own.
+            try {
+                $code = DB::transaction(function () use ($unit) {
+                    $unit->users()->update(['unit_id' => null, 'activated_at' => null]);
 
-            $code = $unit->registrationCodes()->create([]);
+                    return $unit->registrationCodes()->create([]);
+                });
+            } catch (Throwable $e) {
+                report($e);
+
+                $row['error'] = 'Failed to apply this row: '.$e->getMessage();
+
+                return $row;
+            }
 
             $row['registration_code'] = $code->code;
             $row['registration_code_id'] = $code->id;
