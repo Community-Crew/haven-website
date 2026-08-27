@@ -25,8 +25,28 @@ class RegistrationCodeLabelPdf
         return RegistrationCode::query()
             ->whereNull('printed_at')
             ->with('unit')
-            ->orderBy('created_at')
-            ->get();
+            ->get()
+            ->sortBy(fn (RegistrationCode $code) => $this->sortKey($code))
+            ->values();
+    }
+
+    /**
+     * Building, then floor, then unit - so printed labels come off in the
+     * order you'd actually walk the building handing them out. Zero-padding
+     * the unit lets e.g. Terra's letter units ("A", "B", ...) and the
+     * towers' numeric-string units ("2", "10", ...) sort correctly against
+     * each other without needing to know which kind it is up front.
+     */
+    private function sortKey(RegistrationCode $code): string
+    {
+        $unit = $code->unit;
+
+        return sprintf(
+            '%s|%03d|%s',
+            $unit?->building ?? '',
+            $unit?->floor ?? 0,
+            str_pad((string) ($unit?->unit ?? ''), 4, '0', STR_PAD_LEFT),
+        );
     }
 
     /**
