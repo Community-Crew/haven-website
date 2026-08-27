@@ -28,7 +28,15 @@ class RegistrationCode extends Model
     protected static function booted(): void
     {
         static::creating(function (RegistrationCode $registrationCode) {
-            $registrationCode->code = fake()->regexify('[0-9A-F]{4}-[0-9A-F]{4}');
+            // Deliberately not fake()->regexify(...) here: fakerphp/faker is
+            // require-dev only, so calling it from application code (rather
+            // than a factory/seeder) fatals in production once `composer
+            // install --no-dev` has stripped it out.
+            $registrationCode->code = sprintf(
+                '%s-%s',
+                strtoupper(bin2hex(random_bytes(2))),
+                strtoupper(bin2hex(random_bytes(2))),
+            );
         });
     }
 
