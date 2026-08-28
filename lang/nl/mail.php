@@ -34,6 +34,13 @@ return [
         ],
     ],
 
+    'privacy_policy_updated' => [
+        'subject' => 'Ons privacybeleid is gewijzigd',
+        'greeting' => 'Hoi :name,',
+        'body' => 'We hebben ons privacybeleid aangepast. Bekijk de nieuwe versie en accepteer deze de volgende keer dat je inlogt om Haven te blijven gebruiken.',
+        'action' => 'Bekijk het privacybeleid',
+    ],
+
     'footer' => 'Haven Community',
 
 ];

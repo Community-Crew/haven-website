@@ -34,6 +34,13 @@ return [
         ],
     ],
 
+    'privacy_policy_updated' => [
+        'subject' => 'Our privacy policy has changed',
+        'greeting' => 'Hi :name,',
+        'body' => 'We\'ve updated our privacy policy. Please review the new version and accept it next time you sign in to keep using Haven.',
+        'action' => 'View the privacy policy',
+    ],
+
     'footer' => 'Haven Community',
 
 ];
