@@ -5,13 +5,18 @@ namespace App\Mail;
 use App\Mail\Support\RendersInlinedMail;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-// Not ShouldQueue - see AccountActivatedMail; no queue worker runs in
-// production yet, and this is sent in a small synchronous loop over
-// activated residents from the "Save & Notify" Filament action.
-class PrivacyPolicyUpdatedMail extends Mailable
+// Queued, unlike the other Mailables in this app (see AccountActivatedMail):
+// "Save & Notify Residents" sends this to every activated resident in one
+// go, and sending that many synchronously inside a single admin request was
+// slow enough to invite a duplicate click (and duplicate sends) - see
+// PrivacyPolicy::saveAndNotify(). Drained by the `queue:work
+// --stop-when-empty` scheduled task in routes/console.php (QUEUE_CONNECTION
+// is 'database'; there's still no persistent queue worker process).
+class PrivacyPolicyUpdatedMail extends Mailable implements ShouldQueue
 {
     use Queueable, RendersInlinedMail, SerializesModels;
 

@@ -17,6 +17,13 @@ it('logs every mail sent, regardless of which Mailable sent it', function () {
 
     Mail::to($user)->send(new AccountActivatedMail($user));
 
+    // Not just first(): LogSentEmail was previously wired up twice (once by
+    // Laravel's event auto-discovery, once by an explicit Event::listen() in
+    // AppServiceProvider), silently double-inserting a row per mail sent -
+    // reported as duplicate entries in production. first() alone wouldn't
+    // have caught that.
+    expect(SentEmail::count())->toBe(1);
+
     $entry = SentEmail::first();
 
     expect($entry)->not->toBeNull()

@@ -140,18 +140,24 @@ class PrivacyPolicy extends Page
 
         $notified = 0;
 
+        // Queued, not sent synchronously - see PrivacyPolicyUpdatedMail and
+        // the `queue:work --stop-when-empty` scheduled task in
+        // routes/console.php that drains it. A synchronous loop over every
+        // activated resident held this request open long enough that an
+        // admin with no visible progress would click the button again,
+        // firing the whole loop a second time.
         User::query()
             ->whereNotNull('activated_at')
             ->cursor()
             ->each(function (User $user) use (&$notified) {
-                Mail::to($user)->send(new PrivacyPolicyUpdatedMail($user));
+                Mail::to($user)->queue(new PrivacyPolicyUpdatedMail($user));
                 $notified++;
             });
 
         Notification::make()
             ->success()
             ->title('Privacy policy saved')
-            ->body("Notified {$notified} activated resident(s) to re-accept it.")
+            ->body("Queued a notification for {$notified} activated resident(s) to re-accept it.")
             ->send();
     }
 
@@ -205,7 +211,13 @@ class PrivacyPolicy extends Page
                 ->icon(Heroicon::Envelope)
                 ->requiresConfirmation()
                 ->modalDescription('This saves your changes and emails every activated resident that they need to re-accept the privacy policy.')
-                ->action('saveAndNotify'),
+                // Must be a closure, not the bare method name string: a
+                // string action bypasses Filament's whole confirmation/
+                // mountAction pipeline (it wires the button straight to
+                // wire:click="saveAndNotify"), which was silently skipping
+                // requiresConfirmation() above entirely - see
+                // Action::getLivewireClickHandler()'s is_string() branch.
+                ->action(fn () => $this->saveAndNotify()),
         ];
     }
 }
