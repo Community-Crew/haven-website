@@ -4,6 +4,10 @@ use App\Mail\PrivacyPolicyUpdatedMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
+// PrivacyPolicyUpdatedMail implements ShouldQueue, so ->send() below queues
+// it rather than sending synchronously - assert against assertQueued(), not
+// assertSent(). ->render() still works fine on a faked/queued mailable.
+
 it('sends in the user\'s locale', function () {
     Mail::fake();
 
@@ -15,7 +19,7 @@ it('sends in the user\'s locale', function () {
 
     Mail::to($user)->send(new PrivacyPolicyUpdatedMail($user));
 
-    Mail::assertSent(PrivacyPolicyUpdatedMail::class, function (PrivacyPolicyUpdatedMail $mail) {
+    Mail::assertQueued(PrivacyPolicyUpdatedMail::class, function (PrivacyPolicyUpdatedMail $mail) {
         $rendered = $mail->render();
 
         return str_contains($rendered, 'privacybeleid')
@@ -34,5 +38,5 @@ it('falls back to english when the user prefers it', function () {
 
     Mail::to($user)->send(new PrivacyPolicyUpdatedMail($user));
 
-    Mail::assertSent(PrivacyPolicyUpdatedMail::class, fn (PrivacyPolicyUpdatedMail $mail) => str_contains($mail->render(), 'privacy policy'));
+    Mail::assertQueued(PrivacyPolicyUpdatedMail::class, fn (PrivacyPolicyUpdatedMail $mail) => str_contains($mail->render(), 'privacy policy'));
 });

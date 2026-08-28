@@ -65,9 +65,10 @@ it('saves without emailing anyone', function () {
 
     expect(PrivacyPolicy::current()->content)->toBe('<p>Plain save.</p>');
     Mail::assertNothingSent();
+    Mail::assertNothingQueued();
 });
 
-it('saves and emails every activated resident on Save & Notify, skipping unactivated ones', function () {
+it('saves and queues a notification to every activated resident via the Save & Notify action, skipping unactivated ones', function () {
     actingAsPrivacyPolicyAdmin();
     Mail::fake();
 
@@ -81,14 +82,21 @@ it('saves and emails every activated resident on Save & Notify, skipping unactiv
         'keycloak_id' => 'kc-privacy-unactivated',
     ]);
 
+    // callAction() (not ->call('saveAndNotify') directly) goes through
+    // Filament's real mountAction/action pipeline, the same one a browser
+    // click uses - this is what actually caught the ->action('saveAndNotify')
+    // string-vs-closure bug (a string action silently never runs at all
+    // through this pipeline, see Action::getLivewireClickHandler()).
     Livewire::test(PrivacyPolicyPage::class)
         ->set('data.content', '<p>New terms.</p>')
-        ->call('saveAndNotify');
+        ->callAction('saveAndNotify');
 
     expect(PrivacyPolicy::current()->content)->toBe('<p>New terms.</p>');
 
-    Mail::assertSent(PrivacyPolicyUpdatedMail::class, function (PrivacyPolicyUpdatedMail $mail) use ($activated) {
+    // Queued, not sent synchronously - see PrivacyPolicyUpdatedMail.
+    Mail::assertQueued(PrivacyPolicyUpdatedMail::class, function (PrivacyPolicyUpdatedMail $mail) use ($activated) {
         return $mail->user->is($activated);
     });
-    Mail::assertSentCount(1);
+    Mail::assertQueuedCount(1);
+    Mail::assertNothingSent();
 });
