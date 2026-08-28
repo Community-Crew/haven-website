@@ -2,10 +2,8 @@
 
 namespace App\Providers;
 
-use App\Listeners\LogSentEmail;
 use App\Policies\ActivityPolicy;
 use App\Providers\auth\KeycloakProvider;
-use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -36,7 +34,9 @@ class AppServiceProvider extends ServiceProvider
         // policy discovery (App\Models\X -> App\Policies\XPolicy) can't find it.
         Gate::policy(Activity::class, ActivityPolicy::class);
 
-        // Logs every outbound mail to sent_emails - see LogSentEmail.
-        Event::listen(MessageSent::class, LogSentEmail::class);
+        // Logs every outbound mail to sent_emails - see App\Listeners\LogSentEmail.
+        // Also auto-discovered (typed MessageSent parameter on handle()), same as
+        // LogAuthenticationEvents above - this explicit registration was a
+        // duplicate, silently double-inserting a SentEmail row per mail sent.
     }
 }
