@@ -56,13 +56,18 @@ Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])
     Route::middleware([EnsureUserAcceptedPrivacyPolicy::class, EnsureUserIsActivated::class])->group(function () {
         // Reservation
         Route::get('/reservations/me', ReservationController::class)->name('user.reservations.index');
-        Route::post('/reservations', ReservationStoreController::class)->name('reservations.store');
-        Route::patch('/reservations/{reservation}/cancel', ReservationCancelController::class)->name('reservations.cancel');
-        Route::put('/reservations/{reservation}', [ReservationUpdateController::class, '__invoke'])->name('reservations.update');
+        Route::post('/reservations', ReservationStoreController::class)->name('reservations.store')
+            ->middleware('throttle:reservation-writes');
+        Route::patch('/reservations/{reservation}/cancel', ReservationCancelController::class)->name('reservations.cancel')
+            ->middleware('throttle:reservation-writes');
+        Route::put('/reservations/{reservation}', [ReservationUpdateController::class, '__invoke'])->name('reservations.update')
+            ->middleware('throttle:reservation-writes');
 
         // Rooms
         Route::get('/rooms/{room:id}/reservations',
-            RoomReservationIndexController::class)->name('rooms.reservations.index');
-        Route::get('/rooms/{room:id}/weekly-schedule', RoomPolicyController::class)->name('rooms.policy.index');
+            RoomReservationIndexController::class)->name('rooms.reservations.index')
+            ->middleware('throttle:reservation-reads');
+        Route::get('/rooms/{room:id}/weekly-schedule', RoomPolicyController::class)->name('rooms.policy.index')
+            ->middleware('throttle:reservation-reads');
     });
 });
