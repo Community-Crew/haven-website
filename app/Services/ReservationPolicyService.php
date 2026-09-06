@@ -13,7 +13,7 @@ class ReservationPolicyService
 {
     public function getUserPolicies(Carbon $date, Room $room): Collection
     {
-        $days = (int) $date->copy()->diffInDays(Carbon::now()->startOfDay(), true);
+        $days = (int) $date->copy()->diffInDays($this->effectiveToday(), true);
         $dayOfWeek = $date->dayOfWeek;
 
         $user = Auth::user();
@@ -54,6 +54,25 @@ class ReservationPolicyService
             });
 
         return $this->mergeEntries($entries);
+    }
+
+    /**
+     * The "today" used for the max_days_in_advance countdown. Once the
+     * clock passes reservations.window_open_time, tomorrow's slots unlock
+     * early - so from that point on, "today" for this calculation is
+     * treated as tomorrow. Configurable via RESERVATION_WINDOW_OPEN_TIME
+     * (defaults to 20:00; was implicitly midnight before this existed).
+     */
+    protected function effectiveToday(): Carbon
+    {
+        $now = Carbon::now();
+        $openBoundary = $now->copy()->setTimeFromTimeString(
+            config('reservations.window_open_time', '20:00')
+        );
+
+        return $now->greaterThanOrEqualTo($openBoundary)
+            ? $now->copy()->startOfDay()->addDay()
+            : $now->copy()->startOfDay();
     }
 
     protected function mergeEntries(Collection $entries): Collection
