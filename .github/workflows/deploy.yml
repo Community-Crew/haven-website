@@ -77,6 +77,7 @@ jobs:
           cd /var/www/haven-api
           git fetch origin production
           git reset --hard origin/production
+          (git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD) > storage/app/version.txt
           composer install --no-dev --optimize-autoloader --no-interaction
           php artisan config:clear
           php artisan migrate --force
