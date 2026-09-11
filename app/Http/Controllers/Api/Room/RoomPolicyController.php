@@ -28,6 +28,11 @@ class RoomPolicyController extends Controller
         return response()->json([
             'success' => true,
             'data' => $weeklySchedule,
+            // Lets the frontend replicate the max_days_in_advance countdown
+            // using the same "today" the backend enforces, instead of
+            // recomputing it from calendar midnight - see
+            // ReservationPolicyService::effectiveToday().
+            'effective_today' => $this->policyService->effectiveToday()->toDateString(),
         ]);
     }
 }
