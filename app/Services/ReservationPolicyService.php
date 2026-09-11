@@ -62,8 +62,13 @@ class ReservationPolicyService
      * early - so from that point on, "today" for this calculation is
      * treated as tomorrow. Configurable via RESERVATION_WINDOW_OPEN_TIME
      * (defaults to 20:00; was implicitly midnight before this existed).
+     *
+     * Public so callers (e.g. RoomPolicyController) can expose it to the
+     * frontend, which otherwise has no way to know the window already
+     * rolled over and would keep showing tomorrow's slots as locked until
+     * real midnight.
      */
-    protected function effectiveToday(): Carbon
+    public function effectiveToday(): Carbon
     {
         $now = Carbon::now();
         $openBoundary = $now->copy()->setTimeFromTimeString(
