@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Contracts\Permission as PermissionContract;
+use Spatie\Permission\Contracts\Role as RoleContract;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasLocalePreference
@@ -35,7 +38,6 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         'activated_at',
         'locale',
         'privacy_policy_accepted_at',
-
     ];
 
     protected $casts = [
@@ -104,6 +106,11 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         return $this->hasMany(Membership::class);
     }
 
+    public function boardPositionSignatures(): HasMany
+    {
+        return $this->hasMany(BoardPositionSignature::class);
+    }
+
     /**
      * The membership that's still open (pending/active/suspended), if any -
      * there's at most one at a time, see MembershipForm.
@@ -119,6 +126,49 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
     {
         // TODO: Implement canAccessPanel() method.
         return true;
+    }
+
+    /**
+     * Overrides Spatie's HasPermissions::hasPermissionViaRole() - the
+     * method every permission check ($user->can('Some:Permission')) runs
+     * through via PermissionRegistrar::registerPermissions()'s Gate::before
+     * hook - to exclude roles that are NDA-gated (they're some
+     * BoardPosition's shield_role_id, and that position requires_nda) and
+     * not yet satisfied by this user.
+     *
+     * Deliberately doesn't touch role *membership* - hasRole('Voorzitter')
+     * still returns true regardless of NDA status, only checked here,
+     * scoped to this one permission's candidate roles. A permission also
+     * reachable via another, non-gated role is unaffected.
+     */
+    protected function hasPermissionViaRole(PermissionContract $permission): bool
+    {
+        if ($this instanceof RoleContract) {
+            return false;
+        }
+
+        $usableRoles = $permission->roles->reject(
+            fn (Role $role) => $this->isRoleSuppressedByNda($role)
+        );
+
+        return $this->hasRole($usableRoles);
+    }
+
+    /**
+     * Deliberately not cached: this needs to be live (unmarking a
+     * signature must affect the very next permission check, even against
+     * the same already-loaded User instance - a queue worker/artisan
+     * command run, or a Pest test, could easily do exactly that within one
+     * process). It's one cheap indexed query either way - Spatie's own
+     * permission/role data is already cached separately from this.
+     */
+    private function isRoleSuppressedByNda(Role $role): bool
+    {
+        $position = BoardPosition::where('shield_role_id', $role->getKey())
+            ->where('requires_nda', true)
+            ->first();
+
+        return $position !== null && ! $position->ndaSatisfiedFor($this);
     }
 
     /**

@@ -28,8 +28,13 @@ class MembershipInfolist
                     ->placeholder('-'),
                 IconEntry::make('has_voting_rights')
                     ->boolean(),
-                TextEntry::make('board_role')
+                TextEntry::make('boardPosition.name')
+                    ->label('Board position')
                     ->placeholder('-'),
+                IconEntry::make('is_public')
+                    ->label('Public')
+                    ->visible(fn ($record) => $record->board_position_id !== null)
+                    ->boolean(),
                 TextEntry::make('notes')
                     ->placeholder('-')
                     ->columnSpanFull(),

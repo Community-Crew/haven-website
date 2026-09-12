@@ -48,11 +48,41 @@ class MembershipForm
                     ->after('joined_at'),
                 Toggle::make('has_voting_rights')
                     ->default(true),
-                TextInput::make('board_role')
-                    ->helperText('E.g. Chair, Secretary, Treasurer - leave blank for a regular member.'),
+                ...self::boardPositionComponents(),
                 Textarea::make('notes')
                     ->columnSpanFull(),
             ]);
+    }
+
+    /**
+     * Shared by MembershipForm and MembershipsRelationManager: board
+     * position assignment, plus is_public/sort_order which only make sense
+     * once a position is actually picked. The role grant/revoke this
+     * triggers happens in MembershipObserver, not here - this only sets
+     * the column.
+     *
+     * @return array<int, Select|Toggle|TextInput>
+     */
+    public static function boardPositionComponents(): array
+    {
+        return [
+            Select::make('board_position_id')
+                ->label('Board position')
+                ->relationship('boardPosition', 'name', fn ($query) => $query->orderBy('sort_order'))
+                ->searchable()
+                ->preload()
+                ->live()
+                ->helperText('Leave blank for a regular member.'),
+            Toggle::make('is_public')
+                ->label('Show on public board page')
+                ->default(true)
+                ->visible(fn (Get $get) => filled($get('board_position_id'))),
+            TextInput::make('sort_order')
+                ->label('Display order')
+                ->numeric()
+                ->default(0)
+                ->visible(fn (Get $get) => filled($get('board_position_id'))),
+        ];
     }
 
     /**
