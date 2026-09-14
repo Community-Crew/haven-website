@@ -111,6 +111,11 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         return $this->hasMany(BoardPositionSignature::class);
     }
 
+    public function boardPositionAssignments(): HasMany
+    {
+        return $this->hasMany(BoardPositionAssignment::class);
+    }
+
     /**
      * The membership that's still open (pending/active/suspended), if any -
      * there's at most one at a time, see MembershipForm.

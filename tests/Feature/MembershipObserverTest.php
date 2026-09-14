@@ -2,6 +2,7 @@
 
 use App\Mail\MembershipStatusChangedMail;
 use App\Models\BoardPosition;
+use App\Models\BoardPositionAssignment;
 use App\Models\Membership;
 use App\Models\MemberType;
 use App\Models\User;
@@ -55,60 +56,52 @@ it('does not mail when nothing but status stays the same', function () {
     Mail::assertNotSent(MembershipStatusChangedMail::class);
 });
 
-it('grants the position role when an open membership is created with one', function () {
-    $role = Role::create(['name' => 'chair-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
-    $position = BoardPosition::create(['name' => 'Chair', 'shield_role_id' => $role->id]);
-
-    Membership::create([
-        'user_id' => $this->user->id,
-        'member_type_id' => $this->memberType->id,
-        'status' => 'active',
-        'board_position_id' => $position->id,
-    ]);
-
-    expect($this->user->fresh()->hasRole($role))->toBeTrue();
-});
-
-it('revokes the position role when the membership ends', function () {
-    $role = Role::create(['name' => 'chair-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
-    $position = BoardPosition::create(['name' => 'Chair', 'shield_role_id' => $role->id]);
+it('ends every active board position when the membership status leaves open', function () {
+    $chairRole = Role::create(['name' => 'chair-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
+    $treasurerRole = Role::create(['name' => 'treasurer-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
+    $chair = BoardPosition::create(['name' => 'Chair', 'shield_role_id' => $chairRole->id]);
+    $treasurer = BoardPosition::create(['name' => 'Treasurer', 'shield_role_id' => $treasurerRole->id]);
 
     $membership = Membership::create([
         'user_id' => $this->user->id,
         'member_type_id' => $this->memberType->id,
         'status' => 'active',
-        'board_position_id' => $position->id,
     ]);
 
-    expect($this->user->fresh()->hasRole($role))->toBeTrue();
+    $chairAssignment = BoardPositionAssignment::create(['user_id' => $this->user->id, 'board_position_id' => $chair->id]);
+    $treasurerAssignment = BoardPositionAssignment::create(['user_id' => $this->user->id, 'board_position_id' => $treasurer->id]);
+
+    expect($this->user->fresh()->hasRole($chairRole))->toBeTrue()
+        ->and($this->user->fresh()->hasRole($treasurerRole))->toBeTrue();
 
     $membership->update(['status' => 'ended']);
 
-    expect($this->user->fresh()->hasRole($role))->toBeFalse();
+    expect($this->user->fresh()->hasRole($chairRole))->toBeFalse()
+        ->and($this->user->fresh()->hasRole($treasurerRole))->toBeFalse()
+        ->and($chairAssignment->fresh()->ended_at)->not->toBeNull()
+        ->and($treasurerAssignment->fresh()->ended_at)->not->toBeNull();
 });
 
-it('swaps roles when a membership moves to a different board position', function () {
-    $oldRole = Role::create(['name' => 'coordinator-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
-    $newRole = Role::create(['name' => 'treasurer-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
-    $oldPosition = BoardPosition::create(['name' => 'Coordinator', 'shield_role_id' => $oldRole->id]);
-    $newPosition = BoardPosition::create(['name' => 'Treasurer', 'shield_role_id' => $newRole->id]);
+it('does not touch board positions when the status change keeps the membership open', function () {
+    $role = Role::create(['name' => 'chair-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
+    $position = BoardPosition::create(['name' => 'Chair', 'shield_role_id' => $role->id]);
 
     $membership = Membership::create([
         'user_id' => $this->user->id,
         'member_type_id' => $this->memberType->id,
-        'status' => 'active',
-        'board_position_id' => $oldPosition->id,
+        'status' => 'pending',
     ]);
 
-    $membership->update(['board_position_id' => $newPosition->id]);
+    $assignment = BoardPositionAssignment::create(['user_id' => $this->user->id, 'board_position_id' => $position->id]);
 
-    $freshUser = $this->user->fresh();
+    // pending -> active is still "open" both before and after.
+    $membership->update(['status' => 'active']);
 
-    expect($freshUser->hasRole($oldRole))->toBeFalse()
-        ->and($freshUser->hasRole($newRole))->toBeTrue();
+    expect($assignment->fresh()->ended_at)->toBeNull()
+        ->and($this->user->fresh()->hasRole($role))->toBeTrue();
 });
 
-it('revokes the position role when a membership holding one is deleted', function () {
+it('ends active board positions when a membership holding open status is deleted', function () {
     $role = Role::create(['name' => 'chair-'.uniqid(), 'keycloak_group_id' => 'kc-'.uniqid()]);
     $position = BoardPosition::create(['name' => 'Chair', 'shield_role_id' => $role->id]);
 
@@ -116,10 +109,12 @@ it('revokes the position role when a membership holding one is deleted', functio
         'user_id' => $this->user->id,
         'member_type_id' => $this->memberType->id,
         'status' => 'active',
-        'board_position_id' => $position->id,
     ]);
+
+    $assignment = BoardPositionAssignment::create(['user_id' => $this->user->id, 'board_position_id' => $position->id]);
 
     $membership->delete();
 
-    expect($this->user->fresh()->hasRole($role))->toBeFalse();
+    expect($this->user->fresh()->hasRole($role))->toBeFalse()
+        ->and($assignment->fresh()->ended_at)->not->toBeNull();
 });

@@ -2,19 +2,19 @@
 
 namespace App\Observers;
 
-use App\Enums\MembershipStatus;
+use App\Models\BoardPositionAssignment;
 use App\Models\BoardPositionSignature;
-use App\Models\Membership;
 
 /**
  * BoardPosition::grantRoleFor() already refuses to grant a requires_nda
  * position's role/Keycloak group until ndaSatisfiedFor() is true, which
- * covers a fresh membership assignment. This observer handles the other
+ * covers a fresh BoardPositionAssignment. This observer handles the other
  * direction - a signature being (un)marked or deleted after the position
  * was already assigned - by re-running grant/revoke for whichever
- * currently-open membership holds that exact position. A user only ever
- * has one open membership at a time (Membership::hasOpenMembershipFor()'s
- * invariant), so there's at most one to resync.
+ * currently-active BoardPositionAssignment holds that exact position. A
+ * user can hold a given position at most once at a time (enforced at the
+ * BoardPositionAssignmentResource form layer, not a DB constraint), so
+ * there's at most one to resync.
  */
 class BoardPositionSignatureObserver
 {
@@ -40,30 +40,30 @@ class BoardPositionSignatureObserver
             return;
         }
 
-        $this->openMembershipHolding($signature)?->boardPosition?->revokeRoleFor($signature->user);
+        $this->activeAssignmentHolding($signature)?->boardPosition?->revokeRoleFor($signature->user);
     }
 
     private function resync(BoardPositionSignature $signature): void
     {
-        $membership = $this->openMembershipHolding($signature);
+        $assignment = $this->activeAssignmentHolding($signature);
 
-        if (! $membership) {
+        if (! $assignment) {
             return;
         }
 
         if ($signature->signed_at) {
-            $membership->boardPosition->grantRoleFor($signature->user);
+            $assignment->boardPosition->grantRoleFor($signature->user);
         } else {
-            $membership->boardPosition->revokeRoleFor($signature->user);
+            $assignment->boardPosition->revokeRoleFor($signature->user);
         }
     }
 
-    private function openMembershipHolding(BoardPositionSignature $signature): ?Membership
+    private function activeAssignmentHolding(BoardPositionSignature $signature): ?BoardPositionAssignment
     {
-        return Membership::query()
+        return BoardPositionAssignment::query()
             ->where('user_id', $signature->user_id)
             ->where('board_position_id', $signature->board_position_id)
-            ->whereIn('status', array_map(fn (MembershipStatus $status) => $status->value, MembershipStatus::open()))
+            ->whereNull('ended_at')
             ->with('boardPosition')
             ->first();
     }

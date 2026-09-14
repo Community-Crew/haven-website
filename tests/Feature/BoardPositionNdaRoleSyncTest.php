@@ -1,9 +1,8 @@
 <?php
 
 use App\Models\BoardPosition;
+use App\Models\BoardPositionAssignment;
 use App\Models\BoardPositionSignature;
-use App\Models\Membership;
-use App\Models\MemberType;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Spatie\Permission\Models\Role;
@@ -28,8 +27,6 @@ beforeEach(function () {
         'keycloak_id' => 'kc-'.uniqid(),
     ]);
 
-    $this->memberType = MemberType::create(['name' => 'Regular']);
-
     // keycloak_group_id pre-set so RoleObserver::created()'s guard skips
     // its own Keycloak group-provisioning call for this test role.
     $this->role = Role::create(['name' => 'gated-role-'.uniqid(), 'keycloak_group_id' => 'kc-group-'.uniqid()]);
@@ -41,10 +38,8 @@ beforeEach(function () {
 });
 
 it('does not grant the role or sync Keycloak when an NDA-gated position is assigned unsigned', function () {
-    Membership::create([
+    BoardPositionAssignment::create([
         'user_id' => $this->user->id,
-        'member_type_id' => $this->memberType->id,
-        'status' => 'active',
         'board_position_id' => $this->position->id,
     ]);
 
@@ -54,10 +49,8 @@ it('does not grant the role or sync Keycloak when an NDA-gated position is assig
 });
 
 it('grants the role and syncs Keycloak once the NDA signature is created signed', function () {
-    Membership::create([
+    BoardPositionAssignment::create([
         'user_id' => $this->user->id,
-        'member_type_id' => $this->memberType->id,
-        'status' => 'active',
         'board_position_id' => $this->position->id,
     ]);
 
@@ -74,10 +67,8 @@ it('grants the role and syncs Keycloak once the NDA signature is created signed'
 });
 
 it('grants the role retroactively when an existing unsigned signature is marked signed', function () {
-    Membership::create([
+    BoardPositionAssignment::create([
         'user_id' => $this->user->id,
-        'member_type_id' => $this->memberType->id,
-        'status' => 'active',
         'board_position_id' => $this->position->id,
     ]);
 
@@ -95,10 +86,8 @@ it('grants the role retroactively when an existing unsigned signature is marked 
 });
 
 it('revokes the role and Keycloak group when the signature is unmarked', function () {
-    Membership::create([
+    BoardPositionAssignment::create([
         'user_id' => $this->user->id,
-        'member_type_id' => $this->memberType->id,
-        'status' => 'active',
         'board_position_id' => $this->position->id,
     ]);
 
@@ -119,10 +108,8 @@ it('revokes the role and Keycloak group when the signature is unmarked', functio
 });
 
 it('revokes the role when a signed signature is deleted', function () {
-    Membership::create([
+    BoardPositionAssignment::create([
         'user_id' => $this->user->id,
-        'member_type_id' => $this->memberType->id,
-        'status' => 'active',
         'board_position_id' => $this->position->id,
     ]);
 
@@ -142,10 +129,8 @@ it('revokes the role when a signed signature is deleted', function () {
 it('does not gate a position that does not require an NDA', function () {
     $this->position->update(['requires_nda' => false]);
 
-    Membership::create([
+    BoardPositionAssignment::create([
         'user_id' => $this->user->id,
-        'member_type_id' => $this->memberType->id,
-        'status' => 'active',
         'board_position_id' => $this->position->id,
     ]);
 
