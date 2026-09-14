@@ -51,7 +51,6 @@ class MembershipsRelationManager extends RelationManager
                     ->after('joined_at'),
                 Toggle::make('has_voting_rights')
                     ->default(true),
-                ...MembershipForm::boardPositionComponents(),
                 Textarea::make('notes')
                     ->columnSpanFull(),
             ]);
@@ -79,9 +78,6 @@ class MembershipsRelationManager extends RelationManager
                 IconColumn::make('has_voting_rights')
                     ->label('Voting')
                     ->boolean(),
-                TextColumn::make('boardPosition.name')
-                    ->label('Board position')
-                    ->placeholder('-'),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([

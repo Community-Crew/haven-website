@@ -44,9 +44,9 @@ class BoardPosition extends Model
         return $this->belongsTo(Role::class, 'shield_role_id');
     }
 
-    public function memberships(): HasMany
+    public function assignments(): HasMany
     {
-        return $this->hasMany(Membership::class);
+        return $this->hasMany(BoardPositionAssignment::class);
     }
 
     public function signatures(): HasMany
@@ -90,8 +90,8 @@ class BoardPosition extends Model
      * Keycloak group) to $user - but only once ndaSatisfiedFor() is true,
      * so an NDA-gated position's Keycloak group membership doesn't exist
      * until the NDA is actually signed. No-ops otherwise; the caller
-     * doesn't need to check first (MembershipObserver relies on this),
-     * and BoardPositionSignatureObserver re-runs this once signed to grant
+     * doesn't need to check first (BoardPositionAssignmentObserver relies
+     * on this), and BoardPositionSignatureObserver re-runs this once signed to grant
      * retroactively. User::hasPermissionViaRole()'s NDA check is a second,
      * independent layer on top of this - it still applies even if a role
      * ever ends up assigned some other way.

@@ -39,10 +39,6 @@ class MembershipsTable
                     ->label('Voting')
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('boardPosition.name')
-                    ->label('Board position')
-                    ->placeholder('-')
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
