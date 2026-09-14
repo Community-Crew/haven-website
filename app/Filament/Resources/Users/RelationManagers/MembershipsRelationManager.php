@@ -13,7 +13,6 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Utilities\Set;
@@ -52,8 +51,7 @@ class MembershipsRelationManager extends RelationManager
                     ->after('joined_at'),
                 Toggle::make('has_voting_rights')
                     ->default(true),
-                TextInput::make('board_role')
-                    ->helperText('E.g. Chair, Secretary, Treasurer - leave blank for a regular member.'),
+                ...MembershipForm::boardPositionComponents(),
                 Textarea::make('notes')
                     ->columnSpanFull(),
             ]);
@@ -81,7 +79,8 @@ class MembershipsRelationManager extends RelationManager
                 IconColumn::make('has_voting_rights')
                     ->label('Voting')
                     ->boolean(),
-                TextColumn::make('board_role')
+                TextColumn::make('boardPosition.name')
+                    ->label('Board position')
                     ->placeholder('-'),
             ])
             ->defaultSort('created_at', 'desc')

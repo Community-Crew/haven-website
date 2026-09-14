@@ -12,6 +12,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Size;
+use Spatie\Permission\Models\Role;
 
 class UserForm
 {
@@ -32,6 +33,24 @@ class UserForm
                     ->getOptionLabelFromRecordUsing(fn (Unit $record) => $record->name)
                     ->searchable()
                     ->preload(),
+                // Deliberately not ->relationship('roles', ...) - that
+                // auto-syncs the pivot directly on save, bypassing
+                // UserRoleSyncService entirely (and so skipping the
+                // Keycloak group add/remove it does). Plain ->options() +
+                // ->dehydrated(false) instead: EditUser::afterSave() diffs
+                // this against the record's original roles and calls
+                // addRole()/removeRole() per change.
+                Select::make('role_ids')
+                    ->label('Roles')
+                    ->multiple()
+                    ->options(fn () => Role::pluck('name', 'id'))
+                    ->searchable()
+                    ->preload()
+                    ->dehydrated(false)
+                    ->default(fn ($record) => $record?->roles->pluck('id')->all())
+                    ->helperText(fn ($record) => $record && ! $record->keycloak_id
+                        ? 'This user has no Keycloak account yet - role changes will only apply locally.'
+                        : null),
                 TextEntry::make('activation_status')
                     ->label('Status')
                     ->state(fn ($record) => $record?->activated_at

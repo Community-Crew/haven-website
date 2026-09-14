@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Observers\RoleObserver;
 use App\Policies\ActivityPolicy;
 use App\Providers\auth\KeycloakProvider;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use Spatie\Activitylog\Models\Activity;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,6 +45,8 @@ class AppServiceProvider extends ServiceProvider
         // duplicate, silently double-inserting a SentEmail row per mail sent.
 
         $this->configureReservationRateLimiters();
+
+        Role::observe(RoleObserver::class);
     }
 
     /**

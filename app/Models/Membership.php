@@ -28,7 +28,9 @@ class Membership extends Model
         'joined_at',
         'ended_at',
         'has_voting_rights',
-        'board_role',
+        'board_position_id',
+        'is_public',
+        'sort_order',
         'notes',
     ];
 
@@ -37,6 +39,8 @@ class Membership extends Model
         'joined_at' => 'date',
         'ended_at' => 'date',
         'has_voting_rights' => 'boolean',
+        'is_public' => 'boolean',
+        'sort_order' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -47,6 +51,11 @@ class Membership extends Model
     public function memberType(): BelongsTo
     {
         return $this->belongsTo(MemberType::class);
+    }
+
+    public function boardPosition(): BelongsTo
+    {
+        return $this->belongsTo(BoardPosition::class);
     }
 
     /**
