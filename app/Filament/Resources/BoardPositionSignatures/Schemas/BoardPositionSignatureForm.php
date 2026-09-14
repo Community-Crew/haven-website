@@ -51,14 +51,11 @@ class BoardPositionSignatureForm
                         ->size(Size::Small)
                         ->hidden(fn ($record) => $record?->signed_at !== null)
                         ->action(function ($record) {
-                            // No explicit re-grant needed: the role itself
-                            // is always assigned regardless of NDA status
-                            // (BoardPosition::grantRoleFor()) - only its
-                            // permissions are gated, live, by
-                            // User::hasPermissionViaRole()'s override
-                            // consulting BoardPosition::ndaSatisfiedFor().
-                            // Setting signed_at here is the whole effect;
-                            // the very next permission check picks it up.
+                            // No explicit re-grant needed here -
+                            // BoardPositionSignatureObserver reacts to the
+                            // signed_at change and grants the position's
+                            // role (and Keycloak group) for whichever open
+                            // membership currently holds it.
                             $record->update(['signed_at' => now()]);
 
                             Notification::make()
@@ -72,7 +69,7 @@ class BoardPositionSignatureForm
                         ->color('danger')
                         ->size(Size::Small)
                         ->requiresConfirmation()
-                        ->modalDescription('The role itself stays assigned, but its permissions become unusable again immediately (checked live - see User::hasPermissionViaRole()).')
+                        ->modalDescription('The position\'s role (and its Keycloak group membership) is revoked immediately - re-marking as signed later grants it again.')
                         ->hidden(fn ($record) => $record?->signed_at === null)
                         ->action(function ($record) {
                             $record->update(['signed_at' => null]);

@@ -66,10 +66,12 @@ class BoardPosition extends Model
 
     /**
      * Whether $user has cleared this position's NDA requirement - always
-     * true if the position doesn't require one. Doesn't gate role
-     * *assignment* (see grantRoleFor()) - it gates whether the role's
-     * permissions are actually usable, via User::hasPermissionViaRole()'s
-     * override, which calls this per-role on every permission check.
+     * true if the position doesn't require one. Consulted in two places:
+     * grantRoleFor() gates the role/Keycloak-group grant itself on it, and
+     * User::hasPermissionViaRole()'s override separately gates whether an
+     * already-held role's permissions are usable, live, on every permission
+     * check - a second layer that still applies if a role is ever assigned
+     * some other way (directly via Spatie, outside grantRoleFor()).
      */
     public function ndaSatisfiedFor(User $user): bool
     {
@@ -84,15 +86,19 @@ class BoardPosition extends Model
     }
 
     /**
-     * Grants this position's role to $user via UserRoleSyncService.
-     * Unconditional beyond having a role configured at all - a user always
-     * gets to *hold* the role; whether its permissions actually do anything
-     * is a separate, per-check concern (ndaSatisfiedFor(), consulted by
-     * User::hasPermissionViaRole()), not something enforced at grant time.
+     * Grants this position's role (and, via UserRoleSyncService, its
+     * Keycloak group) to $user - but only once ndaSatisfiedFor() is true,
+     * so an NDA-gated position's Keycloak group membership doesn't exist
+     * until the NDA is actually signed. No-ops otherwise; the caller
+     * doesn't need to check first (MembershipObserver relies on this),
+     * and BoardPositionSignatureObserver re-runs this once signed to grant
+     * retroactively. User::hasPermissionViaRole()'s NDA check is a second,
+     * independent layer on top of this - it still applies even if a role
+     * ever ends up assigned some other way.
      */
     public function grantRoleFor(User $user): void
     {
-        if (! $this->shieldRole) {
+        if (! $this->shieldRole || ! $this->ndaSatisfiedFor($user)) {
             return;
         }
 
