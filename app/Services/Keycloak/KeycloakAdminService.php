@@ -5,6 +5,8 @@ namespace App\Services\Keycloak;
 use App\Traits\LogsFailedHttpResponses;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 class KeycloakAdminService
 {
@@ -41,7 +43,27 @@ class KeycloakAdminService
 
             $this->throwIfFailed($response, 'Keycloak admin token fetch failed');
 
-            return $response->json('access_token');
+            $token = $response->json('access_token');
+
+            // A 2xx response isn't enough on its own - throwIfFailed() only
+            // checks the HTTP status, so a 200 with an unexpected body
+            // (misconfigured admin client, Keycloak API shape change, ...)
+            // would otherwise reach the `: string` return type below as
+            // null and TypeError there instead, which is a confusing shape
+            // for the best-effort callers (RoleObserver et al.) that catch
+            // Throwable and log it - they'd log a raw TypeError message
+            // indistinguishable from an unrelated bug, instead of this
+            // being clearly a Keycloak-response problem.
+            if (! is_string($token) || $token === '') {
+                Log::warning('Keycloak admin token response missing access_token', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                throw new RuntimeException('Keycloak admin token response missing access_token');
+            }
+
+            return $token;
         });
     }
 
