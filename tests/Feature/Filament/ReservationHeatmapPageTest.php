@@ -80,6 +80,32 @@ it('renders the combined heatmap for the last 3 months, ignoring old and non-app
         ->assertSee('1 approved reservation(s) in the last 3 months');
 });
 
+it('lights up every hour a reservation spans, not just its start hour', function () {
+    $admin = actingAsReservationHeatmapAdmin();
+
+    $room = makeHeatmapRoom('Werkplaats', 'werkplaats');
+
+    $start = now()->subWeek()->setTime(14, 0);
+
+    Reservation::factory()->create([
+        'user_id' => $admin->id,
+        'room_id' => $room->id,
+        'status' => 'approved',
+        'start_at' => $start,
+        'end_at' => $start->copy()->addHours(2),
+    ]);
+
+    $grid = Livewire::test(ReservationHeatmapPage::class)
+        ->instance()
+        ->getCombinedHeatmap()['grid'];
+
+    $day = $start->dayOfWeekIso - 1;
+
+    expect($grid[$day][14])->toBe(1)
+        ->and($grid[$day][15])->toBe(1)
+        ->and($grid[$day][16])->toBe(0);
+});
+
 it('shows a small-multiples heatmap card per room', function () {
     $admin = actingAsReservationHeatmapAdmin();
 

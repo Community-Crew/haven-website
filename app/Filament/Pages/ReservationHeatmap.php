@@ -9,13 +9,16 @@ use BackedEnum;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use UnitEnum;
 
 /**
- * Day-of-week x hour-of-day heatmap of approved reservations over the last
- * few months: a combined view across all rooms, plus a small-multiples grid
- * of every individual room.
+ * Day-of-week x hour-of-day *occupation* heatmap over the last few months: a
+ * combined view across all rooms, plus a small-multiples grid of every
+ * individual room. Every hour a reservation spans counts, not just its
+ * start hour - a 14:00-16:00 booking lights up both the 14:00 and 15:00
+ * cells.
  *
  * The hour range shown is derived from the combined data (padded by an hour
  * on each side) rather than hardcoded, since opening hours vary per room/role
@@ -88,29 +91,48 @@ class ReservationHeatmap extends Page
     {
         $since = now()->subMonths($this->months)->startOfDay();
 
-        $startTimes = Reservation::query()
+        $reservations = Reservation::query()
             ->where('status', ReservationStatus::APPROVED)
             ->where('start_at', '>=', $since)
             ->when($roomId, fn ($query) => $query->where('room_id', $roomId))
-            ->pluck('start_at');
+            ->get(['start_at', 'end_at']);
 
         $grid = array_fill(0, 7, array_fill(0, 24, 0));
         $max = 0;
 
-        foreach ($startTimes as $startAt) {
-            $day = $startAt->dayOfWeekIso - 1; // 0 = Monday .. 6 = Sunday
-            $hour = $startAt->hour;
-
-            $grid[$day][$hour]++;
-            $max = max($max, $grid[$day][$hour]);
+        foreach ($reservations as $reservation) {
+            foreach ($this->occupiedSlots($reservation->start_at, $reservation->end_at) as [$day, $hour]) {
+                $grid[$day][$hour]++;
+                $max = max($max, $grid[$day][$hour]);
+            }
         }
 
         return [
             'grid' => $grid,
             'colors' => $this->colorGrid($grid, $max),
             'max' => $max,
-            'total' => $startTimes->count(),
+            'total' => $reservations->count(),
         ];
+    }
+
+    /**
+     * Every hour slot (as [dayIndex, hour] pairs, 0 = Monday) a reservation
+     * occupies, one per hour between start and end - a 14:00-16:00 booking
+     * yields the 14:00 and 15:00 slots.
+     *
+     * @return list<array{0: int, 1: int}>
+     */
+    protected function occupiedSlots(Carbon $start, Carbon $end): array
+    {
+        $slots = [];
+        $cursor = $start->copy()->startOfHour();
+
+        while ($cursor->lt($end)) {
+            $slots[] = [$cursor->dayOfWeekIso - 1, $cursor->hour];
+            $cursor->addHour();
+        }
+
+        return $slots;
     }
 
     /**
