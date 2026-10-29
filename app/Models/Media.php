@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -29,7 +30,20 @@ class Media extends Model
 
     public const QUALITY = 82;
 
+    /**
+     * Collections holding residents' own uploads (e.g. check-in/out photos
+     * of a room). Never offered for reuse or re-linked from the admin
+     * pickers - doing so would detach the photo from its check (destroying
+     * the evidence) and could surface it publicly as a cover image.
+     */
+    public const PRIVATE_COLLECTIONS = [ReservationCheck::PHOTO_COLLECTION];
+
     protected $table = 'media';
+
+    public function scopeReusable(Builder $query): Builder
+    {
+        return $query->whereNotIn('collection', self::PRIVATE_COLLECTIONS);
+    }
 
     protected $fillable = [
         'uuid',
