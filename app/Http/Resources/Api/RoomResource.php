@@ -63,6 +63,14 @@ class RoomResource extends JsonResource
              * @example "https://fsn1.your-objectstorage.com/havencommunity/placeholder.gif?[...]576"
              */
             'image_url' => $this->image_url,
+
+            /**
+             * An example photo showing residents what angle/framing to use
+             * for their check-in/check-out photo. Null if none was set.
+             *
+             * @example "https://fsn1.your-objectstorage.com/havencommunity/example.jpg?[...]576"
+             */
+            'checkin_example_photo_urls' => $this->checkin_example_photo_urls,
         ];
     }
 }

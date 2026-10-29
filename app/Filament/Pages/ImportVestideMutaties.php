@@ -31,7 +31,7 @@ class ImportVestideMutaties extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowUpTray;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Members';
+    protected static string|UnitEnum|null $navigationGroup = 'Property';
 
     protected static ?string $navigationLabel = 'Import Mutaties';
 

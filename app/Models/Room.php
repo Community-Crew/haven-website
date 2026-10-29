@@ -8,11 +8,13 @@ use App\Traits\HasCoverMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 /**
  * @property-read string|null $image_url
+ * @property-read array<int, string> $checkin_example_photo_urls
  */
 class Room extends Model
 {
@@ -37,7 +39,9 @@ class Room extends Model
      */
     protected string $coverMediaCollection = 'rooms-cover';
 
-    protected $appends = ['image_url'];
+    public const CHECKIN_EXAMPLE_COLLECTION = 'rooms-checkin-example';
+
+    protected $appends = ['image_url', 'checkin_example_photo_urls'];
 
     public function getSlugOptions(): SlugOptions
     {
@@ -59,6 +63,18 @@ class Room extends Model
     public function reservationPolicies(): BelongsToMany
     {
         return $this->belongsToMany(ReservationPolicy::class);
+    }
+
+    public function checkinExamplePhotos(): MorphMany
+    {
+        return $this->morphMany(Media::class, 'mediable')
+            ->where('collection', self::CHECKIN_EXAMPLE_COLLECTION)
+            ->orderBy('created_at');
+    }
+
+    public function getCheckinExamplePhotoUrlsAttribute(): array
+    {
+        return $this->checkinExamplePhotos->pluck('url')->filter()->values()->all();
     }
 
     public function toArray()

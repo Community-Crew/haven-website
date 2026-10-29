@@ -6,6 +6,7 @@ use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +14,6 @@ use Illuminate\Support\Str;
 use Intervention\Image\Encoders\GifEncoder;
 use Intervention\Image\Encoders\WebpEncoder;
 use Intervention\Image\Laravel\Facades\Image;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Throwable;
 
 class Media extends Model
@@ -59,8 +59,12 @@ class Media extends Model
 
     /**
      * Resize/compress an uploaded file and store it as a new Media record.
-     * Shared by every upload path (rich-text attachments, cover images, ...)
-     * so they all get identical treatment.
+     * Shared by every upload path (rich-text attachments, cover images,
+     * plain API multipart uploads, ...) so they all get identical treatment.
+     *
+     * Typed against the plain Illuminate\Http\UploadedFile rather than
+     * Livewire's TemporaryUploadedFile (which extends it) so this also
+     * accepts uploads from ordinary API requests, not just Filament forms.
      *
      * Deliberately reads via $file->get() (a single GetObject) rather than
      * $file->getSize()/getMimeType()/getRealPath() - when the Livewire temp
@@ -69,7 +73,7 @@ class Media extends Model
      * result instead, with no further network round-trips.
      */
     public static function createFromUploadedFile(
-        TemporaryUploadedFile $file,
+        UploadedFile $file,
         string $collection,
         string $disk = 'hetzner',
         ?int $maxDimension = null,

@@ -24,7 +24,7 @@ class UnitResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHome;
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Members';
+    protected static string|null|\UnitEnum $navigationGroup = 'Property';
 
     public static function getGloballySearchableAttributes(): array
     {

@@ -7,6 +7,7 @@ use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Pages\ViewUser;
 use App\Filament\Resources\Users\RelationManagers\BoardPositionAssignmentsRelationManager;
 use App\Filament\Resources\Users\RelationManagers\MembershipsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ReservationsRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
@@ -22,6 +23,8 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static string|null|\UnitEnum $navigationGroup = 'Members';
+
+    protected static ?int $navigationSort = 1;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
@@ -47,6 +50,7 @@ class UserResource extends Resource
         return [
             MembershipsRelationManager::class,
             BoardPositionAssignmentsRelationManager::class,
+            ReservationsRelationManager::class,
         ];
     }
 

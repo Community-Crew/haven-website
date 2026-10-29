@@ -22,9 +22,18 @@ class BoardPositionResource extends Resource
 
     protected static ?string $navigationLabel = 'Board Positions';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Members';
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Identification;
+
+    /**
+     * No sidebar entry of its own - reached via the "Board Positions" button
+     * on the Board Position Assignments list instead (see
+     * ListBoardPositionAssignments::getHeaderActions()), since it's config
+     * for assignments rather than something browsed daily.
+     */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Schema $schema): Schema
     {

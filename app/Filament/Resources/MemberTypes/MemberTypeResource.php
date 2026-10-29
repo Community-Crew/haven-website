@@ -22,9 +22,17 @@ class MemberTypeResource extends Resource
 
     protected static ?string $navigationLabel = 'Member Types';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Members';
-
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Tag;
+
+    /**
+     * No sidebar entry of its own - reached via the "Member Types" button on
+     * the Memberships list instead (see ListMemberships::getHeaderActions()),
+     * since it's config for Memberships rather than something browsed daily.
+     */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public static function form(Schema $schema): Schema
     {

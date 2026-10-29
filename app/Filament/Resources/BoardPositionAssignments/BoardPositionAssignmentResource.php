@@ -29,7 +29,7 @@ class BoardPositionAssignmentResource extends Resource
 
     protected static ?string $modelLabel = 'board position assignment';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Members';
+    protected static string|null|\UnitEnum $navigationGroup = 'Board & Commissions';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
 

@@ -6,6 +6,8 @@ use App\Filament\Resources\Reservations\Pages\CreateReservation;
 use App\Filament\Resources\Reservations\Pages\EditReservation;
 use App\Filament\Resources\Reservations\Pages\ListReservations;
 use App\Filament\Resources\Reservations\Pages\ViewReservation;
+use App\Filament\Resources\Reservations\RelationManagers\ChecksRelationManager;
+use App\Filament\Resources\Reservations\RelationManagers\NotesRelationManager;
 use App\Filament\Resources\Reservations\Schemas\ReservationForm;
 use App\Filament\Resources\Reservations\Schemas\ReservationInfolist;
 use App\Filament\Resources\Reservations\Tables\ReservationsTable;
@@ -23,6 +25,8 @@ class ReservationResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
     protected static string|null|\UnitEnum $navigationGroup = 'Bookings';
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -44,7 +48,8 @@ class ReservationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ChecksRelationManager::class,
+            NotesRelationManager::class,
         ];
     }
 

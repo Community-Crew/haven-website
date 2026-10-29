@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Reservations\Schemas;
 
+use App\Filament\Resources\Users\UserResource;
+use App\Models\Reservation;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
@@ -17,7 +19,10 @@ class ReservationInfolist
                 TextEntry::make('room.name')
                     ->label('Room'),
                 TextEntry::make('user.name')
-                    ->label('User'),
+                    ->label('User')
+                    ->url(fn (Reservation $record) => $record->user && UserResource::canView($record->user)
+                        ? UserResource::getUrl('view', ['record' => $record->user])
+                        : null),
                 TextEntry::make('start_at')
                     ->dateTime('d/m/y H:i'),
                 TextEntry::make('end_at')
