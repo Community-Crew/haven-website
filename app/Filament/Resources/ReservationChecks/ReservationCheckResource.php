@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\ReservationChecks;
 
+use App\Enums\CheckVerificationStatus;
 use App\Filament\Resources\ReservationChecks\Pages\ListReservationChecks;
+use App\Filament\Resources\ReservationChecks\Pages\ReviewReservationChecks;
 use App\Filament\Resources\ReservationChecks\Pages\ViewReservationCheck;
 use App\Filament\Resources\ReservationChecks\Schemas\ReservationCheckInfolist;
 use App\Filament\Resources\ReservationChecks\Tables\ReservationChecksTable;
@@ -30,6 +32,18 @@ class ReservationCheckResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        $pending = ReservationCheck::query()->where('verification_status', CheckVerificationStatus::PENDING)->count();
+
+        return $pending > 0 ? (string) $pending : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function canCreate(): bool
     {
         return false;
@@ -56,6 +70,8 @@ class ReservationCheckResource extends Resource
     {
         return [
             'index' => ListReservationChecks::route('/'),
+            // Must come before 'view' so /review isn't captured as a {record}.
+            'review' => ReviewReservationChecks::route('/review'),
             'view' => ViewReservationCheck::route('/{record}'),
         ];
     }

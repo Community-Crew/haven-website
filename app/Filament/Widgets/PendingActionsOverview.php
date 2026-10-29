@@ -64,7 +64,7 @@ class PendingActionsOverview extends StatsOverviewWidget
                 ->descriptionIcon($flaggedChecks > 0 ? 'heroicon-o-flag' : null)
                 ->icon('heroicon-o-camera')
                 ->color($flaggedChecks > 0 ? 'danger' : ($pendingChecks > 0 ? 'warning' : 'gray'))
-                ->url(ReservationCheckResource::getUrl('index')),
+                ->url(ReservationCheckResource::getUrl('review')),
 
             Stat::make('Missed Check-outs (7d)', $missedCheckouts)
                 ->description($missedCheckouts > 0 ? 'Auto-rejected, no photo submitted' : null)

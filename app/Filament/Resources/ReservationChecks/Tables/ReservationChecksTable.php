@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ReservationChecks\Tables;
 
 use App\Enums\CheckVerificationStatus;
-use App\Mail\ReservationCheckRejectedMail;
 use App\Models\ReservationCheck;
+use App\Services\ReservationCheckService;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
@@ -14,7 +14,6 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Mail;
 
 class ReservationChecksTable
 {
@@ -72,12 +71,7 @@ class ReservationChecksTable
                     ->authorize('update')
                     ->visible(fn (ReservationCheck $record) => $record->verification_status !== CheckVerificationStatus::VERIFIED)
                     ->action(function (ReservationCheck $record) {
-                        $record->update([
-                            'verification_status' => CheckVerificationStatus::VERIFIED,
-                            'reviewed_by' => auth()->id(),
-                            'reviewed_at' => now(),
-                            'rejection_note' => null,
-                        ]);
+                        app(ReservationCheckService::class)->approve($record, auth()->user());
 
                         Notification::make()->title('Marked as verified')->success()->send();
                     }),
@@ -93,14 +87,7 @@ class ReservationChecksTable
                     ])
                     ->visible(fn (ReservationCheck $record) => $record->verification_status !== CheckVerificationStatus::REJECTED)
                     ->action(function (ReservationCheck $record, array $data) {
-                        $record->update([
-                            'verification_status' => CheckVerificationStatus::REJECTED,
-                            'reviewed_by' => auth()->id(),
-                            'reviewed_at' => now(),
-                            'rejection_note' => $data['rejection_note'],
-                        ]);
-
-                        Mail::to($record->reservation->user)->send(new ReservationCheckRejectedMail($record));
+                        app(ReservationCheckService::class)->reject($record, auth()->user(), $data['rejection_note']);
 
                         Notification::make()->title('Marked as rejected')->success()->send();
                     }),

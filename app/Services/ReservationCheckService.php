@@ -5,12 +5,15 @@ namespace App\Services;
 use App\Enums\CheckType;
 use App\Enums\CheckVerificationStatus;
 use App\Enums\ReservationStatus;
+use App\Mail\ReservationCheckRejectedMail;
 use App\Models\Media;
 use App\Models\Reservation;
 use App\Models\ReservationCheck;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -68,6 +71,37 @@ class ReservationCheckService
 
             return $this->createCheck($reservation, CheckType::CHECK_OUT, $photos, $reservation->end_at);
         });
+    }
+
+    /**
+     * Shared by the admin review queue and the checks table so both record a
+     * review identically. Authorization (ReservationCheckPolicy::update) is
+     * the caller's job, same as for the resident-facing methods above.
+     */
+    public function approve(ReservationCheck $check, User $reviewer): void
+    {
+        $check->update([
+            'verification_status' => CheckVerificationStatus::VERIFIED,
+            'reviewed_by' => $reviewer->id,
+            'reviewed_at' => now(),
+            'rejection_note' => null,
+        ]);
+    }
+
+    /**
+     * Also emails the resident, since a rejection is something they need to
+     * act on (and $note is written to be read by them).
+     */
+    public function reject(ReservationCheck $check, User $reviewer, string $note): void
+    {
+        $check->update([
+            'verification_status' => CheckVerificationStatus::REJECTED,
+            'reviewed_by' => $reviewer->id,
+            'reviewed_at' => now(),
+            'rejection_note' => $note,
+        ]);
+
+        Mail::to($check->reservation->user)->send(new ReservationCheckRejectedMail($check));
     }
 
     protected function guardCanSubmit(Reservation $reservation, CheckType $type): void
