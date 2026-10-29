@@ -1,5 +1,7 @@
 <?php
 
+use App\Mail\PrivacyPolicyUpdatedMail;
+
 return [
 
     /*
@@ -111,6 +113,30 @@ return [
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Outgoing Mail Circuit Breaker
+    |--------------------------------------------------------------------------
+    |
+    | See App\Support\MailCircuitBreaker. The limits sit well above normal
+    | traffic (a handful of transactional mails an hour) but far below what a
+    | runaway loop produces. bulk_mailables are deliberate send-to-everyone
+    | mails, exempt from the global limit (not the per-recipient one).
+    |
+    */
+
+    'breaker' => [
+        'enabled' => env('MAIL_BREAKER_ENABLED', true),
+        'max_per_window' => (int) env('MAIL_BREAKER_MAX_PER_WINDOW', 30),
+        'window_minutes' => (int) env('MAIL_BREAKER_WINDOW_MINUTES', 10),
+        'max_per_recipient_per_hour' => (int) env('MAIL_BREAKER_MAX_PER_RECIPIENT_PER_HOUR', 6),
+        'cooldown_hours' => (int) env('MAIL_BREAKER_COOLDOWN_HOURS', 6),
+        'alert_to' => env('MAIL_BREAKER_ALERT_TO'),
+        'bulk_mailables' => [
+            PrivacyPolicyUpdatedMail::class,
+        ],
     ],
 
 ];
