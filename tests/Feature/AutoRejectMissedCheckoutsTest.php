@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\AutoRejectMissedCheckouts;
 use App\Enums\CheckVerificationStatus;
 use App\Mail\ReservationCheckRejectedMail;
 use App\Models\Reservation;
@@ -9,6 +10,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
+    // Well after check-in/out went live, so "a few hours ago" is in scope.
+    $this->travelTo(AutoRejectMissedCheckouts::liveSince()->addWeek());
+
     $this->user = User::factory()->create([
         'email' => 'missed-checkout@example.com',
         'keycloak_id' => 'kc-missed-checkout',
@@ -103,4 +107,41 @@ it('ignores reservations that are not approved', function () {
     $this->artisan('app:auto-reject-missed-checkouts');
 
     expect(ReservationCheck::where('reservation_id', $reservation->id)->exists())->toBeFalse();
+});
+
+it('never touches reservations that ended before check-in/out went live', function () {
+    Mail::fake();
+    $this->travelTo(AutoRejectMissedCheckouts::liveSince()->addHours(3));
+
+    $backlog = Reservation::create([
+        'name' => 'Before launch',
+        'start_at' => AutoRejectMissedCheckouts::liveSince()->subHours(3),
+        'end_at' => AutoRejectMissedCheckouts::liveSince()->subMinute(),
+        'status' => 'approved',
+        'user_id' => $this->user->id,
+        'room_id' => $this->room->id,
+    ]);
+
+    $this->artisan('app:auto-reject-missed-checkouts');
+
+    expect(ReservationCheck::where('reservation_id', $backlog->id)->exists())->toBeFalse();
+    Mail::assertNothingSent();
+});
+
+it('ignores reservations that ended more than a day before the deadline', function () {
+    Mail::fake();
+
+    $old = Reservation::create([
+        'name' => 'Long ago',
+        'start_at' => now()->subDays(3)->subHours(2),
+        'end_at' => now()->subDays(3),
+        'status' => 'approved',
+        'user_id' => $this->user->id,
+        'room_id' => $this->room->id,
+    ]);
+
+    $this->artisan('app:auto-reject-missed-checkouts');
+
+    expect(ReservationCheck::where('reservation_id', $old->id)->exists())->toBeFalse();
+    Mail::assertNothingSent();
 });
