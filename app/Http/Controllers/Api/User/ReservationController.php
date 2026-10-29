@@ -28,7 +28,7 @@ class ReservationController extends Controller
             ->withStatus($request->query('status'))
             ->inDateRange($request->query('start_at'), $request->query('end_at'))
             ->forRoomSlug($request->query('room_slug'))
-            ->with(['room'])
+            ->with(['room', 'checks.photos', 'visibleToResidentNotes'])
             ->latest()
             ->paginate(15);
 

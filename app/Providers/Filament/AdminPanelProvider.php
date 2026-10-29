@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Widgets\MembershipsOverview;
 use App\Filament\Widgets\OverRegistrationOverview;
+use App\Filament\Widgets\PendingActionsOverview;
 use App\Filament\Widgets\SentMailOverview;
 use App\Filament\Widgets\UpcomingReservations;
 use App\Http\Controllers\Auth\KeycloakAdminController;
@@ -12,6 +13,7 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -43,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                PendingActionsOverview::class,
                 OverRegistrationOverview::class,
                 MembershipsOverview::class,
                 SentMailOverview::class,
@@ -63,6 +66,14 @@ class AdminPanelProvider extends PanelProvider
                 AuthenticateAdminWithKeycloak::class,
             ])
             ->strictAuthorization()
+            // Filament defaults every relation manager on a resource's View
+            // page to read-only, hiding Create/Edit/Delete regardless of the
+            // viewer's actual permissions. This app manages nested data
+            // (memberships, board positions, reservation checks/notes, ...)
+            // from exactly those View pages - there's no separate page for
+            // them - so the per-model policies already in place should be
+            // the only thing gating those actions.
+            ->readOnlyRelationManagersOnResourceViewPagesByDefault(false)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->routes(function () {
                 Route::get('/oauth/keycloak/redirect', [KeycloakAdminController::class, 'redirect'])
@@ -74,14 +85,21 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentShieldPlugin::make(),
             ])
+            // Daily-use groups (Members, Bookings, Agenda) are left expanded;
+            // everything touched less often defaults collapsed so the
+            // sidebar opens onto what admins actually need day to day
+            // instead of a full wall of options.
             ->navigationGroups([
                 'Members',
                 'Bookings',
                 'Agenda',
-                'Content',
-                'Communication',
-                'System',
-                __('filament-shield::filament-shield.nav.group'),
+                NavigationGroup::make('Board & Commissions')->collapsed(),
+                NavigationGroup::make('Facilities')->collapsed(),
+                NavigationGroup::make('Property')->collapsed(),
+                NavigationGroup::make('Content')->collapsed(),
+                NavigationGroup::make('Communication')->collapsed(),
+                NavigationGroup::make('System')->collapsed(),
+                NavigationGroup::make(__('filament-shield::filament-shield.nav.group'))->collapsed(),
             ]);
     }
 }

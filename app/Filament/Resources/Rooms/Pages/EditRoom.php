@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Rooms\Pages;
 use App\Filament\Resources\Rooms\RoomResource;
 use App\Filament\Resources\Rooms\Schemas\RoomForm;
 use App\Filament\Support\MediaCoverPicker;
+use App\Filament\Support\MediaGalleryPicker;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
@@ -28,6 +29,7 @@ class EditRoom extends EditRecord
         return [
             ...$data,
             ...MediaCoverPicker::hydrate($this->record, RoomForm::COVER_STATE_KEY, RoomForm::COVER_COLLECTION),
+            ...MediaGalleryPicker::hydrate($this->record, RoomForm::CHECKIN_EXAMPLE_STATE_KEY, RoomForm::CHECKIN_EXAMPLE_COLLECTION),
         ];
     }
 
@@ -44,6 +46,13 @@ class EditRoom extends EditRecord
             $this->record,
             RoomForm::COVER_STATE_KEY,
             RoomForm::COVER_COLLECTION,
+            $this->pendingCoverImageData ?? [],
+        );
+
+        MediaGalleryPicker::sync(
+            $this->record,
+            RoomForm::CHECKIN_EXAMPLE_STATE_KEY,
+            RoomForm::CHECKIN_EXAMPLE_COLLECTION,
             $this->pendingCoverImageData ?? [],
         );
     }

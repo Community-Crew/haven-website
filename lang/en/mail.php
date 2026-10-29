@@ -22,6 +22,17 @@ return [
         'when' => 'Was scheduled for',
     ],
 
+    'reservation_check_rejected' => [
+        'subject' => 'Your check-in/check-out photo needs another look: :room',
+        'greeting' => 'Hi :name,',
+        'body' => 'Your :type photo for :room was not verified.',
+        'reason' => 'Reason',
+        'type' => [
+            'check_in' => 'check-in',
+            'check_out' => 'check-out',
+        ],
+    ],
+
     'membership_status_changed' => [
         'subject' => 'Your membership is now :status',
         'greeting' => 'Hi :name,',

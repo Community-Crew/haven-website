@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\Media\MediaShowController;
 use App\Http\Controllers\Api\PrivacyPolicy\PrivacyPolicyAcceptController;
 use App\Http\Controllers\Api\PrivacyPolicy\PrivacyPolicyShowController;
 use App\Http\Controllers\Api\Reservation\ReservationCancelController;
+use App\Http\Controllers\Api\Reservation\ReservationCheckInController;
+use App\Http\Controllers\Api\Reservation\ReservationCheckOutController;
 use App\Http\Controllers\Api\Reservation\ReservationStoreController;
 use App\Http\Controllers\Api\Reservation\ReservationUpdateController;
 use App\Http\Controllers\Api\Room\RoomIndexController;
@@ -65,6 +67,10 @@ Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])
         Route::patch('/reservations/{reservation}/cancel', ReservationCancelController::class)->name('reservations.cancel')
             ->middleware('throttle:reservation-writes');
         Route::put('/reservations/{reservation}', [ReservationUpdateController::class, '__invoke'])->name('reservations.update')
+            ->middleware('throttle:reservation-writes');
+        Route::post('/reservations/{reservation}/check-in', ReservationCheckInController::class)->name('reservations.check-in')
+            ->middleware('throttle:reservation-writes');
+        Route::post('/reservations/{reservation}/check-out', ReservationCheckOutController::class)->name('reservations.check-out')
             ->middleware('throttle:reservation-writes');
 
         // Rooms

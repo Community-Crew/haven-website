@@ -24,7 +24,7 @@ class BoardPositionSignatureResource extends Resource
 
     protected static ?string $modelLabel = 'NDA signature';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Members';
+    protected static string|null|\UnitEnum $navigationGroup = 'Board & Commissions';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::PencilSquare;
 

@@ -27,6 +27,12 @@ class ReservationCancelController extends Controller
             ], 422);
         }
 
+        if ($reservation->checkIn()->exists()) {
+            return response()->json([
+                'message' => 'This reservation has already been checked into and can no longer be cancelled.',
+            ], 422);
+        }
+
         $reservation->update([
             'status' => 'cancelled',
         ]);

@@ -30,7 +30,7 @@ class ReservationHeatmap extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFire;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Bookings';
+    protected static string|UnitEnum|null $navigationGroup = 'Facilities';
 
     protected static ?string $navigationLabel = 'Reservation Heatmap';
 

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Rooms\Pages;
 use App\Filament\Resources\Rooms\RoomResource;
 use App\Filament\Resources\Rooms\Schemas\RoomForm;
 use App\Filament\Support\MediaCoverPicker;
+use App\Filament\Support\MediaGalleryPicker;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateRoom extends CreateRecord
@@ -26,6 +27,13 @@ class CreateRoom extends CreateRecord
             $this->record,
             RoomForm::COVER_STATE_KEY,
             RoomForm::COVER_COLLECTION,
+            $this->pendingCoverImageData ?? [],
+        );
+
+        MediaGalleryPicker::sync(
+            $this->record,
+            RoomForm::CHECKIN_EXAMPLE_STATE_KEY,
+            RoomForm::CHECKIN_EXAMPLE_COLLECTION,
             $this->pendingCoverImageData ?? [],
         );
     }

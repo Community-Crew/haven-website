@@ -22,6 +22,17 @@ return [
         'when' => 'Gepland voor',
     ],
 
+    'reservation_check_rejected' => [
+        'subject' => 'Je in-/uitcheckfoto is nog niet goedgekeurd: :room',
+        'greeting' => 'Hoi :name,',
+        'body' => 'Je :type-foto voor :room is niet goedgekeurd.',
+        'reason' => 'Reden',
+        'type' => [
+            'check_in' => 'incheck',
+            'check_out' => 'uitcheck',
+        ],
+    ],
+
     'membership_status_changed' => [
         'subject' => 'Je lidmaatschap is nu :status',
         'greeting' => 'Hoi :name,',

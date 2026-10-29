@@ -10,6 +10,11 @@ Artisan::command('inspire', function () {
 
 Schedule::command('app:cleanup-unused-media')->daily();
 
+// The 1-hour post-end check-out grace period (ReservationCheckService::
+// CHECK_OUT_GRACE_HOURS) needs checking well inside that hour, not once a
+// day, so a miss doesn't sit unresolved for hours before an admin notices.
+Schedule::command('app:auto-reject-missed-checkouts')->everyFifteenMinutes();
+
 // There's no persistent queue worker process in production (QUEUE_CONNECTION
 // is 'database', nothing consumes it otherwise) - this piggybacks on
 // Laravel's scheduler (already cron'd, per the task above) to drain

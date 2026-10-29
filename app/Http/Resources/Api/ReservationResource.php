@@ -36,6 +36,17 @@ class ReservationResource extends JsonResource
                     'logo_url' => $this->organisation->image_url,
                 ];
             }),
+
+            'checks' => $this->when($isOwner, fn () => ReservationCheckResource::collection($this->checks)),
+
+            // Only ever the subset an admin explicitly flipped visible - see
+            // Reservation::visibleToResidentNotes(), which is what the
+            // controller eager-loads under this same relation name so an
+            // internal note is never even fetched for this endpoint.
+            'notes' => $this->when($isOwner, fn () => $this->visibleToResidentNotes->map(fn ($note) => [
+                'body' => $note->body,
+                'created_at' => $note->created_at,
+            ])),
         ];
     }
 }

@@ -32,7 +32,7 @@ class CommissionResource extends Resource
 
     protected static ?string $modelLabel = 'commission';
 
-    protected static string|null|\UnitEnum $navigationGroup = 'Members';
+    protected static string|null|\UnitEnum $navigationGroup = 'Board & Commissions';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
 
