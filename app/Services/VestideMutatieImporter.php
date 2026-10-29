@@ -22,6 +22,8 @@ use Throwable;
  */
 class VestideMutatieImporter
 {
+    public function __construct(protected ResidentOffboardingService $offboarding) {}
+
     private const TOWERS = [
         '60' => 'Castor',
         '66' => 'Pollux',
@@ -45,8 +47,8 @@ class VestideMutatieImporter
 
     /**
      * Apply previously-previewed rows: for every row with a matched unit
-     * that wasn't skipped, unassign/deactivate its current resident(s) and
-     * issue a fresh registration code.
+     * that wasn't skipped, mark its current resident(s) as moved out (and
+     * send them the move-out notice) and issue a fresh registration code.
      *
      * @param  array<int, array<string, mixed>>  $rows
      * @return array<int, array<string, mixed>>
@@ -72,8 +74,14 @@ class VestideMutatieImporter
             // unassigned with no replacement code - it rolls back and the
             // row is reported as an error instead, retryable on its own.
             try {
-                $code = DB::transaction(function () use ($unit) {
-                    $unit->users()->update(['unit_id' => null, 'activated_at' => null]);
+                $movedOut = [];
+
+                $code = DB::transaction(function () use ($unit, &$movedOut) {
+                    foreach ($unit->users()->get() as $resident) {
+                        if ($this->offboarding->markMovedOut($resident)) {
+                            $movedOut[] = $resident;
+                        }
+                    }
 
                     return $unit->registrationCodes()->create([]);
                 });
@@ -83,6 +91,12 @@ class VestideMutatieImporter
                 $row['error'] = 'Failed to apply this row: '.$e->getMessage();
 
                 return $row;
+            }
+
+            // Only once the row is committed - a rolled-back row mustn't
+            // have told anyone they're moving out.
+            foreach ($movedOut as $resident) {
+                $this->offboarding->sendMovedOutNotice($resident);
             }
 
             $row['registration_code'] = $code->code;

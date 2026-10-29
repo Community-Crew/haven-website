@@ -10,6 +10,10 @@ Artisan::command('inspire', function () {
 
 Schedule::command('app:cleanup-unused-media')->daily();
 
+// Wipes personal data once a resident's move-out retention period
+// (ResidentOffboardingService::RETENTION_DAYS) is over.
+Schedule::command('app:anonymize-former-residents')->daily();
+
 // The 1-hour post-end check-out grace period (ReservationCheckService::
 // CHECK_OUT_GRACE_HOURS) needs checking well inside that hour, not once a
 // day, so a miss doesn't sit unresolved for hours before an admin notices.
