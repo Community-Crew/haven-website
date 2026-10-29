@@ -168,4 +168,21 @@ class KeycloakAdminService
 
         $this->throwIfFailed($response, 'Keycloak remove user from group failed');
     }
+
+    /**
+     * Deletes a user's Keycloak account outright (used when anonymizing a
+     * former resident). A 404 counts as success - the account is gone
+     * either way, e.g. already removed by hand in the Keycloak console.
+     */
+    public function deleteUser(string $keycloakUserId): void
+    {
+        $response = Http::withToken($this->token())
+            ->delete($this->adminApiBase()."/users/{$keycloakUserId}");
+
+        if ($response->status() === 404) {
+            return;
+        }
+
+        $this->throwIfFailed($response, 'Keycloak user deletion failed');
+    }
 }
