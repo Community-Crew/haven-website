@@ -10,6 +10,7 @@ use App\Models\Reservation;
 use App\Models\ReservationCheck;
 use App\Services\ReservationCheckService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 /**
@@ -28,13 +29,36 @@ class AutoRejectMissedCheckouts extends Command
 
     protected $description = 'Auto-reject the check-out for approved reservations whose 1-hour post-end grace period has passed with no check-out submitted';
 
+    /**
+     * When check-in/out went live in production (v1.5.1's deploy). Residents
+     * had no way to check out of anything that ended before this, so those
+     * reservations must never be auto-rejected - the first run without this
+     * cutoff rejected (and emailed) every past reservation ever made.
+     */
+    public const LIVE_SINCE = '2026-10-29 14:11:31';
+
+    /**
+     * Only reservations that ended within this window are considered, so a
+     * scheduler outage (or a future bug) can't turn into a flood of emails
+     * about long-past reservations - an hour or so late is fine, days late
+     * is just noise.
+     */
+    protected const LOOKBACK_HOURS = 24;
+
+    public static function liveSince(): Carbon
+    {
+        return Carbon::parse(self::LIVE_SINCE, 'Europe/Amsterdam');
+    }
+
     public function handle(): void
     {
         $deadline = now()->subHours(ReservationCheckService::CHECK_OUT_GRACE_HOURS);
+        $earliest = max(self::liveSince(), $deadline->copy()->subHours(self::LOOKBACK_HOURS));
 
         $reservations = Reservation::query()
             ->where('status', ReservationStatus::APPROVED)
             ->where('end_at', '<', $deadline)
+            ->where('end_at', '>=', $earliest)
             ->whereDoesntHave('checks', fn ($query) => $query->where('type', CheckType::CHECK_OUT))
             ->with(['user', 'room'])
             ->get();
