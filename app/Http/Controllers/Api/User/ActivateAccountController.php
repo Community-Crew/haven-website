@@ -39,9 +39,14 @@ class ActivateAccountController extends Controller
             ], Response::HTTP_BAD_REQUEST);
         }
 
+        // Clearing moved_out_at covers someone who moved to another unit
+        // within Haven: their old unit's Vestide import marked them moved
+        // out, and activating with the new unit's code cancels that before
+        // they're anonymized.
         $user->update([
             'unit_id' => $registrationCode->unit_id,
             'activated_at' => now(),
+            'moved_out_at' => null,
         ]);
 
         $registrationCode->update([

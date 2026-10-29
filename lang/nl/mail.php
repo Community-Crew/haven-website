@@ -52,6 +52,14 @@ return [
         'action' => 'Bekijk het privacybeleid',
     ],
 
+    'resident_moved_out' => [
+        'subject' => 'Je Haven-account wordt verwijderd',
+        'greeting' => 'Hoi :name,',
+        'body' => 'Volgens onze gegevens woon je niet meer in Haven, dus is je Haven-account gesloten. Bedankt dat je deel uitmaakte van de community!',
+        'deletion' => 'Op :date verwijderen we je account en persoonsgegevens definitief. Je eerdere reserveringen bewaren we alleen als anonieme statistiek.',
+        'mistake' => 'Woon je hier nog wel? Dan is dit een vergissing - beantwoord deze mail vóór :date en we lossen het op.',
+    ],
+
     'footer' => 'Haven Community',
 
 ];

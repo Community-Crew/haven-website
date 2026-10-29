@@ -52,6 +52,14 @@ return [
         'action' => 'View the privacy policy',
     ],
 
+    'resident_moved_out' => [
+        'subject' => 'Your Haven account will be removed',
+        'greeting' => 'Hi :name,',
+        'body' => 'According to our records you no longer live at Haven, so your Haven account has been closed. Thanks for being part of the community!',
+        'deletion' => 'On :date we will permanently remove your account and personal data. Your past reservations are kept only as anonymous statistics.',
+        'mistake' => 'Still living here? Then this is a mistake - just reply to this email before :date and we will fix it.',
+    ],
+
     'footer' => 'Haven Community',
 
 ];

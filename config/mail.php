@@ -1,6 +1,7 @@
 <?php
 
 use App\Mail\PrivacyPolicyUpdatedMail;
+use App\Mail\ResidentMovedOutMail;
 
 return [
 
@@ -117,6 +118,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Contact Address
+    |--------------------------------------------------------------------------
+    |
+    | Reply-To for mails a resident is expected to answer (e.g. the move-out
+    | notice), since the From address may not be a monitored mailbox.
+    |
+    */
+
+    'contact_address' => env('MAIL_CONTACT_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+
+    /*
+    |--------------------------------------------------------------------------
     | Outgoing Mail Circuit Breaker
     |--------------------------------------------------------------------------
     |
@@ -136,6 +149,7 @@ return [
         'alert_to' => env('MAIL_BREAKER_ALERT_TO'),
         'bulk_mailables' => [
             PrivacyPolicyUpdatedMail::class,
+            ResidentMovedOutMail::class,
         ],
     ],
 

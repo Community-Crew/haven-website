@@ -33,7 +33,10 @@ use Illuminate\Support\Str;
 
 function seedHistory(): void
 {
-    Http::fake();
+    Http::fake([
+        '*/protocol/openid-connect/token' => Http::response(['access_token' => 'fake-admin-token']),
+        '*' => Http::response(),
+    ]);
     Storage::fake('hetzner');
 
     $type = MemberType::create(['name' => 'Regular']);
@@ -79,6 +82,17 @@ function seedHistory(): void
                 }
             }
         }
+    }
+
+    // Residents who moved out long ago, still waiting to be anonymized -
+    // anonymize-former-residents acts on them, and must not mail them.
+    foreach (range(1, 2) as $i) {
+        User::factory()->create([
+            'email' => "moved-out-{$i}@example.com",
+            'keycloak_id' => "kc-moved-out-{$i}",
+            'locale' => 'nl',
+            'moved_out_at' => now()->subMonths(4),
+        ]);
     }
 
     // Long-unlinked media, the kind cleanup-unused-media acts on.
