@@ -1,14 +1,14 @@
 <?php
 
-use App\Console\Commands\AutoRejectMissedCheckouts;
 use App\Enums\CheckVerificationStatus;
 use App\Models\Reservation;
 use App\Models\ReservationCheck;
 use App\Models\Room;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
 it('deletes only the backlog auto-rejections from before check-in/out went live', function () {
-    $live = AutoRejectMissedCheckouts::liveSince();
+    $live = Carbon::parse('2026-10-29 14:11:31', 'Europe/Amsterdam');
     $admin = User::factory()->create(['email' => 'cleanup-admin@example.com', 'keycloak_id' => 'kc-cleanup-admin']);
     $resident = User::factory()->create(['email' => 'cleanup-resident@example.com', 'keycloak_id' => 'kc-cleanup-resident']);
     $room = Room::create(['name' => 'Werkplaats', 'slug' => 'werkplaats-cleanup', 'description' => 'A room', 'location' => 'Ground floor', 'status' => 'available']);

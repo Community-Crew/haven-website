@@ -30,13 +30,14 @@ class AutoRejectMissedCheckouts extends Command
     protected $description = 'Auto-reject the check-out for approved reservations whose 1-hour post-end grace period has passed with no check-out submitted';
 
     /**
-     * When check-in/out went live in production (v1.5.1's deploy). Residents
-     * had no way to check out of anything that ended before this, so those
-     * reservations must never be auto-rejected - the first run without this
-     * cutoff rejected (and emailed) every past reservation ever made.
+     * When residents could actually start submitting check-outs, i.e. when
+     * the app version with photo upload went live - set via
+     * RESERVATION_CHECKS_LIVE_SINCE (e.g. "2026-10-30 12:00", Amsterdam
+     * time). Unset means the job does nothing: auto-rejecting a check-out
+     * nobody could submit just emails residents a wrong rejection, which is
+     * what happened twice on 2026-10-29 (first for every past reservation,
+     * then because the backend shipped before the app did).
      */
-    public const LIVE_SINCE = '2026-10-29 14:11:31';
-
     /**
      * Only reservations that ended within this window are considered, so a
      * scheduler outage (or a future bug) can't turn into a flood of emails
@@ -45,13 +46,21 @@ class AutoRejectMissedCheckouts extends Command
      */
     protected const LOOKBACK_HOURS = 24;
 
-    public static function liveSince(): Carbon
+    public static function liveSince(): ?Carbon
     {
-        return Carbon::parse(self::LIVE_SINCE, 'Europe/Amsterdam');
+        $value = config('reservations.checks_live_since');
+
+        return $value ? Carbon::parse($value, 'Europe/Amsterdam') : null;
     }
 
     public function handle(): void
     {
+        if (! self::liveSince()) {
+            $this->info('Check-out auto-rejection is off - RESERVATION_CHECKS_LIVE_SINCE is not set.');
+
+            return;
+        }
+
         $deadline = now()->subHours(ReservationCheckService::CHECK_OUT_GRACE_HOURS);
         $earliest = max(self::liveSince(), $deadline->copy()->subHours(self::LOOKBACK_HOURS));
 

@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
+    config(['reservations.checks_live_since' => '2026-10-30 12:00']);
+
     // Well after check-in/out went live, so "a few hours ago" is in scope.
     $this->travelTo(AutoRejectMissedCheckouts::liveSince()->addWeek());
 
@@ -143,5 +145,26 @@ it('ignores reservations that ended more than a day before the deadline', functi
     $this->artisan('app:auto-reject-missed-checkouts');
 
     expect(ReservationCheck::where('reservation_id', $old->id)->exists())->toBeFalse();
+    Mail::assertNothingSent();
+});
+
+it('does nothing until the go-live time is configured', function () {
+    Mail::fake();
+    config(['reservations.checks_live_since' => null]);
+
+    Reservation::create([
+        'name' => 'Werkplaats sessie',
+        'start_at' => now()->subHours(4),
+        'end_at' => now()->subHours(2),
+        'status' => 'approved',
+        'user_id' => $this->user->id,
+        'room_id' => $this->room->id,
+    ]);
+
+    $this->artisan('app:auto-reject-missed-checkouts')
+        ->expectsOutputToContain('RESERVATION_CHECKS_LIVE_SINCE is not set')
+        ->assertSuccessful();
+
+    expect(ReservationCheck::count())->toBe(0);
     Mail::assertNothingSent();
 });
