@@ -19,4 +19,16 @@ return [
     */
     'window_open_time' => env('RESERVATION_WINDOW_OPEN_TIME', '20:00'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Check-in/out Live Since
+    |--------------------------------------------------------------------------
+    |
+    | When residents could start submitting check-in/out photos (the app
+    | release with photo upload), Europe/Amsterdam time, e.g.
+    | "2026-10-30 12:00". Until it's set, app:auto-reject-missed-checkouts
+    | does nothing - see that command.
+    |
+    */
+    'checks_live_since' => env('RESERVATION_CHECKS_LIVE_SINCE'),
 ];
