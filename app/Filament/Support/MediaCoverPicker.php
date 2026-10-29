@@ -116,7 +116,11 @@ class MediaCoverPicker
             return;
         }
 
+        // The path is client-submitted Livewire state, so it can name any
+        // file on disk - reusable() keeps residents' private uploads from
+        // being pulled in (and detached from where they belong).
         Media::query()
+            ->reusable()
             ->where('path', $path)
             ->update([
                 'mediable_type' => $record->getMorphClass(),
@@ -130,6 +134,7 @@ class MediaCoverPicker
     protected static function searchResults(string $search): array
     {
         return Media::query()
+            ->reusable()
             ->where(fn ($query) => $query
                 ->where('name', 'like', "%{$search}%")
                 ->orWhere('collection', 'like', "%{$search}%"))
@@ -146,7 +151,7 @@ class MediaCoverPicker
             return null;
         }
 
-        $media = Media::query()->where('path', $path)->first();
+        $media = Media::query()->reusable()->where('path', $path)->first();
 
         return $media ? self::label($media) : null;
     }
