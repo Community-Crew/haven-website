@@ -120,8 +120,9 @@ it('has scheduled jobs to check', function () {
 });
 
 it('mails nobody about historic data when every scheduled job runs right after a deploy', function () {
-    // Long after check-in/out went live, so the backlog isn't excluded
-    // merely because it predates the feature.
+    // Check-in/out switched on, and long after it went live, so the
+    // backlog isn't excluded merely because it predates the feature.
+    config(['reservations.checks_live_since' => '2026-10-30 12:00']);
     $this->travelTo(AutoRejectMissedCheckouts::liveSince()->addYears(2));
     seedHistory();
 
