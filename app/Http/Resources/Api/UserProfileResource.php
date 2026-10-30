@@ -38,6 +38,10 @@ class UserProfileResource extends JsonResource
             'privacy_policy_accepted' => $this->resource->hasAcceptedCurrentPrivacyPolicy(),
             'privacy_policy_accepted_at' => $this->privacy_policy_accepted_at ? $this->privacy_policy_accepted_at->toIso8601String() : null,
             /**
+             * The current user's app settings - same shape as GET /user/settings.
+             */
+            'settings' => new UserSettingsResource($this->resource),
+            /**
              * The unit of the current user.
              */
             'unit' => $this->when($this->unit_id, function () {

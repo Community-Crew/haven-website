@@ -33,6 +33,25 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
      *
      * @var list<string>
      */
+    /**
+     * Locales the app and mails are translated into - see lang/.
+     */
+    public const LOCALES = ['nl', 'en'];
+
+    /**
+     * 'system' follows the device's prefers-color-scheme.
+     */
+    public const THEMES = ['system', 'light', 'dark'];
+
+    /**
+     * Mirror the column defaults, so a freshly created user (not reloaded
+     * from the database) has them too.
+     */
+    protected $attributes = [
+        'locale' => 'nl',
+        'theme' => 'system',
+    ];
+
     protected $fillable = [
         'name',
         'email',
@@ -40,6 +59,7 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         'unit_id',
         'activated_at',
         'locale',
+        'theme',
         'privacy_policy_accepted_at',
         'moved_out_at',
         'anonymized_at',

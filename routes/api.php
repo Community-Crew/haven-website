@@ -19,6 +19,8 @@ use App\Http\Controllers\Api\Room\RoomShowController;
 use App\Http\Controllers\Api\User\ActivateAccountController;
 use App\Http\Controllers\Api\User\ReservationController;
 use App\Http\Controllers\Api\User\UserController;
+use App\Http\Controllers\Api\User\UserSettingsShowController;
+use App\Http\Controllers\Api\User\UserSettingsUpdateController;
 use App\Http\Middleware\EnsureUserAcceptedPrivacyPolicy;
 use App\Http\Middleware\EnsureUserIsActivated;
 use App\Http\Middleware\ValidateKeycloakToken;
@@ -52,6 +54,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])->group(function () {
     // User
     Route::get('/user', UserController::class)->name('user.show');
+
+    // Outside the activation/privacy-policy gate below, so the language can
+    // be switched on those screens too.
+    Route::get('/user/settings', UserSettingsShowController::class)->name('user.settings.show');
+    Route::patch('/user/settings', UserSettingsUpdateController::class)->name('user.settings.update');
 
     Route::post('/user/activate', ActivateAccountController::class)->name('user.activate');
 
