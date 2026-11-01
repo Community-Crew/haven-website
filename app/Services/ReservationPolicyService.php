@@ -14,7 +14,9 @@ class ReservationPolicyService
     public function getUserPolicies(Carbon $date, Room $room): Collection
     {
         $days = (int) $date->copy()->diffInDays($this->effectiveToday(), true);
-        $dayOfWeek = $date->dayOfWeek;
+        // Entries store day_of_week as 0 = Monday … 6 = Sunday (see
+        // ReservationPolicyForm), not Carbon's 0 = Sunday dayOfWeek.
+        $dayOfWeek = $date->dayOfWeekIso - 1;
 
         $user = Auth::user();
 
