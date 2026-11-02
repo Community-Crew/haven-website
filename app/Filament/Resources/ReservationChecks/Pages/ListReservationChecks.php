@@ -14,8 +14,8 @@ class ListReservationChecks extends ListRecords
     {
         return [
             Action::make('review')
-                ->label('Start reviewing')
-                ->icon('heroicon-o-play')
+                ->label('Open Tiedr')
+                ->icon('heroicon-o-fire')
                 ->badge(ReservationCheckResource::getNavigationBadge())
                 ->url(ReservationCheckResource::getUrl('review')),
         ];

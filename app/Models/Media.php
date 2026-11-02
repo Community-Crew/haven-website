@@ -169,6 +169,12 @@ class Media extends Model
     /**
      * Resolve a short-lived, signed URL for this file. Cached just under the
      * signed URL's own expiry so repeated views don't re-sign on every request.
+     *
+     * Deliberately doesn't check exists() first: signing is a purely local
+     * computation, but exists() is a HeadObject round-trip to the bucket
+     * (100ms-1s+ each), which made pages rendering many photos - e.g. the
+     * check-in/out review table - take seconds whenever the cache was cold.
+     * A file that's gone missing simply 404s at the signed URL instead.
      */
     public function temporaryUrl(int $minutes = 15): ?string
     {
@@ -179,10 +185,6 @@ class Media extends Model
             $disk = Storage::disk($this->disk);
 
             try {
-                if (! $disk->exists($this->path)) {
-                    return null;
-                }
-
                 return $disk->temporaryUrl($this->path, Carbon::now()->addMinutes($minutes));
             } catch (Throwable $e) {
                 logger()->error('Media temporaryUrl error: '.$e->getMessage());

@@ -53,7 +53,7 @@ class ReservationChecksTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->modifyQueryUsing(fn ($query) => $query
-                ->with('photos')
+                ->with(['photos', 'reservation.room', 'reservation.user', 'reviewer'])
                 ->orderByRaw('flag_reason IS NULL')
                 ->orderBy('created_at'))
             ->filters([
