@@ -15,6 +15,17 @@ use Spatie\Permission\Models\Role;
  * memberships, and a log of every request for assertions.
  */
 beforeEach(function () {
+    // Its own Keycloak config rather than whatever .env has: CI sets none,
+    // and an empty realm turns every URL into ".../admin/realms//groups",
+    // which the fake below doesn't recognise.
+    config([
+        'services.keycloak.base_url' => 'https://kc.test',
+        'services.keycloak.realms' => 'haven',
+        'services.keycloak.client_id' => 'haven-admin',
+        'services.keycloak.admin_client_id' => 'haven-service',
+        'services.keycloak.admin_client_secret' => 'secret',
+    ]);
+
     $this->kc = (object) [
         'groups' => [],      // id => ['name' => ..., 'parent' => ?id]
         'users' => [],       // id => representation
