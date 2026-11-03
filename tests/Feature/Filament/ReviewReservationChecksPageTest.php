@@ -115,7 +115,7 @@ it('rejects with a reason and emails the resident', function () {
         ->callAction('reject', data: ['rejection_note' => 'Dishes left in the sink.'])
         ->assertHasNoActionErrors()
         ->assertSet('checkId', null)
-        ->assertSee('All caught up');
+        ->assertSee('No new rooms nearby');
 
     expect($check->fresh()->verification_status)->toBe(CheckVerificationStatus::REJECTED)
         ->and($check->fresh()->rejection_note)->toBe('Dishes left in the sink.');

@@ -15,15 +15,19 @@ use Filament\Resources\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Url;
 
 /**
- * Focused review queue: one pending check at a time, flagged ones first
+ * "Tiedr" - swipe right on clean rooms. Dressed up as a dating app (photo
+ * card, swipe/heart/cross buttons, red flags) but underneath it's a focused
+ * review queue: one pending check at a time, flagged ones first
  * (same ordering as the table), with everything needed to judge it on one
  * screen - the submitted photos next to the room's reference photos (and, for
  * a check-out, the same reservation's check-in photos as a before/after), the
  * reservation's time window, the resident's track record and internal notes.
- * Approve/Reject/Skip advance straight to the next one, with A/R/S shortcuts.
+ * Approve/Reject/Skip advance straight to the next one, with A/R/S shortcuts
+ * (or swiping the card right/left).
  */
 class ReviewReservationChecks extends Page
 {
@@ -31,7 +35,7 @@ class ReviewReservationChecks extends Page
 
     protected string $view = 'filament.resources.reservation-checks.pages.review-reservation-checks';
 
-    protected static ?string $title = 'Review Check-in/out Photos';
+    protected static ?string $title = 'Tiedr';
 
     /**
      * Deep link to a specific check (e.g. from its detail page). Otherwise
@@ -76,6 +80,16 @@ class ReviewReservationChecks extends Page
     public function getTitle(): string|Htmlable
     {
         return static::$title;
+    }
+
+    public function getHeading(): string|Htmlable
+    {
+        return new HtmlString('<span class="tiedr-wordmark">'.svg('heroicon-s-fire')->toHtml().'tiedr</span>');
+    }
+
+    public function getSubheading(): string|Htmlable|null
+    {
+        return 'Swipe right on clean rooms.';
     }
 
     public function getCheck(): ?ReservationCheck
@@ -177,7 +191,9 @@ class ReviewReservationChecks extends Page
     {
         return Action::make('approve')
             ->label('Approve')
-            ->icon('heroicon-o-check-circle')
+            ->icon('heroicon-s-heart')
+            ->iconButton()
+            ->tooltip('Approve (A)')
             ->color('success')
             ->size('lg')
             ->keyBindings(['a'])
@@ -190,7 +206,7 @@ class ReviewReservationChecks extends Page
 
                 $service->approve($this->getCheck(), auth()->user());
 
-                Notification::make()->title('Approved')->success()->send();
+                Notification::make()->title("It's a match!")->body('Check approved.')->success()->send();
 
                 $this->advance();
             });
@@ -200,15 +216,17 @@ class ReviewReservationChecks extends Page
     {
         return Action::make('reject')
             ->label('Reject')
-            ->icon('heroicon-o-x-circle')
+            ->icon('heroicon-o-x-mark')
+            ->iconButton()
+            ->tooltip('Reject (R)')
             ->color('danger')
             ->size('lg')
             ->keyBindings(['r'])
             ->authorize(fn (): bool => $this->canReview())
             ->visible(fn (): bool => $this->getCheck()?->verification_status !== CheckVerificationStatus::REJECTED)
-            ->modalHeading('Reject this photo')
-            ->modalDescription('The resident gets an email with your reason, so write it for them.')
-            ->modalSubmitActionLabel('Reject and notify resident')
+            ->modalHeading('Swipe left')
+            ->modalDescription('Let them down gently: the resident gets an email with your reason, so write it for them.')
+            ->modalSubmitActionLabel('Nope - notify resident')
             ->schema([
                 Textarea::make('rejection_note')
                     ->label('Reason')
@@ -224,7 +242,7 @@ class ReviewReservationChecks extends Page
 
                 $service->reject($this->getCheck(), auth()->user(), $data['rejection_note']);
 
-                Notification::make()->title('Rejected - the resident has been emailed')->success()->send();
+                Notification::make()->title('Nope.')->body('Rejected - the resident has been emailed.')->success()->send();
 
                 $this->advance();
             });
@@ -234,8 +252,10 @@ class ReviewReservationChecks extends Page
     {
         return Action::make('skip')
             ->label('Skip')
-            ->icon('heroicon-o-forward')
-            ->color('gray')
+            ->icon('heroicon-s-forward')
+            ->iconButton()
+            ->tooltip('Maybe later (S)')
+            ->color('info')
             ->size('lg')
             ->keyBindings(['s'])
             ->visible(fn (): bool => $this->getCheck()?->verification_status === CheckVerificationStatus::PENDING)
@@ -248,7 +268,7 @@ class ReviewReservationChecks extends Page
     public function resetSkippedAction(): Action
     {
         return Action::make('resetSkipped')
-            ->label('Show skipped again')
+            ->label('Give skipped ones another chance')
             ->link()
             ->visible(fn (): bool => $this->skipped !== [])
             ->action(function (): void {

@@ -14,8 +14,8 @@ class ViewReservationCheck extends ViewRecord
     {
         return [
             Action::make('review')
-                ->label('Open in review')
-                ->icon('heroicon-o-eye')
+                ->label('Open in Tiedr')
+                ->icon('heroicon-o-fire')
                 ->url(fn (): string => ReservationCheckResource::getUrl('review', ['check' => $this->record->getKey()])),
         ];
     }
