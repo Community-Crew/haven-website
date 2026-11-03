@@ -70,6 +70,17 @@ class AppServiceProvider extends ServiceProvider
                 ], 429));
         });
 
+        // Proof-of-work challenges (see App\Services\ProofOfWork): one per
+        // opened booking form, so a resident needs only a few - the cap is
+        // what stops a script fetching a stack of them to solve in advance.
+        RateLimiter::for('reservation-challenges', function (Request $request) {
+            return Limit::perMinute(6)
+                ->by($request->user()?->id ?: $request->ip())
+                ->response(fn () => response()->json([
+                    'message' => 'Too many requests. Please wait a minute and try again.',
+                ], 429));
+        });
+
         // Availability polling (room reservations index, weekly schedule):
         // looser, since browsing legitimately refreshes these, but still
         // well below what a tight poll loop would produce.
