@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Keycloak\KeycloakAdminService;
 use Exception;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Spatie\Permission\Models\Role;
+use Throwable;
 
 class KeycloakAdminController extends Controller
 {
@@ -43,10 +46,10 @@ class KeycloakAdminController extends Controller
             $cleanedRoles = [];
             foreach ($keycloakRoles as $groupPath) {
                 $roleName = trim(str_replace('/', '-', $groupPath), '-');
-                Role::firstOrCreate([
-                    'name' => $roleName,
-                    'guard_name' => 'web',
-                ]);
+
+                if (! Role::query()->where('name', $roleName)->where('guard_name', 'web')->exists()) {
+                    $this->createRoleForGroup($roleName, $groupPath);
+                }
 
                 $cleanedRoles[] = $roleName;
             }
@@ -57,6 +60,30 @@ class KeycloakAdminController extends Controller
 
         Filament::auth()->login($user);
 
+        if ($user->isVestideOnly()) {
+            return redirect()->to(Filament::getPanel('vestide')->getUrl());
+        }
+
         return redirect()->intended('/');
+    }
+
+    /**
+     * A role for a group the user is already in. Created quietly and linked
+     * to that group: RoleObserver would provision a group named after the
+     * flat role name instead, so a nested group like /Vestide/Manager would
+     * get a stray top-level "Vestide-Manager" twin. Best-effort - without the
+     * link the role still works, it just isn't synced back to Keycloak when
+     * assigned from the admin.
+     */
+    private function createRoleForGroup(string $roleName, string $groupPath): void
+    {
+        $role = Role::withoutEvents(fn () => Role::create(['name' => $roleName, 'guard_name' => 'web']));
+
+        try {
+            $role->keycloak_group_id = app(KeycloakAdminService::class)->findOrCreateGroupPath($groupPath)['id'];
+            $role->saveQuietly();
+        } catch (Throwable $e) {
+            Log::warning('Could not link new role to its Keycloak group', ['role' => $roleName, 'error' => $e->getMessage()]);
+        }
     }
 }

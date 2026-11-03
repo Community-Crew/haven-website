@@ -27,11 +27,20 @@ class Room extends Model
         'location',
         'status',
         'image_path',
+        'cleaned_at',
+        'cleaned_by',
     ];
 
     protected $casts = [
         'status' => RoomStatus::class,
+        'cleaned_at' => 'datetime',
     ];
+
+    /**
+     * Which Vestide staff member marked the room as cleaned - audit trail
+     * only, kept out of toArray() (RoomResource doesn't pick it either).
+     */
+    protected $hidden = ['cleaned_by'];
 
     /**
      * Media collection name for this model's cover image - see HasCoverMedia

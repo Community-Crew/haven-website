@@ -27,6 +27,7 @@ return [
         'greeting' => 'Hi :name,',
         'body' => 'Your :type photo for :room was not verified.',
         'reason' => 'Reason',
+        'shared_with_vestide' => 'Check-outs and their photos are shared with Vestide, your landlord, so they can keep track of how the shared rooms are left.',
         'type' => [
             'check_in' => 'check-in',
             'check_out' => 'check-out',

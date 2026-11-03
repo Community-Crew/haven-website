@@ -27,6 +27,7 @@ return [
         'greeting' => 'Hoi :name,',
         'body' => 'Je :type-foto voor :room is niet goedgekeurd.',
         'reason' => 'Reden',
+        'shared_with_vestide' => "Uitchecks en de bijbehorende foto's worden gedeeld met Vestide, je verhuurder, zodat zij kunnen bijhouden hoe de gedeelde ruimtes worden achtergelaten.",
         'type' => [
             'check_in' => 'incheck',
             'check_out' => 'uitcheck',

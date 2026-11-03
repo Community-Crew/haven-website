@@ -10,6 +10,8 @@ use App\Filament\Widgets\UpcomingReservations;
 use App\Http\Controllers\Auth\KeycloakAdminController;
 use App\Http\Middleware\AuthenticateAdminWithKeycloak;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -84,6 +86,15 @@ class AdminPanelProvider extends PanelProvider
             })
             ->plugins([
                 FilamentShieldPlugin::make(),
+            ])
+            // Super admins can open the Vestide panel too (see
+            // User::canAccessPanel()) - this is the way there and back.
+            ->userMenuItems([
+                Action::make('vestidePanel')
+                    ->label('Vestide dashboard')
+                    ->icon('heroicon-o-arrows-right-left')
+                    ->url(fn () => Filament::getPanel('vestide')->getUrl())
+                    ->visible(fn () => (bool) auth()->user()?->isSuperAdmin()),
             ])
             // Daily-use groups (Members, Bookings, Agenda) are left expanded;
             // everything touched less often defaults collapsed so the

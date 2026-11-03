@@ -170,6 +170,89 @@ class KeycloakAdminService
     }
 
     /**
+     * Exact (not substring) match on email.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function findUserByEmail(string $email): ?array
+    {
+        $response = Http::withToken($this->token())
+            ->get($this->adminApiBase().'/users', ['email' => $email, 'exact' => 'true']);
+
+        $this->throwIfFailed($response, 'Keycloak user lookup failed');
+
+        return collect($response->json())->first(fn (array $user) => strcasecmp($user['email'] ?? '', $email) === 0);
+    }
+
+    /**
+     * Creates an enabled account without a password - the owner sets one
+     * via sendActionsEmail(). Returns the new user's id.
+     */
+    public function createUser(string $email, string $firstName, string $lastName): string
+    {
+        $response = Http::withToken($this->token())->post($this->adminApiBase().'/users', [
+            'username' => $email,
+            'email' => $email,
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'enabled' => true,
+            'emailVerified' => false,
+        ]);
+
+        $this->throwIfFailed($response, 'Keycloak user creation failed');
+
+        // Like group creation: 201 with an empty body, id in Location.
+        return basename($response->header('Location'));
+    }
+
+    /**
+     * Emails the user a Keycloak link to perform the given required actions
+     * (e.g. UPDATE_PASSWORD, VERIFY_EMAIL), returning them to $redirectUri
+     * through the login client afterwards.
+     *
+     * @param  array<int, string>  $actions
+     */
+    public function sendActionsEmail(string $keycloakUserId, array $actions, ?string $redirectUri = null, int $lifespanSeconds = 259200): void
+    {
+        $query = array_filter([
+            'lifespan' => $lifespanSeconds,
+            'client_id' => $redirectUri ? config('services.keycloak.client_id') : null,
+            'redirect_uri' => $redirectUri,
+        ]);
+
+        $response = Http::withToken($this->token())
+            ->put($this->adminApiBase()."/users/{$keycloakUserId}/execute-actions-email?".http_build_query($query), $actions);
+
+        $this->throwIfFailed($response, 'Keycloak execute-actions email failed');
+    }
+
+    /**
+     * Full representations (not brief), so requiredActions is included.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function groupMembers(string $keycloakGroupId): array
+    {
+        $response = Http::withToken($this->token())
+            ->get($this->adminApiBase()."/groups/{$keycloakGroupId}/members", ['max' => 500, 'briefRepresentation' => 'false']);
+
+        $this->throwIfFailed($response, 'Keycloak group members lookup failed');
+
+        return $response->json() ?? [];
+    }
+
+    /**
+     * Ends every Keycloak session of the user.
+     */
+    public function logoutUser(string $keycloakUserId): void
+    {
+        $response = Http::withToken($this->token())
+            ->post($this->adminApiBase()."/users/{$keycloakUserId}/logout");
+
+        $this->throwIfFailed($response, 'Keycloak user logout failed');
+    }
+
+    /**
      * Deletes a user's Keycloak account outright (used when anonymizing a
      * former resident). A 404 counts as success - the account is gone
      * either way, e.g. already removed by hand in the Keycloak console.
