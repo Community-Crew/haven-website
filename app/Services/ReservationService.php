@@ -38,6 +38,7 @@ class ReservationService
                 'start_at' => $start,
                 'end_at' => $end,
                 'status' => ReservationStatus::APPROVED,
+                'challenge_age_seconds' => $data['challenge_age_seconds'] ?? null,
             ]);
         });
     }

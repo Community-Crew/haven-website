@@ -54,5 +54,12 @@ return [
         'difficulty' => (int) env('RESERVATION_POW_DIFFICULTY', 16),
         'min_age' => (int) env('RESERVATION_POW_MIN_AGE', 5),
         'max_age' => (int) env('RESERVATION_POW_MAX_AGE', 600),
+
+        // Signals shown to admins (Reservation::bookingSignals()), never
+        // enforced: a booking this many seconds or less after the challenge
+        // was issued - faster than picking a slot and typing a name - and
+        // one this many seconds or less after the window opened.
+        'suspicious_age' => (int) env('RESERVATION_POW_SUSPICIOUS_AGE', 10),
+        'window_rush' => (int) env('RESERVATION_WINDOW_RUSH_SECONDS', 60),
     ],
 ];

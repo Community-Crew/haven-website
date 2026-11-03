@@ -1,8 +1,10 @@
 <?php
 
+use App\Filament\Resources\Reservations\Pages\ListReservations;
 use App\Http\Middleware\EnsureUserAcceptedPrivacyPolicy;
 use App\Http\Middleware\EnsureUserIsActivated;
 use App\Http\Middleware\ValidateKeycloakToken;
+use App\Models\Reservation;
 use App\Models\ReservationPolicy;
 use App\Models\ReservationPolicyEntry;
 use App\Models\Room;
@@ -11,6 +13,8 @@ use App\Services\ProofOfWork;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
+use Livewire\Livewire;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
@@ -20,7 +24,7 @@ beforeEach(function () {
     Http::fake();
 
     // Low difficulty keeps the PHP solver below fast; the mechanism is the same.
-    config(['reservations.proof_of_work' => ['difficulty' => 8, 'min_age' => 5, 'max_age' => 600]]);
+    config(['reservations.proof_of_work.difficulty' => 8, 'reservations.proof_of_work.min_age' => 5, 'reservations.proof_of_work.max_age' => 600]);
 
     Carbon::setTestNow(Carbon::parse('2026-11-04 10:00'));
 
@@ -178,4 +182,50 @@ it('counts leading zero bits', function () {
         ->and($pow->leadingZeroBits("\x01"))->toBe(7)
         ->and($pow->leadingZeroBits("\x00\x80"))->toBe(8)
         ->and($pow->leadingZeroBits("\x00\x00\x0f"))->toBe(20);
+});
+
+it('records how long the challenge was out, without exposing it in the API', function () {
+    $challenge = powChallenge();
+    $nonce = solvePow($challenge);
+    $this->travel(42)->seconds();
+
+    $response = $this->postJson('/api/v1/reservations', reservationPayload(['pow_challenge' => $challenge, 'pow_nonce' => $nonce]))
+        ->assertCreated()
+        ->assertJsonMissingPath('data.challenge_age_seconds');
+
+    expect(Reservation::find($response->json('data.id'))->challenge_age_seconds)->toBe(42);
+});
+
+it('flags a booking made within seconds of opening the page, and one right after the window opened', function () {
+    config(['reservations.window_open_time' => '20:00']);
+
+    $fast = Reservation::factory()->make(['challenge_age_seconds' => 6, 'created_at' => Carbon::parse('2026-11-04 14:00:00')]);
+    $rush = Reservation::factory()->make(['challenge_age_seconds' => 95, 'created_at' => Carbon::parse('2026-11-04 20:00:12')]);
+    $both = Reservation::factory()->make(['challenge_age_seconds' => 5, 'created_at' => Carbon::parse('2026-11-04 20:00:03')]);
+    $normal = Reservation::factory()->make(['challenge_age_seconds' => 95, 'created_at' => Carbon::parse('2026-11-04 20:05:00')]);
+    $admin = Reservation::factory()->make(['challenge_age_seconds' => null, 'created_at' => Carbon::parse('2026-11-04 14:00:00')]);
+
+    expect($fast->bookingSignals())->toHaveKey('fast')->not->toHaveKey('window_rush')
+        ->and($rush->bookingSignals())->toHaveKey('window_rush')->not->toHaveKey('fast')
+        ->and($both->bookingSignals())->toHaveKeys(['fast', 'window_rush'])
+        ->and($normal->bookingSignals())->toBe([])
+        ->and($admin->bookingSignals())->toBe([]);
+});
+
+it('lets admins filter reservations on suspiciously fast bookings', function () {
+    $admin = User::factory()->create(['email' => 'pow-admin-'.uniqid().'@example.com', 'keycloak_id' => 'kc-'.uniqid()]);
+    foreach (['ViewAny:Reservation', 'View:Reservation'] as $permission) {
+        $admin->givePermissionTo(Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']));
+    }
+    filament()->setCurrentPanel(filament()->getPanel('admin'));
+    $this->actingAs($admin);
+
+    $base = ['room_id' => $this->room->id, 'user_id' => $this->user->id, 'status' => 'approved', 'name' => 'x'];
+    $fast = Reservation::create([...$base, 'start_at' => '2026-11-05 09:00', 'end_at' => '2026-11-05 10:00', 'challenge_age_seconds' => 5]);
+    $slow = Reservation::create([...$base, 'start_at' => '2026-11-05 11:00', 'end_at' => '2026-11-05 12:00', 'challenge_age_seconds' => 80]);
+
+    Livewire::test(ListReservations::class)
+        ->filterTable('booked_suspiciously_fast')
+        ->assertCanSeeTableRecords([$fast])
+        ->assertCanNotSeeTableRecords([$slow]);
 });

@@ -75,6 +75,18 @@ class ReservationsTable
                     ->label('Notes')
                     ->counts('notes')
                     ->placeholder('0'),
+                // Hints the booking was scripted - see Reservation::bookingSignals().
+                IconColumn::make('booking_signals')
+                    ->label('Signals')
+                    ->state(fn (Reservation $record) => $record->bookingSignals() !== [])
+                    ->icon(fn (Reservation $record) => match (true) {
+                        isset($record->bookingSignals()['fast']) => 'heroicon-o-bolt',
+                        $record->bookingSignals() !== [] => 'heroicon-o-clock',
+                        default => null,
+                    })
+                    ->color(fn (Reservation $record) => isset($record->bookingSignals()['fast']) ? 'danger' : 'warning')
+                    ->tooltip(fn (Reservation $record) => implode("\n", $record->bookingSignals()) ?: null)
+                    ->toggleable(),
             ])
             ->defaultSort('start_at', 'desc')
             ->filters([
@@ -92,6 +104,10 @@ class ReservationsTable
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
+                Filter::make('booked_suspiciously_fast')
+                    ->label('Booked suspiciously fast')
+                    ->toggle()
+                    ->query(fn (Builder $query) => $query->bookedSuspiciouslyFast()),
                 Filter::make('start_at')
                     ->schema([
                         DatePicker::make('from'),

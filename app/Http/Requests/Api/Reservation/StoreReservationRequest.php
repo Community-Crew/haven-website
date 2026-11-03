@@ -8,6 +8,11 @@ use Illuminate\Validation\Validator;
 
 class StoreReservationRequest extends FormRequest
 {
+    /**
+     * Seconds the solved challenge had been out - set once it's verified.
+     */
+    public ?int $challengeAge = null;
+
     public function authorize(): bool
     {
         return true;
@@ -48,11 +53,15 @@ class StoreReservationRequest extends FormRequest
                     return;
                 }
 
-                $reason = $proofOfWork->verify($this->user(), $this->input('pow_challenge'), $this->input('pow_nonce'));
+                $result = $proofOfWork->verify($this->user(), $this->input('pow_challenge'), $this->input('pow_nonce'));
 
-                if ($reason !== null) {
-                    $validator->errors()->add('pow_challenge', "proof_of_work_{$reason}");
+                if (! $result->passed()) {
+                    $validator->errors()->add('pow_challenge', "proof_of_work_{$result->failure}");
+
+                    return;
                 }
+
+                $this->challengeAge = $result->age;
             },
         ];
     }

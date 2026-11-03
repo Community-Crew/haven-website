@@ -56,10 +56,19 @@ class ProofOfWork
     }
 
     /**
-     * Null when the solution is accepted (and the challenge is now used up),
-     * otherwise why not - as a short reason code for the API response.
+     * Accepted (and the challenge now used up), or why not - as a short
+     * reason code for the API response. An accepted one also reports how
+     * long the challenge had been out, for Reservation::bookingSignals().
      */
-    public function verify(User $user, ?string $challenge, mixed $counter): ?string
+    public function verify(User $user, ?string $challenge, mixed $counter): ProofOfWorkResult
+    {
+        return ProofOfWorkResult::from($this->check($user, $challenge, $counter));
+    }
+
+    /**
+     * @return string|int the failure reason, or the challenge's age in seconds
+     */
+    protected function check(User $user, ?string $challenge, mixed $counter): string|int
     {
         if (! is_string($challenge) || ! str_contains($challenge, '.') || ! is_scalar($counter) || ! ctype_digit((string) $counter)) {
             return 'missing';
@@ -98,7 +107,7 @@ class ProofOfWork
             return 'reused';
         }
 
-        return null;
+        return $age;
     }
 
     public function leadingZeroBits(string $binary): int
