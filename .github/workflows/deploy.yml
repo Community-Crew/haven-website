@@ -75,7 +75,11 @@ jobs:
       - name: Deploy to production
         run: |
           cd /var/www/haven-api
-          git fetch origin production
+          # --tags: a plain fetch of the branch doesn't bring the release tags
+          # along, so describe --exact-match below never found one and
+          # /api/health reported the short SHA even on a tagged release.
+          # --force: lets a re-pushed (moved) tag update.
+          git fetch --tags --force origin production
           git reset --hard origin/production
           (git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD) > storage/app/version.txt
           composer install --no-dev --optimize-autoloader --no-interaction
