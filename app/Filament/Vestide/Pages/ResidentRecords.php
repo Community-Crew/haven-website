@@ -57,6 +57,8 @@ class ResidentRecords extends Page implements HasTable
                 ->with('unit')
                 ->withCount($counts)
                 ->whereNull('anonymized_at')
+                // Vestide's own staff get a Haven user on first login - they're not residents.
+                ->whereDoesntHave('roles', fn (Builder $roles) => $roles->whereIn('name', [User::VESTIDE_ROLE, User::VESTIDE_MANAGER_ROLE]))
                 ->when(mb_strlen(trim((string) $this->getTableSearch())) < self::MIN_SEARCH, fn (Builder $query) => $query->whereRaw('1 = 0')))
             ->searchable()
             ->searchPlaceholder('Naam van de bewoner')

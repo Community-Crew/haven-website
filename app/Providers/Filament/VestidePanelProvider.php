@@ -4,6 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Http\Middleware\AuthenticateAdminWithKeycloak;
 use App\Http\Middleware\UseDutchLocale;
+use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -58,6 +60,13 @@ class VestidePanelProvider extends PanelProvider
             ], isPersistent: true)
             ->authMiddleware([
                 AuthenticateAdminWithKeycloak::class,
+            ])
+            ->userMenuItems([
+                Action::make('adminPanel')
+                    ->label('Naar het Haven-beheer')
+                    ->icon('heroicon-o-arrows-right-left')
+                    ->url(fn () => Filament::getPanel('admin')->getUrl())
+                    ->visible(fn () => (bool) auth()->user()?->isSuperAdmin()),
             ]);
     }
 }

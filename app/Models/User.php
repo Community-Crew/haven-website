@@ -223,15 +223,18 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
     }
 
     /**
-     * Role (synced from the Keycloak group of the same name) for the
-     * landlord's staff - grants the Vestide panel only.
+     * Roles (synced from the Keycloak groups "Vestide" and "Vestide/Manager",
+     * see VestideAccountService) for the landlord's staff - they grant the
+     * Vestide panel only. Managers can also manage the staff accounts.
      */
     public const VESTIDE_ROLE = 'Vestide';
+
+    public const VESTIDE_MANAGER_ROLE = 'Vestide-Manager';
 
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'vestide') {
-            return $this->hasRole([self::VESTIDE_ROLE, config('filament-shield.super_admin.name')]);
+            return $this->hasRole([self::VESTIDE_ROLE, self::VESTIDE_MANAGER_ROLE]) || $this->isSuperAdmin();
         }
 
         // Vestide staff stay in their own panel. Everyone else keeps the
@@ -241,9 +244,20 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         return ! $this->isVestideOnly();
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole(config('filament-shield.super_admin.name'));
+    }
+
+    public function isVestideManager(): bool
+    {
+        return $this->hasRole(self::VESTIDE_MANAGER_ROLE) || $this->isSuperAdmin();
+    }
+
     public function isVestideOnly(): bool
     {
-        return $this->hasRole(self::VESTIDE_ROLE) && $this->roles->count() === 1;
+        return $this->roles->isNotEmpty()
+            && $this->roles->every(fn (Role $role) => in_array($role->name, [self::VESTIDE_ROLE, self::VESTIDE_MANAGER_ROLE], true));
     }
 
     /**
