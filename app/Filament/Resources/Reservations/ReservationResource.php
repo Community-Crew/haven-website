@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Reservations;
 use App\Filament\Resources\Reservations\Pages\CreateReservation;
 use App\Filament\Resources\Reservations\Pages\EditReservation;
 use App\Filament\Resources\Reservations\Pages\ListReservations;
+use App\Filament\Resources\Reservations\Pages\ReservationAgenda;
 use App\Filament\Resources\Reservations\Pages\ViewReservation;
 use App\Filament\Resources\Reservations\RelationManagers\ChecksRelationManager;
 use App\Filament\Resources\Reservations\RelationManagers\NotesRelationManager;
@@ -56,7 +57,11 @@ class ReservationResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListReservations::route('/'),
+            // The agenda is the landing page; the table stays for search,
+            // filters and bulk actions. 'list' must come before 'view' so
+            // /list isn't captured as a {record}.
+            'index' => ReservationAgenda::route('/'),
+            'list' => ListReservations::route('/list'),
             'create' => CreateReservation::route('/create'),
             'view' => ViewReservation::route('/{record}'),
             'edit' => EditReservation::route('/{record}/edit'),

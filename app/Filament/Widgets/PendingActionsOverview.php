@@ -57,7 +57,8 @@ class PendingActionsOverview extends StatsOverviewWidget
             Stat::make('Reservations Awaiting Approval', $pendingReservations)
                 ->icon('heroicon-o-clock')
                 ->color($pendingReservations > 0 ? 'warning' : 'gray')
-                ->url(ReservationResource::getUrl('index')),
+                // The table pre-filtered to them, not the agenda.
+                ->url(ReservationResource::getUrl('list', ['filters' => ['status' => ['value' => 'pending']]])),
 
             Stat::make('Check-in/out Photos to Review', $pendingChecks)
                 ->description($flaggedChecks > 0 ? "{$flaggedChecks} flagged" : null)
