@@ -6,10 +6,12 @@ use App\Enums\MembershipStatus;
 use App\Mail\ResidentMovedOutMail;
 use App\Models\Media;
 use App\Models\Membership;
+use App\Models\RegistrationCode;
 use App\Models\Reservation;
 use App\Models\ReservationCheck;
 use App\Models\ReservationNote;
 use App\Models\SentEmail;
+use App\Models\Unit;
 use App\Models\User;
 use App\Services\Keycloak\KeycloakAdminService;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +69,40 @@ class ResidentOffboardingService
         });
 
         return true;
+    }
+
+    /**
+     * A unit changing hands: move out whoever lives there now and issue a
+     * fresh registration code for the next tenant. Used by the Vestide
+     * mutaties import and by Vestide issuing a code for a single unit, so
+     * both offboard people the same way.
+     *
+     * One transaction, so a failure issuing the code can't leave a unit's
+     * outgoing resident unassigned with no replacement code. The move-out
+     * notices only go out once it's committed - a rolled-back handover
+     * mustn't have told anyone they're moving out.
+     *
+     * @return array{code: RegistrationCode, moved_out: array<int, User>}
+     */
+    public function handOverUnit(Unit $unit): array
+    {
+        $movedOut = [];
+
+        $code = DB::transaction(function () use ($unit, &$movedOut) {
+            foreach ($unit->users()->get() as $resident) {
+                if ($this->markMovedOut($resident)) {
+                    $movedOut[] = $resident;
+                }
+            }
+
+            return $unit->registrationCodes()->create([]);
+        });
+
+        foreach ($movedOut as $resident) {
+            $this->sendMovedOutNotice($resident);
+        }
+
+        return ['code' => $code, 'moved_out' => $movedOut];
     }
 
     public function sendMovedOutNotice(User $user): void

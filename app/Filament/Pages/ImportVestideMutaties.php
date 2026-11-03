@@ -33,10 +33,6 @@ class ImportVestideMutaties extends Page
 
     protected static string|UnitEnum|null $navigationGroup = 'Property';
 
-    protected static ?string $navigationLabel = 'Import Mutaties';
-
-    protected static ?string $title = 'Import Vestide Mutaties';
-
     protected string $view = 'filament.pages.import-vestide-mutaties';
 
     public ?string $raw = null;
@@ -45,6 +41,27 @@ class ImportVestideMutaties extends Page
     public ?array $rows = null;
 
     public bool $applied = false;
+
+    /**
+     * Board members print the registration-code labels; Vestide doesn't, so
+     * its copy of this page (Vestide\Pages\ImportMutaties) hides them.
+     */
+    protected bool $showsLabels = true;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('mutaties.navigation');
+    }
+
+    public function getTitle(): string
+    {
+        return __('mutaties.title');
+    }
+
+    public function showsLabels(): bool
+    {
+        return $this->showsLabels;
+    }
 
     public function mount(): void
     {
@@ -56,8 +73,8 @@ class ImportVestideMutaties extends Page
         return $schema
             ->components([
                 Textarea::make('raw')
-                    ->label('Vestide mutaties list')
-                    ->helperText('Paste the "Actief vanaf" / "Contractomschrijving" table straight from the Vestide export.')
+                    ->label(__('mutaties.field'))
+                    ->helperText(__('mutaties.field_help'))
                     ->rows(14)
                     ->required(),
             ]);
@@ -67,14 +84,14 @@ class ImportVestideMutaties extends Page
     {
         return [
             Action::make('preview')
-                ->label('Preview')
+                ->label(__('mutaties.preview'))
                 ->color('gray')
                 ->action(fn (VestideMutatieImporter $importer) => $this->preview($importer)),
             Action::make('apply')
-                ->label('Apply mutaties')
+                ->label(__('mutaties.apply'))
                 ->color('danger')
                 ->requiresConfirmation()
-                ->modalDescription('This unassigns and deactivates the current resident(s) of every matched unit and issues a new registration code for each. This cannot be undone automatically.')
+                ->modalDescription(__('mutaties.apply_confirm'))
                 ->visible(fn () => filled($this->rows) && ! $this->applied)
                 ->action(fn (VestideMutatieImporter $importer) => $this->apply($importer)),
             Action::make('downloadLabels')
@@ -84,6 +101,7 @@ class ImportVestideMutaties extends Page
                 ->requiresConfirmation()
                 ->modalHeading('Download unprinted labels')
                 ->modalDescription('Generates one label per unprinted registration code across all units (not just this batch) and marks every one of them as printed.')
+                ->visible(fn () => $this->showsLabels)
                 ->action(fn (RegistrationCodeLabelPdf $pdf) => $this->downloadLabels($pdf)),
         ];
     }
@@ -99,7 +117,7 @@ class ImportVestideMutaties extends Page
         $total = count($this->rows);
 
         Notification::make()
-            ->title("Matched {$matched} of {$total} rows")
+            ->title(__('mutaties.matched', ['matched' => $matched, 'total' => $total]))
             ->status($matched === $total ? 'success' : 'warning')
             ->send();
     }
@@ -112,14 +130,18 @@ class ImportVestideMutaties extends Page
         $applied = collect($this->rows)->where('applied', true)->count();
 
         Notification::make()
-            ->title("Applied {$applied} mutation(s)")
-            ->body('New registration codes were generated for each matched unit; the previous resident(s) were unassigned and deactivated.')
+            ->title(__('mutaties.applied', ['count' => $applied]))
+            ->body(__('mutaties.applied_body'))
             ->success()
             ->send();
     }
 
     public function downloadLabels(RegistrationCodeLabelPdf $pdf): ?StreamedResponse
     {
+        if (! $this->showsLabels) {
+            return null;
+        }
+
         $codes = $pdf->unprinted();
 
         if ($codes->isEmpty()) {
@@ -157,6 +179,10 @@ class ImportVestideMutaties extends Page
 
     public function togglePrinted(int $index): void
     {
+        if (! $this->showsLabels) {
+            return;
+        }
+
         if (! isset($this->rows[$index]['registration_code_id'])) {
             return;
         }

@@ -6,19 +6,19 @@
     </x-filament::section>
 
     @if ($rows)
-        <x-filament::section heading="Preview">
+        <x-filament::section :heading="__('mutaties.preview')">
             <div class="overflow-x-auto">
                 <table class="w-full text-start">
                     <thead>
                         <tr>
-                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Active from</th>
-                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Address</th>
-                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Unit</th>
-                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Current resident(s)</th>
+                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">{{ __('mutaties.columns.active_from') }}</th>
+                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">{{ __('mutaties.columns.address') }}</th>
+                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">{{ __('mutaties.columns.unit') }}</th>
+                            <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">{{ __('mutaties.columns.residents') }}</th>
                             <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
-                                {{ $applied ? 'New code' : 'Status' }}
+                                {{ $applied ? __('mutaties.columns.new_code') : __('mutaties.columns.status') }}
                             </th>
-                            @if ($applied)
+                            @if ($applied && $this->showsLabels())
                                 <th class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">Label printed</th>
                             @endif
                         </tr>
@@ -39,7 +39,7 @@
                                     @if (filled($row['current_residents'] ?? null))
                                         {{ implode(', ', $row['current_residents']) }}
                                     @else
-                                        <span class="text-gray-400">vacant</span>
+                                        <span class="text-gray-400">{{ __('mutaties.vacant') }}</span>
                                     @endif
                                 </td>
                                 <td class="px-3 py-2 text-sm">
@@ -48,10 +48,10 @@
                                     @elseif ($row['applied'] ?? false)
                                         <span class="font-mono">{{ $row['registration_code'] }}</span>
                                     @else
-                                        <x-filament::badge color="success">Matched</x-filament::badge>
+                                        <x-filament::badge color="success">{{ __('mutaties.match_ok') }}</x-filament::badge>
                                     @endif
                                 </td>
-                                @if ($applied)
+                                @if ($applied && $this->showsLabels())
                                     <td class="px-3 py-2 text-sm">
                                         @if ($row['applied'] ?? false)
                                             <x-filament::button

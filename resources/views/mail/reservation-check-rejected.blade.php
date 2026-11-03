@@ -14,4 +14,7 @@
             {{ $check->rejection_note }}
         </p>
     @endif
+    @if ($check->type === \App\Enums\CheckType::CHECK_OUT)
+        <p class="text-sm text-gray-600 mt-4">{{ __('mail.reservation_check_rejected.shared_with_vestide') }}</p>
+    @endif
 @endsection

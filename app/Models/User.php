@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -181,6 +182,15 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         return $this->hasMany(Reservation::class);
     }
 
+    /**
+     * Check-ins/outs on this user's reservations - including auto-rejected
+     * missed check-outs, which nobody submitted.
+     */
+    public function reservationChecks(): HasManyThrough
+    {
+        return $this->hasManyThrough(ReservationCheck::class, Reservation::class);
+    }
+
     public function organisations(): BelongsToMany
     {
         return $this->belongsToMany(Organisation::class);
@@ -212,10 +222,28 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
             ->latestOfMany();
     }
 
+    /**
+     * Role (synced from the Keycloak group of the same name) for the
+     * landlord's staff - grants the Vestide panel only.
+     */
+    public const VESTIDE_ROLE = 'Vestide';
+
     public function canAccessPanel(Panel $panel): bool
     {
-        // TODO: Implement canAccessPanel() method.
-        return true;
+        if ($panel->getId() === 'vestide') {
+            return $this->hasRole([self::VESTIDE_ROLE, config('filament-shield.super_admin.name')]);
+        }
+
+        // Vestide staff stay in their own panel. Everyone else keeps the
+        // existing behaviour: in, with Shield permissions deciding what
+        // they actually see.
+        // TODO: Implement canAccessPanel() method for the admin panel.
+        return ! $this->isVestideOnly();
+    }
+
+    public function isVestideOnly(): bool
+    {
+        return $this->hasRole(self::VESTIDE_ROLE) && $this->roles->count() === 1;
     }
 
     /**

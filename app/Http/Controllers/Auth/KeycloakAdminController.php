@@ -57,6 +57,10 @@ class KeycloakAdminController extends Controller
 
         Filament::auth()->login($user);
 
+        if ($user->isVestideOnly()) {
+            return redirect()->to(Filament::getPanel('vestide')->getUrl());
+        }
+
         return redirect()->intended('/');
     }
 }

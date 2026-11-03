@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Unit;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /**
@@ -63,40 +62,22 @@ class VestideMutatieImporter
             $unit = Unit::find($row['unit_id']);
 
             if (! $unit) {
-                $row['error'] = 'Unit no longer exists.';
+                $row['error'] = __('mutaties.errors.unit_gone');
                 $row['skip'] = true;
 
                 return $row;
             }
 
-            // Wrapped in one transaction per row so a failure issuing the new
-            // code (or anything else) can't leave a unit's outgoing resident
-            // unassigned with no replacement code - it rolls back and the
-            // row is reported as an error instead, retryable on its own.
+            // A failed row rolls back on its own (see handOverUnit) and is
+            // reported as an error instead, retryable on its own.
             try {
-                $movedOut = [];
-
-                $code = DB::transaction(function () use ($unit, &$movedOut) {
-                    foreach ($unit->users()->get() as $resident) {
-                        if ($this->offboarding->markMovedOut($resident)) {
-                            $movedOut[] = $resident;
-                        }
-                    }
-
-                    return $unit->registrationCodes()->create([]);
-                });
+                $code = $this->offboarding->handOverUnit($unit)['code'];
             } catch (Throwable $e) {
                 report($e);
 
-                $row['error'] = 'Failed to apply this row: '.$e->getMessage();
+                $row['error'] = __('mutaties.errors.apply_failed', ['message' => $e->getMessage()]);
 
                 return $row;
-            }
-
-            // Only once the row is committed - a rolled-back row mustn't
-            // have told anyone they're moving out.
-            foreach ($movedOut as $resident) {
-                $this->offboarding->sendMovedOutNotice($resident);
             }
 
             $row['registration_code'] = $code->code;
@@ -164,7 +145,7 @@ class VestideMutatieImporter
         ];
 
         if (! preg_match('/blauwe\s+loper\s+(\d+)\s+(.+?),/i', $row['address'], $matches)) {
-            $result['error'] = 'Could not parse address.';
+            $result['error'] = __('mutaties.errors.unparseable');
             $result['skip'] = true;
 
             return $result;
@@ -178,7 +159,7 @@ class VestideMutatieImporter
             : $this->matchTowerUnit($streetNumber, $apartment);
 
         if (! $unit) {
-            $result['error'] = "No matching unit found for \"{$row['address']}\".";
+            $result['error'] = __('mutaties.errors.no_unit', ['address' => $row['address']]);
             $result['skip'] = true;
 
             return $result;
