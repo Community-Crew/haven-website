@@ -20,7 +20,7 @@ class ReservationStoreController extends Controller
 
     public function __invoke(StoreReservationRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        $data = [...$request->validated(), 'challenge_age_seconds' => $request->challengeAge];
 
         $reservation = $this->reservationService->createReservation($data);
 

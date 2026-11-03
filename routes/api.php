@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Media\MediaShowController;
 use App\Http\Controllers\Api\PrivacyPolicy\PrivacyPolicyAcceptController;
 use App\Http\Controllers\Api\PrivacyPolicy\PrivacyPolicyShowController;
 use App\Http\Controllers\Api\Reservation\ReservationCancelController;
+use App\Http\Controllers\Api\Reservation\ReservationChallengeController;
 use App\Http\Controllers\Api\Reservation\ReservationCheckInController;
 use App\Http\Controllers\Api\Reservation\ReservationCheckOutController;
 use App\Http\Controllers\Api\Reservation\ReservationStoreController;
@@ -69,6 +70,8 @@ Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])
     Route::middleware([EnsureUserAcceptedPrivacyPolicy::class, EnsureUserIsActivated::class])->group(function () {
         // Reservation
         Route::get('/reservations/me', ReservationController::class)->name('user.reservations.index');
+        Route::post('/reservations/challenge', ReservationChallengeController::class)->name('reservations.challenge')
+            ->middleware('throttle:reservation-challenges');
         Route::post('/reservations', ReservationStoreController::class)->name('reservations.store')
             ->middleware('throttle:reservation-writes');
         Route::patch('/reservations/{reservation}/cancel', ReservationCancelController::class)->name('reservations.cancel')

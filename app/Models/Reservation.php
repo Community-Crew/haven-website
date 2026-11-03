@@ -25,12 +25,20 @@ class Reservation extends Model
         'share_user',
         'status',
         'organisation_id',
+        'challenge_age_seconds',
     ];
+
+    /**
+     * Admin-only (see bookingSignals()) - kept out of the API so whoever
+     * scripts bookings doesn't learn what's measured.
+     */
+    protected $hidden = ['challenge_age_seconds'];
 
     protected $casts = [
         'status' => ReservationStatus::class,
         'start_at' => 'datetime',
         'end_at' => 'datetime',
+        'challenge_age_seconds' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -135,5 +143,46 @@ class Reservation extends Model
         $attributes['status'] = $this->status->jsonSerialize();
 
         return $attributes;
+    }
+
+    /**
+     * Hints that the booking may have been scripted, for admins to weigh -
+     * nothing acts on these automatically. Keyed by signal, with a
+     * human-readable explanation:
+     * - fast: booked within seconds of the proof-of-work challenge being
+     *   issued, i.e. of the booking page opening.
+     * - window_rush: booked right after the daily reservation window
+     *   opened. Normal for an eager resident on its own; telling in
+     *   combination with the first.
+     *
+     * @return array<string, string>
+     */
+    public function bookingSignals(): array
+    {
+        $signals = [];
+
+        if ($this->challenge_age_seconds !== null && $this->challenge_age_seconds <= (int) config('reservations.proof_of_work.suspicious_age')) {
+            $signals['fast'] = "Booked {$this->challenge_age_seconds}s after opening the booking page";
+        }
+
+        if ($this->created_at) {
+            $opened = $this->created_at->copy()->setTimeFromTimeString(config('reservations.window_open_time', '20:00'));
+            $after = $opened->diffInSeconds($this->created_at, false);
+
+            if ($after >= 0 && $after <= (int) config('reservations.proof_of_work.window_rush')) {
+                $signals['window_rush'] = 'Booked '.(int) $after.'s after the reservation window opened';
+            }
+        }
+
+        return $signals;
+    }
+
+    /**
+     * Reservations with the `fast` booking signal.
+     */
+    public function scopeBookedSuspiciouslyFast(Builder $query): Builder
+    {
+        return $query->whereNotNull('challenge_age_seconds')
+            ->where('challenge_age_seconds', '<=', (int) config('reservations.proof_of_work.suspicious_age'));
     }
 }
