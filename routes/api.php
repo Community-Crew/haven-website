@@ -72,7 +72,8 @@ Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])
     Route::middleware([EnsureUserAcceptedPrivacyPolicy::class, EnsureUserIsActivated::class])->group(function () {
         // Reservation
         Route::get('/reservations/me', ReservationController::class)->name('user.reservations.index');
-        Route::get('/reservations/me/missed-photos', MissedPhotosIndexController::class)->name('user.reservations.missed-photos.index');
+        Route::get('/reservations/me/missed-photos', MissedPhotosIndexController::class)->name('user.reservations.missed-photos.index')
+            ->middleware('throttle:reservation-reads');
         Route::post('/reservations/me/missed-photos/acknowledge', MissedPhotosAcknowledgeController::class)->name('user.reservations.missed-photos.acknowledge')
             ->middleware('throttle:reservation-writes');
         Route::post('/reservations/challenge', ReservationChallengeController::class)->name('reservations.challenge')
