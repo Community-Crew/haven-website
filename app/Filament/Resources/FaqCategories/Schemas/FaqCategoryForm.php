@@ -97,6 +97,9 @@ class FaqCategoryForm
     {
         return RichEditor::make($name)
             ->toolbarButtons([['bold', 'italic', 'link'], ['bulletList', 'orderedList'], ['undo', 'redo']])
+            // Off already without the attachFiles button, but explicit so a
+            // Filament upgrade can't turn uploads (pasted/dropped files) on.
+            ->fileAttachments(false)
             ->hint('Links: '.self::LINK_HELP);
     }
 
