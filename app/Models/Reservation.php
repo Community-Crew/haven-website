@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Console\Commands\AutoRejectMissedCheckouts;
 use App\Enums\CheckType;
 use App\Enums\ReservationStatus;
+use App\Services\ReservationCheckService;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,6 +28,7 @@ class Reservation extends Model
         'status',
         'organisation_id',
         'challenge_age_seconds',
+        'missed_photos_acknowledged_at',
     ];
 
     /**
@@ -39,6 +42,7 @@ class Reservation extends Model
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'challenge_age_seconds' => 'integer',
+        'missed_photos_acknowledged_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -123,6 +127,51 @@ class Reservation extends Model
                 $q->where('end_at', '<=', $end);
             }
         });
+    }
+
+    /**
+     * Scope: the resident's finished reservations that are missing check-in
+     * or check-out photos and haven't had the app's popup dismissed yet.
+     * "Finished" means past the check-out grace period, when neither can be
+     * submitted anymore. An auto-rejected check-out (AutoRejectMissedCheckouts)
+     * is a check with no photos, so it counts as missing too. Nothing before
+     * RESERVATION_CHECKS_LIVE_SINCE counts - residents couldn't upload then.
+     */
+    public function scopeMissingPhotos(Builder $query): Builder
+    {
+        $liveSince = AutoRejectMissedCheckouts::liveSince();
+
+        if (! $liveSince) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        $withPhotos = fn (CheckType $type) => fn (Builder $q) => $q->where('type', $type)->whereHas('photos');
+
+        return $query
+            ->where('status', ReservationStatus::APPROVED)
+            ->where('end_at', '<', now()->subHours(ReservationCheckService::CHECK_OUT_GRACE_HOURS))
+            ->where('end_at', '>=', $liveSince)
+            ->whereNull('missed_photos_acknowledged_at')
+            ->where(fn (Builder $q) => $q
+                ->whereDoesntHave('checks', $withPhotos(CheckType::CHECK_IN))
+                ->orWhereDoesntHave('checks', $withPhotos(CheckType::CHECK_OUT)));
+    }
+
+    /**
+     * Which of check_in/check_out have no photos, for a reservation loaded
+     * with checks.photos.
+     *
+     * @return array<int, string>
+     */
+    public function missingPhotoTypes(): array
+    {
+        return collect(CheckType::cases())
+            ->reject(fn (CheckType $type) => $this->checks->contains(
+                fn (ReservationCheck $check) => $check->type === $type && $check->photos->isNotEmpty()
+            ))
+            ->map(fn (CheckType $type) => $type->value)
+            ->values()
+            ->all();
     }
 
     /**
