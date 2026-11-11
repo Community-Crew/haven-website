@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Agenda\AgendaIndexController;
 use App\Http\Controllers\Api\Agenda\AgendaShowController;
 use App\Http\Controllers\Api\Board\BoardIndexController;
+use App\Http\Controllers\Api\Faq\FaqIndexController;
 use App\Http\Controllers\Api\Health\HealthShowController;
 use App\Http\Controllers\Api\Media\MediaShowController;
 use App\Http\Controllers\Api\PrivacyPolicy\PrivacyPolicyAcceptController;
@@ -49,6 +50,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // Media
     Route::get('/media/{media:uuid}', MediaShowController::class)->name('media.show');
+
+    // FAQ
+    Route::get('/faq', FaqIndexController::class)->name('faq.index');
 
     // Privacy Policy
     Route::get('/privacy-policy', PrivacyPolicyShowController::class)->name('privacy-policy.show');
