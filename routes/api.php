@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\Health\HealthShowController;
 use App\Http\Controllers\Api\Media\MediaShowController;
 use App\Http\Controllers\Api\PrivacyPolicy\PrivacyPolicyAcceptController;
 use App\Http\Controllers\Api\PrivacyPolicy\PrivacyPolicyShowController;
+use App\Http\Controllers\Api\Reservation\MissedPhotosAcknowledgeController;
+use App\Http\Controllers\Api\Reservation\MissedPhotosIndexController;
 use App\Http\Controllers\Api\Reservation\ReservationCancelController;
 use App\Http\Controllers\Api\Reservation\ReservationChallengeController;
 use App\Http\Controllers\Api\Reservation\ReservationCheckInController;
@@ -70,6 +72,10 @@ Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])
     Route::middleware([EnsureUserAcceptedPrivacyPolicy::class, EnsureUserIsActivated::class])->group(function () {
         // Reservation
         Route::get('/reservations/me', ReservationController::class)->name('user.reservations.index');
+        Route::get('/reservations/me/missed-photos', MissedPhotosIndexController::class)->name('user.reservations.missed-photos.index')
+            ->middleware('throttle:reservation-reads');
+        Route::post('/reservations/me/missed-photos/acknowledge', MissedPhotosAcknowledgeController::class)->name('user.reservations.missed-photos.acknowledge')
+            ->middleware('throttle:reservation-writes');
         Route::post('/reservations/challenge', ReservationChallengeController::class)->name('reservations.challenge')
             ->middleware('throttle:reservation-challenges');
         Route::post('/reservations', ReservationStoreController::class)->name('reservations.store')
