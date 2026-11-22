@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ReservationStatus;
 use App\Models\Reservation;
 use App\Models\Room;
+use App\Models\RoomRuleAcceptance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -12,7 +13,8 @@ use Illuminate\Validation\ValidationException;
 class ReservationService
 {
     public function __construct(
-        protected ReservationPolicyService $policyService
+        protected ReservationPolicyService $policyService,
+        protected RoomRulesService $roomRules,
     ) {}
 
     public function createReservation(array $data)
@@ -29,7 +31,9 @@ class ReservationService
 
             $this->ensureNoOverlap($roomId, $start, $end);
 
-            return Reservation::create([
+            $this->roomRules->ensureAccepted($room, $data['rules_accepted_hash'] ?? null);
+
+            $reservation = Reservation::create([
                 'name' => $data['name'],
                 'share_name' => $data['share_name'],
                 'room_id' => $roomId,
@@ -40,6 +44,10 @@ class ReservationService
                 'status' => ReservationStatus::APPROVED,
                 'challenge_age_seconds' => $data['challenge_age_seconds'] ?? null,
             ]);
+
+            $this->roomRules->record($reservation, $room, RoomRuleAcceptance::MOMENT_BOOKING, auth()->id());
+
+            return $reservation;
         });
     }
 

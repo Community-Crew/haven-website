@@ -9,6 +9,7 @@ use App\Mail\ReservationCheckRejectedMail;
 use App\Models\Media;
 use App\Models\Reservation;
 use App\Models\ReservationCheck;
+use App\Models\RoomRuleAcceptance;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
@@ -43,15 +44,24 @@ class ReservationCheckService
      */
     public const CHECK_OUT_GRACE_HOURS = 1;
 
+    public function __construct(protected RoomRulesService $roomRules) {}
+
     /**
      * @param  array<int, UploadedFile>  $photos
      */
-    public function checkIn(Reservation $reservation, array $photos): ReservationCheck
+    public function checkIn(Reservation $reservation, array $photos, ?string $rulesAcceptedHash = null): ReservationCheck
     {
-        return DB::transaction(function () use ($reservation, $photos) {
+        return DB::transaction(function () use ($reservation, $photos, $rulesAcceptedHash) {
             $this->guardCanSubmit($reservation, CheckType::CHECK_IN);
 
-            return $this->createCheck($reservation, CheckType::CHECK_IN, $photos, $reservation->start_at);
+            // Before createCheck(), which uploads the photos to storage.
+            $this->roomRules->ensureAccepted($reservation->room, $rulesAcceptedHash);
+
+            $check = $this->createCheck($reservation, CheckType::CHECK_IN, $photos, $reservation->start_at);
+
+            $this->roomRules->record($reservation, $reservation->room, RoomRuleAcceptance::MOMENT_CHECK_IN, auth()->id());
+
+            return $check;
         });
     }
 

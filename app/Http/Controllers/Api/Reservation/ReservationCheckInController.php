@@ -17,7 +17,7 @@ class ReservationCheckInController extends Controller
     {
         Gate::authorize('update', $reservation);
 
-        $check = $this->checkService->checkIn($reservation, $request->file('photos'));
+        $check = $this->checkService->checkIn($reservation, $request->file('photos'), $request->input('rules_accepted_hash'));
 
         return response()->json([
             'message' => 'Checked in successfully. Your photos are pending verification.',

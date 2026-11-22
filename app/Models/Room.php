@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RoomStatus;
+use App\Support\RoomRuleList;
 use App\Traits\Auditable;
 use App\Traits\HasCoverMedia;
 use Illuminate\Database\Eloquent\Model;
@@ -29,11 +30,13 @@ class Room extends Model
         'image_path',
         'cleaned_at',
         'cleaned_by',
+        'rules',
     ];
 
     protected $casts = [
         'status' => RoomStatus::class,
         'cleaned_at' => 'datetime',
+        'rules' => 'array',
     ];
 
     /**
@@ -84,6 +87,30 @@ class Room extends Model
     public function getCheckinExamplePhotoUrlsAttribute(): array
     {
         return $this->checkinExamplePhotos->pluck('url')->filter()->values()->all();
+    }
+
+    /**
+     * @return list<array{text: string, text_en: string|null}>
+     */
+    public function ruleList(): array
+    {
+        return RoomRuleList::normalize($this->rules);
+    }
+
+    /**
+     * Identifies the exact default rules plus this room's own, or null if
+     * there are none.
+     */
+    public function rulesHash(): ?string
+    {
+        $defaults = DefaultRoomRules::current()->ruleList();
+        $own = $this->ruleList();
+
+        if ($defaults === [] && $own === []) {
+            return null;
+        }
+
+        return hash('sha256', json_encode([$defaults, $own]));
     }
 
     public function toArray()
