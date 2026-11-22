@@ -32,6 +32,9 @@ class ReservationCheckResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    // Reached from Reservations, which also carries the waiting count.
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getNavigationBadge(): ?string
     {
         $pending = ReservationCheck::query()->where('verification_status', CheckVerificationStatus::PENDING)->count();

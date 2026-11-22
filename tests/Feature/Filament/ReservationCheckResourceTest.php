@@ -2,11 +2,15 @@
 
 use App\Enums\CheckVerificationStatus;
 use App\Filament\Resources\ReservationChecks\Pages\ListReservationChecks;
+use App\Filament\Resources\ReservationChecks\ReservationCheckResource;
+use App\Filament\Resources\Reservations\Pages\ListReservations;
+use App\Filament\Resources\Reservations\ReservationResource;
 use App\Mail\ReservationCheckRejectedMail;
 use App\Models\Reservation;
 use App\Models\ReservationCheck;
 use App\Models\Room;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
@@ -101,4 +105,43 @@ it('rejects a pending check with a note and emails the resident', function () {
         ReservationCheckRejectedMail::class,
         fn (ReservationCheckRejectedMail $mail) => $mail->hasTo($check->reservation->user->email)
     );
+});
+
+it('lists reservations to review, each linking to its own check', function () {
+    $admin = actingAsReservationCheckAdmin();
+    $admin->givePermissionTo(Permission::firstOrCreate(['name' => 'ViewAny:Reservation', 'guard_name' => 'web']));
+
+    $pending = makeReservationCheck();
+    $otherPending = makeReservationCheck();
+    $verified = makeReservationCheck(['verification_status' => CheckVerificationStatus::VERIFIED]);
+
+    Livewire::test(ListReservations::class)
+        ->set('activeTab', 'to_review')
+        ->assertCanSeeTableRecords([$pending->reservation, $otherPending->reservation])
+        ->assertCanNotSeeTableRecords([$verified->reservation])
+        ->assertTableColumnStateSet('photos', 'To review', $pending->reservation)
+        ->assertActionHasUrl(
+            TestAction::make('reviewPhoto')->table($pending->reservation),
+            ReservationCheckResource::getUrl('review', ['check' => $pending->id]),
+        )
+        ->assertActionHasUrl(
+            TestAction::make('reviewPhoto')->table($otherPending->reservation),
+            ReservationCheckResource::getUrl('review', ['check' => $otherPending->id]),
+        );
+});
+
+it('leaves photo review out of the reservations list without its permission', function () {
+    $admin = User::factory()->create(['email' => 'desk@example.com', 'keycloak_id' => 'kc-desk']);
+    $admin->givePermissionTo(Permission::firstOrCreate(['name' => 'ViewAny:Reservation', 'guard_name' => 'web']));
+    filament()->setCurrentPanel(filament()->getPanel('admin'));
+    $this->actingAs($admin);
+    $check = makeReservationCheck();
+
+    Livewire::test(ListReservations::class)
+        ->assertSuccessful()
+        ->assertActionHidden(TestAction::make('reviewPhoto')->table($check->reservation))
+        ->assertActionHidden('reviewPhotos');
+
+    expect(ReservationResource::getNavigationBadge())->toBeNull()
+        ->and(array_keys(Livewire::test(ListReservations::class)->instance()->getTabs()))->not->toContain('to_review');
 });

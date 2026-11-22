@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Reservations\Pages;
 
 use App\Enums\ReservationStatus;
 use App\Filament\Resources\Reservations\ReservationResource;
+use App\Filament\Support\ReservationPageActions;
 use App\Models\Reservation;
 use App\Models\Room;
 use Filament\Actions\Action;
@@ -73,6 +74,11 @@ class ReservationAgenda extends Page
         return static::$title;
     }
 
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     public function getSubheading(): ?string
     {
         if ($this->mode === 'day') {
@@ -90,6 +96,7 @@ class ReservationAgenda extends Page
     protected function getHeaderActions(): array
     {
         return [
+            ReservationPageActions::reviewPhotos(),
             Action::make('list')
                 ->label('Table')
                 ->icon(Heroicon::OutlinedTableCells)
