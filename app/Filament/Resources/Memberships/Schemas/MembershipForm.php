@@ -39,8 +39,7 @@ class MembershipForm
                         if ($state) {
                             $set('has_voting_rights', MemberType::find($state)?->has_voting_rights ?? true);
                         }
-                    })
-                    ->required(),
+                    }),
                 ...self::statusComponents(),
                 DatePicker::make('joined_at'),
                 DatePicker::make('ended_at')
@@ -79,6 +78,14 @@ class MembershipForm
                     return function (string $attribute, $value, Closure $fail) use ($get, $record, $userId) {
                         if (! MembershipStatus::from($value)->isOpen()) {
                             return;
+                        }
+
+                        // Only on the way to active, so memberships that
+                        // were already active before this check stay valid.
+                        if ($value === MembershipStatus::ACTIVE->value
+                            && $record?->status !== MembershipStatus::ACTIVE
+                            && ! $record?->canBeActivated()) {
+                            $fail('Keep this membership pending and use "Review & approve" on Members & users. The member must first fill in their details and accept the statutes and house rules.');
                         }
 
                         $resolvedUserId = $userId ?? $get('user_id');

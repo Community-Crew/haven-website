@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Filament\Resources\Memberships\Schemas\MembershipForm;
+use App\Filament\Support\MembershipReviewActions;
 use App\Models\MemberType;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -43,8 +44,7 @@ class MembershipsRelationManager extends RelationManager
                         if ($state) {
                             $set('has_voting_rights', MemberType::find($state)?->has_voting_rights ?? true);
                         }
-                    })
-                    ->required(),
+                    }),
                 ...MembershipForm::statusComponents(userId: $this->getOwnerRecord()->getKey()),
                 DatePicker::make('joined_at'),
                 DatePicker::make('ended_at')
@@ -68,6 +68,10 @@ class MembershipsRelationManager extends RelationManager
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn ($state) => $state->getColor()),
+                IconColumn::make('id_checked')
+                    ->label('ID checked')
+                    ->state(fn ($record) => $record->identity_verified_at !== null)
+                    ->boolean(),
                 TextColumn::make('joined_at')
                     ->date()
                     ->sortable(),
@@ -87,6 +91,8 @@ class MembershipsRelationManager extends RelationManager
                 CreateAction::make(),
             ])
             ->recordActions([
+                MembershipReviewActions::approve(),
+                MembershipReviewActions::reject(),
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),

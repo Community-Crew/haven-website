@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Enums\MembershipStatus;
 use App\Mail\MembershipStatusChangedMail;
+use App\Mail\ResidentMovedOutMail;
 use App\Models\BoardPositionAssignment;
 use App\Models\Membership;
 use Illuminate\Support\Facades\Mail;
@@ -19,7 +21,29 @@ class MembershipObserver
             && $membership->getOriginal('status')->isOpen()
             && ! $membership->status->isOpen()) {
             $this->endActiveBoardPositions($membership);
+            $this->restartRetentionAfterKeptMembership($membership);
         }
+    }
+
+    /**
+     * A beneficiary or honorary member may have moved out years ago. Without
+     * this they'd be anonymized on the next daily run, with no notice; now
+     * they get the usual retention period and move-out mail. A rejected
+     * application never was a membership, so its clock simply keeps running.
+     */
+    private function restartRetentionAfterKeptMembership(Membership $membership): void
+    {
+        $user = $membership->user;
+
+        if (! $user->moved_out_at
+            || ! $membership->memberType?->keepsDataAfterMoveOut()
+            || $membership->getOriginal('status') === MembershipStatus::PENDING) {
+            return;
+        }
+
+        $user->update(['moved_out_at' => now()]);
+
+        Mail::to($user)->send(new ResidentMovedOutMail($user));
     }
 
     /**

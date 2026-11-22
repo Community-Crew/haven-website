@@ -198,7 +198,7 @@ it('cancels a move-out when they activate on another unit', function () {
     $this->withoutMiddleware([ValidateKeycloakToken::class]);
 
     $response = $this->actingAs($this->resident->fresh())
-        ->postJson('/api/v1/user/activate', ['code' => $code->code]);
+        ->postJson('/api/v1/user/activate', ['code' => $code->code, 'phone' => '0612345678']);
 
     expect($response->status())->toBe(200)
         ->and($this->resident->fresh()->moved_out_at)->toBeNull()

@@ -8,6 +8,7 @@ use App\Models\RegistrationCode;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Propaganistas\LaravelPhone\PhoneNumber;
 use Symfony\Component\HttpFoundation\Response;
 
 class ActivateAccountController extends Controller
@@ -19,6 +20,8 @@ class ActivateAccountController extends Controller
     {
         $request->validate([
             'code' => ['required', 'string'],
+            // Someone re-activating on a new unit already gave theirs.
+            'phone' => [$request->user()->phone ? 'nullable' : 'required', 'string', 'phone:INTERNATIONAL,NL'],
         ]);
 
         $registrationCode = RegistrationCode::where('code', strtoupper(trim($request->code)))
@@ -47,7 +50,13 @@ class ActivateAccountController extends Controller
             'unit_id' => $registrationCode->unit_id,
             'activated_at' => now(),
             'moved_out_at' => null,
+            'phone' => $request->filled('phone')
+                ? (new PhoneNumber($request->input('phone'), 'NL'))->formatE164()
+                : $user->phone,
+            'postal_address' => null,
         ]);
+
+        $user->endBeneficiaryMemberships();
 
         $registrationCode->update([
             'is_used' => true,

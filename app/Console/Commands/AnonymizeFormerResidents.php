@@ -20,10 +20,7 @@ class AnonymizeFormerResidents extends Command
 
     public function handle(ResidentOffboardingService $offboarding): int
     {
-        $users = User::query()
-            ->whereNull('anonymized_at')
-            ->where('moved_out_at', '<=', now()->subDays(ResidentOffboardingService::RETENTION_DAYS))
-            ->get();
+        $users = User::query()->dueForAnonymization()->get();
 
         $failed = 0;
 
