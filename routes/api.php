@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\Reservation\ReservationUpdateController;
 use App\Http\Controllers\Api\Room\RoomIndexController;
 use App\Http\Controllers\Api\Room\RoomPolicyController;
 use App\Http\Controllers\Api\Room\RoomReservationIndexController;
+use App\Http\Controllers\Api\Room\RoomRulesController;
 use App\Http\Controllers\Api\Room\RoomShowController;
 use App\Http\Controllers\Api\User\ActivateAccountController;
 use App\Http\Controllers\Api\User\ReservationController;
@@ -98,6 +99,8 @@ Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])
             RoomReservationIndexController::class)->name('rooms.reservations.index')
             ->middleware('throttle:reservation-reads');
         Route::get('/rooms/{room:id}/weekly-schedule', RoomPolicyController::class)->name('rooms.policy.index')
+            ->middleware('throttle:reservation-reads');
+        Route::get('/rooms/{room:id}/rules', RoomRulesController::class)->name('rooms.rules.show')
             ->middleware('throttle:reservation-reads');
     });
 });

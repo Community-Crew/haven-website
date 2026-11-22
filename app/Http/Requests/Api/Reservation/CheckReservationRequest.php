@@ -21,6 +21,7 @@ class CheckReservationRequest extends FormRequest
             // 500 instead of a clean 422 - see Media::createFromUploadedFile.
             'photos' => ['required', 'array', 'min:1', 'max:5'],
             'photos.*' => ['image', 'mimes:jpeg,png,webp', 'max:10240'],
+            'rules_accepted_hash' => ['nullable', 'string', 'max:64'],
         ];
     }
 }

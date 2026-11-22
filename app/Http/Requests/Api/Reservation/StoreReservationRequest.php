@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Api\Reservation;
 
+use App\Models\Room;
 use App\Services\ProofOfWork;
+use App\Services\RoomRulesService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -32,6 +34,7 @@ class StoreReservationRequest extends FormRequest
             'start_at' => ['required', 'date', 'after_or_equal:now'],
             'end_at' => ['required', 'date', 'after:start_at'],
             'share_name' => ['required', 'boolean'],
+            'rules_accepted_hash' => ['nullable', 'string', 'max:64'],
         ];
     }
 
@@ -46,6 +49,22 @@ class StoreReservationRequest extends FormRequest
     public function after(): array
     {
         return [
+            // Ahead of the proof of work, so that having to re-accept changed
+            // rules doesn't use up the challenge.
+            function (Validator $validator) {
+                if ($validator->errors()->isNotEmpty()) {
+                    return;
+                }
+
+                $failure = app(RoomRulesService::class)->failure(
+                    Room::findOrFail($this->input('room_id')),
+                    $this->input('rules_accepted_hash'),
+                );
+
+                if ($failure) {
+                    $validator->errors()->add('rules_accepted_hash', $failure);
+                }
+            },
             function (Validator $validator) {
                 $proofOfWork = app(ProofOfWork::class);
 

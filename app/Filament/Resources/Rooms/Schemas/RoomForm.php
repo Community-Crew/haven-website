@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Rooms\Schemas;
 use App\Enums\RoomStatus;
 use App\Filament\Support\MediaCoverPicker;
 use App\Filament\Support\MediaGalleryPicker;
+use App\Filament\Support\RoomRulesRepeater;
 use App\Models\Room;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
@@ -61,6 +62,10 @@ class RoomForm
                         'Example Photos',
                         required: false,
                     )),
+                Section::make('Room Rules')
+                    ->description('Extra rules for this room only, shown below the Default Room Rules. Residents tick each rule when booking and again at check-in. Any change applies immediately, and residents who have the old rules open are asked to accept again.')
+                    ->columnSpanFull()
+                    ->schema([RoomRulesRepeater::make()]),
             ]);
     }
 }
