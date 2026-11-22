@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Reservations;
 
+use App\Filament\Resources\ReservationChecks\ReservationCheckResource;
 use App\Filament\Resources\Reservations\Pages\CreateReservation;
 use App\Filament\Resources\Reservations\Pages\EditReservation;
 use App\Filament\Resources\Reservations\Pages\ListReservations;
@@ -30,6 +31,24 @@ class ReservationResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    /**
+     * Photo review lives under Reservations, so its waiting count shows here.
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        return ReservationCheckResource::canViewAny() ? ReservationCheckResource::getNavigationBadge() : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [static::getRouteBaseName().'.*', ReservationCheckResource::getRouteBaseName().'.*'];
+    }
 
     public static function form(Schema $schema): Schema
     {
