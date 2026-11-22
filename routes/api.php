@@ -21,11 +21,15 @@ use App\Http\Controllers\Api\Room\RoomPolicyController;
 use App\Http\Controllers\Api\Room\RoomReservationIndexController;
 use App\Http\Controllers\Api\Room\RoomShowController;
 use App\Http\Controllers\Api\User\ActivateAccountController;
+use App\Http\Controllers\Api\User\MembershipApplicationController;
+use App\Http\Controllers\Api\User\MembershipDocumentsController;
 use App\Http\Controllers\Api\User\ReservationController;
+use App\Http\Controllers\Api\User\UserContactDetailsUpdateController;
 use App\Http\Controllers\Api\User\UserController;
 use App\Http\Controllers\Api\User\UserSettingsShowController;
 use App\Http\Controllers\Api\User\UserSettingsUpdateController;
 use App\Http\Middleware\EnsureUserAcceptedPrivacyPolicy;
+use App\Http\Middleware\EnsureUserCanManageMembership;
 use App\Http\Middleware\EnsureUserIsActivated;
 use App\Http\Middleware\ValidateKeycloakToken;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +76,16 @@ Route::prefix('v1')->name('api.v1.')->middleware([ValidateKeycloakToken::class])
     // Callable regardless of activation/acceptance status, so a user stuck
     // behind EnsureUserAcceptedPrivacyPolicy below can actually clear it.
     Route::post('/privacy-policy/accept', PrivacyPolicyAcceptController::class)->name('privacy-policy.accept');
+
+    // Also open to former residents, who can stay on as a beneficiary.
+    Route::middleware([EnsureUserAcceptedPrivacyPolicy::class, EnsureUserCanManageMembership::class])->group(function () {
+        Route::patch('/user/contact-details', UserContactDetailsUpdateController::class)->name('user.contact-details.update')
+            ->middleware('throttle:reservation-writes');
+        Route::get('/membership-documents', MembershipDocumentsController::class)->name('membership-documents.index')
+            ->middleware('throttle:reservation-reads');
+        Route::post('/user/membership-application', MembershipApplicationController::class)->name('user.membership-application.store')
+            ->middleware('throttle:reservation-writes');
+    });
 
     Route::middleware([EnsureUserAcceptedPrivacyPolicy::class, EnsureUserIsActivated::class])->group(function () {
         // Reservation

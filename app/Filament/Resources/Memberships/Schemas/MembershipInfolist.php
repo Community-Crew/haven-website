@@ -20,6 +20,13 @@ class MembershipInfolist
                 TextEntry::make('status')
                     ->badge()
                     ->color(fn ($state) => $state->getColor()),
+                TextEntry::make('identity_verified_at')
+                    ->label('ID checked at')
+                    ->dateTime()
+                    ->placeholder('Not checked yet'),
+                TextEntry::make('identityVerifiedBy.name')
+                    ->label('ID checked by')
+                    ->placeholder('-'),
                 TextEntry::make('joined_at')
                     ->date()
                     ->placeholder('-'),

@@ -58,6 +58,7 @@ return [
         'greeting' => 'Hoi :name,',
         'body' => 'Volgens onze gegevens woon je niet meer in Haven, dus is je Haven-account gesloten. Bedankt dat je deel uitmaakte van de community!',
         'deletion' => 'Op :date verwijderen we je account en persoonsgegevens definitief. Je eerdere reserveringen bewaren we alleen als anonieme statistiek.',
+        'beneficiary' => 'Wil je betrokken blijven bij Haven? Log dan vóór :date in en meld je op je profiel aan als begunstiger. Je gegevens blijven dan bewaard zolang je begunstiger bent.',
         'mistake' => 'Woon je hier nog wel? Dan is dit een vergissing - beantwoord deze mail vóór :date en we lossen het op.',
     ],
 

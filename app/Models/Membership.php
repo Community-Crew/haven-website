@@ -6,6 +6,7 @@ use App\Enums\MembershipStatus;
 use App\Observers\MembershipObserver;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -36,11 +37,46 @@ class Membership extends Model
         'joined_at' => 'date',
         'ended_at' => 'date',
         'has_voting_rights' => 'boolean',
+        'identity_verified_at' => 'datetime',
+        'documents_accepted_at' => 'datetime',
     ];
+
+    /**
+     * Members fill in their own details; the board checks them against an
+     * ID. Deliberately not fillable, so only that check can set it.
+     */
+    public function markIdentityVerified(User $verifiedBy): void
+    {
+        $this->forceFill([
+            'identity_verified_at' => now(),
+            'identity_verified_by' => $verifiedBy->getKey(),
+        ])->save();
+    }
+
+    /**
+     * Applications waiting on the board rather than on the applicant.
+     */
+    public function scopeReadyForReview(Builder $query): Builder
+    {
+        return $query->where('status', MembershipStatus::PENDING)->whereNotNull('documents_accepted_at');
+    }
+
+    public function canBeActivated(): bool
+    {
+        return $this->identity_verified_at !== null
+            && $this->documents_accepted_at !== null
+            && $this->member_type_id !== null
+            && $this->user->hasCompleteMemberDetails();
+    }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function identityVerifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'identity_verified_by');
     }
 
     public function memberType(): BelongsTo

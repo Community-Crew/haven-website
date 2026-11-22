@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Memberships\Tables;
 
 use App\Enums\MembershipStatus;
+use App\Filament\Support\MembershipReviewActions;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -28,6 +29,10 @@ class MembershipsTable
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn ($state) => $state->getColor()),
+                IconColumn::make('id_checked')
+                    ->label('ID checked')
+                    ->state(fn ($record) => $record->identity_verified_at !== null)
+                    ->boolean(),
                 TextColumn::make('joined_at')
                     ->date()
                     ->sortable(),
@@ -55,6 +60,8 @@ class MembershipsTable
                     ->relationship('memberType', 'name'),
             ])
             ->recordActions([
+                MembershipReviewActions::approve(),
+                MembershipReviewActions::reject(),
                 ViewAction::make(),
                 EditAction::make(),
             ])

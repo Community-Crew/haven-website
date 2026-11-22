@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Mail\MembershipStatusChangedMail;
 use App\Mail\ResidentMovedOutMail;
 use App\Models\User;
 use App\Support\MailCircuitBreaker;
@@ -34,6 +35,7 @@ class GuardOutgoingMail
         $recipient = collect($event->message->getTo())->first()?->getAddress();
 
         if ($recipient && ! in_array($mailable, self::FORMER_RESIDENT_ALLOWED, true)
+            && ! $this->isKeptMembershipStatusMail($mailable, $recipient)
             && User::formerResidents()->where('email', $recipient)->exists()) {
             Log::info('Dropped mail to a former resident', ['mailable' => $mailable, 'to' => $recipient]);
 
@@ -41,5 +43,18 @@ class GuardOutgoingMail
         }
 
         return $this->breaker->allows($mailable, $recipient) ? null : false;
+    }
+
+    /**
+     * Beneficiaries and honorary members can be former residents too, but do
+     * need to hear about their status. Ordinary memberships ending at
+     * move-out stay silent.
+     */
+    protected function isKeptMembershipStatusMail(string $mailable, string $recipient): bool
+    {
+        return $mailable === MembershipStatusChangedMail::class
+            && User::where('email', $recipient)
+                ->whereHas('memberships.memberType', fn ($type) => $type->keepsDataAfterMoveOut())
+                ->exists();
     }
 }

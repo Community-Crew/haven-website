@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Concerns\LogsRecordView;
 use App\Filament\Resources\Users\UserResource;
+use App\Filament\Support\MembershipReviewActions;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -16,6 +17,9 @@ class ViewUser extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            MembershipReviewActions::approve(),
+            MembershipReviewActions::reject(),
+            MembershipReviewActions::appointHonorary(),
             EditAction::make(),
         ];
     }

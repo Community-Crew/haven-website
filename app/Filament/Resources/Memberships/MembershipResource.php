@@ -24,6 +24,10 @@ class MembershipResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    // Managed from Members & users (UserResource); these pages stay
+    // reachable for links and the membership history.
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
     protected static ?string $recordTitleAttribute = 'id';

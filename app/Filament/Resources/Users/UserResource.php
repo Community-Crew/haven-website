@@ -11,6 +11,7 @@ use App\Filament\Resources\Users\RelationManagers\ReservationsRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
+use App\Models\Membership;
 use App\Models\User;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -24,7 +25,23 @@ class UserResource extends Resource
 
     protected static string|null|\UnitEnum $navigationGroup = 'Members';
 
+    protected static ?string $navigationLabel = 'Members & users';
+
+    protected static ?string $breadcrumb = 'Members & users';
+
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationBadge(): ?string
+    {
+        $applications = Membership::readyForReview()->count();
+
+        return $applications > 0 ? (string) $applications : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
@@ -70,6 +87,6 @@ class UserResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('filament-shield::filament-shield.nav.group');
+        return 'Members';
     }
 }

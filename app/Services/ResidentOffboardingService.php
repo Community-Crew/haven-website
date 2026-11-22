@@ -58,12 +58,16 @@ class ResidentOffboardingService
                 'moved_out_at' => now(),
                 'unit_id' => null,
                 'activated_at' => null,
+                // The tag or key goes back with the home.
+                'access_tag_hash' => null,
             ]);
 
             // Ending through the model (not a bulk update) so
             // MembershipObserver also ends their board positions.
+            // An honorary membership isn't tied to living here, so it stays.
             $user->memberships()
                 ->whereIn('status', MembershipStatus::open())
+                ->whereDoesntHave('memberType', fn ($type) => $type->where('is_honorary', true))
                 ->get()
                 ->each(fn (Membership $membership) => $membership->update(['status' => MembershipStatus::ENDED]));
         });
@@ -107,6 +111,11 @@ class ResidentOffboardingService
 
     public function sendMovedOutNotice(User $user): void
     {
+        // It announces their data's removal, which doesn't apply to them.
+        if ($user->hasRetainedMembership()) {
+            return;
+        }
+
         Mail::to($user)->send(new ResidentMovedOutMail($user));
     }
 
@@ -121,7 +130,8 @@ class ResidentOffboardingService
             return;
         }
 
-        $user->update(['moved_out_at' => null]);
+        $user->update(['moved_out_at' => null, 'postal_address' => null]);
+        $user->endBeneficiaryMemberships();
     }
 
     /**
@@ -187,6 +197,12 @@ class ResidentOffboardingService
             ->orWhere(fn ($query) => $query->where('subject_type', (new ReservationNote)->getMorphClass())->whereIn('subject_id', $noteIds))
             ->delete();
 
+        // An erasure request can come from a beneficiary, whose membership
+        // is still open. Bulk update: nothing should be mailed to them now.
+        $user->memberships()
+            ->whereIn('status', MembershipStatus::open())
+            ->update(['status' => MembershipStatus::ENDED, 'ended_at' => now()->toDateString()]);
+
         $user->groups()->detach();
         $user->organisations()->detach();
         $user->roles()->detach();
@@ -200,6 +216,10 @@ class ResidentOffboardingService
             'keycloak_token' => null,
             'keycloak_refresh_token' => null,
             'remember_token' => null,
+            'phone' => null,
+            'birth_date' => null,
+            'postal_address' => null,
+            'access_tag_hash' => null,
             'unit_id' => null,
             'activated_at' => null,
             'privacy_policy_accepted_at' => null,

@@ -64,9 +64,17 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
         'privacy_policy_accepted_at',
         'moved_out_at',
         'anonymized_at',
+        'phone',
+        'birth_date',
+        'access_tag_hash',
+        'postal_address',
     ];
 
     protected $casts = [
+        'postal_address' => 'encrypted:array',
+        'phone' => 'encrypted',
+        // Y-m-d string: there's no encrypted date cast.
+        'birth_date' => 'encrypted',
         'activated_at' => 'datetime',
         'privacy_policy_accepted_at' => 'datetime',
         'moved_out_at' => 'datetime',
@@ -80,9 +88,73 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
      */
     protected $hidden = [
         'remember_token',
+        'phone',
+        'birth_date',
+        'access_tag_hash',
+        'postal_address',
     ];
 
     protected array $runtimeGroups = [];
+
+    /**
+     * A scanned tag/key is only ever compared, so only a keyed hash is kept:
+     * a database leak then doesn't hand out UIDs that could be cloned.
+     * Readers differ in separators and case, so those are normalized away.
+     */
+    public static function hashAccessTag(string $tag): string
+    {
+        $normalized = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $tag));
+
+        return hash_hmac('sha256', $normalized, (string) config('app.key'));
+    }
+
+    public function hasCompleteMemberDetails(): bool
+    {
+        return filled($this->phone)
+            && filled($this->birth_date)
+            && (! $this->moved_out_at || filled($this->postal_address));
+    }
+
+    /**
+     * An open beneficiary or honorary membership is why a former resident's
+     * data stays: see scopeDueForAnonymization().
+     */
+    public function hasRetainedMembership(): bool
+    {
+        return $this->memberships()
+            ->whereIn('status', MembershipStatus::open())
+            ->whereHas('memberType', fn (Builder $type) => $type->keepsDataAfterMoveOut())
+            ->exists();
+    }
+
+    /**
+     * For someone who's a resident again: residents are members, not
+     * beneficiaries.
+     */
+    public function endBeneficiaryMemberships(): void
+    {
+        $this->openBeneficiaryMemberships()->get()->each(fn (Membership $membership) => $membership->update([
+            'status' => MembershipStatus::ENDED,
+            'ended_at' => now()->toDateString(),
+        ]));
+    }
+
+    private function openBeneficiaryMemberships(): HasMany
+    {
+        return $this->memberships()
+            ->whereIn('status', MembershipStatus::open())
+            ->whereHas('memberType', fn (Builder $type) => $type->where('is_beneficiary', true));
+    }
+
+    public function scopeDueForAnonymization(Builder $query): Builder
+    {
+        return $query
+            ->whereNull('anonymized_at')
+            ->where('moved_out_at', '<=', now()->subDays(ResidentOffboardingService::RETENTION_DAYS))
+            ->whereDoesntHave('memberships', fn (Builder $membership) => $membership
+                ->whereIn('status', MembershipStatus::open())
+                ->whereHas('memberType', fn (Builder $type) => $type->keepsDataAfterMoveOut()));
+    }
 
     /**
      * Used by Mail::to($user)->send(...) to pick the mail's language - see
@@ -314,6 +386,6 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference
      */
     protected function auditExcept(): array
     {
-        return ['updated_at', 'remember_token', 'keycloak_token', 'keycloak_refresh_token'];
+        return ['updated_at', 'remember_token', 'keycloak_token', 'keycloak_refresh_token', 'phone', 'birth_date', 'access_tag_hash', 'postal_address'];
     }
 }
